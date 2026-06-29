@@ -32,19 +32,13 @@ export function HeroBanner() {
               that carry meaning.
             </p>
 
-            <div className="animate-fade-in-up animation-delay-300 mt-8 flex flex-wrap items-center gap-3">
+            <div className="animate-fade-in-up animation-delay-300 mt-8">
               <Link
                 href="/products"
                 className="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
               >
                 Explore Collection
                 <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/about"
-                className="inline-flex h-9 items-center rounded-full border border-border bg-background px-6 text-sm font-medium transition-colors hover:bg-muted"
-              >
-                Our Story
               </Link>
             </div>
 
