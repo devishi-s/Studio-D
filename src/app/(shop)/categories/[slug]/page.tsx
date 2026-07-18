@@ -3,12 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
-import {
-  categories,
-  getCategoryBySlug,
-  getProductsByCategory,
-  sortProducts,
-} from "@/data/products";
+import { categories, getCategoryBySlug } from "@/data/products";
+import { getProductsByCategory } from "@/lib/supabase/products";
+import { sortProducts } from "@/lib/products";
 import type { SortOption } from "@/types";
 import { Container } from "@/components/layout/container";
 import { ProductGrid } from "@/components/product/product-grid";
@@ -19,6 +16,8 @@ type CategoryPageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ sort?: string }>;
 };
+
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
@@ -49,14 +48,13 @@ export default async function CategoryPage({
   if (!category) notFound();
 
   const activeSort = (sort as SortOption) ?? "newest";
-  const categoryProducts = getProductsByCategory(slug);
+  const categoryProducts = await getProductsByCategory(slug);
   const sorted = sortProducts(categoryProducts, activeSort);
   const variant = variantByIndex[(category.displayOrder - 1) % 4] ?? "blush";
 
   return (
     <section className="py-10 sm:py-14">
       <Container>
-        {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
           <Link
             href="/categories"
@@ -69,7 +67,6 @@ export default async function CategoryPage({
           <span className="text-foreground">{category.name}</span>
         </nav>
 
-        {/* Category header with banner */}
         <div className="relative overflow-hidden rounded-xl">
           <ImagePlaceholder
             label={category.name}
@@ -87,7 +84,6 @@ export default async function CategoryPage({
           </div>
         </div>
 
-        {/* Sort + count */}
         <div className="mt-8 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {sorted.length} {sorted.length === 1 ? "product" : "products"}
@@ -100,7 +96,6 @@ export default async function CategoryPage({
           />
         </div>
 
-        {/* Product grid */}
         <div className="mt-6">
           {sorted.length > 0 ? (
             <ProductGrid products={sorted} columns={3} />

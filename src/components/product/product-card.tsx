@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
-import { ImagePlaceholder } from "@/components/common/image-placeholder";
+import { ProductImage } from "@/components/product/product-image";
 import { AddToCartButton } from "@/components/product/add-to-cart-button";
 
 type ProductCardProps = {
@@ -14,6 +14,7 @@ type ProductCardProps = {
 export function ProductCard({ product, className }: ProductCardProps) {
   const hasDiscount =
     product.compareAtPrice && product.compareAtPrice > product.price;
+  const primaryImage = product.images[0];
 
   return (
     <div
@@ -24,12 +25,14 @@ export function ProductCard({ product, className }: ProductCardProps) {
     >
       <Link
         href={`/products/${product.slug}`}
-        className="relative block overflow-hidden"
+        className="relative block aspect-square overflow-hidden"
       >
-        <ImagePlaceholder
-          label={product.name}
-          variant="blush"
-          className="aspect-square rounded-none transition-transform duration-500 group-hover:scale-105"
+        <ProductImage
+          src={primaryImage}
+          alt={product.name}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="transition-transform duration-500 group-hover:scale-105"
         />
 
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">

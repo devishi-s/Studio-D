@@ -1,3 +1,13 @@
+/**
+ * @deprecated Phase 3.2 — product catalog reads now go through
+ * `src/lib/supabase/products.ts`. This file remains as a local fallback and
+ * reference (categories metadata, cart product resolution, rollback).
+ * Do not add new storefront page imports for product queries from here.
+ * Prefer `getAllProducts`, `getProductBySlug`, `getProductsByCategory`, and
+ * `getFeaturedProducts` from `@/lib/supabase/products`.
+ * Sorting/filtering helpers for fetched lists live in `@/lib/products`.
+ */
+
 import type { Product, Category, SortOption } from "@/types";
 
 // ─── Categories ──────────────────────────────────────────────

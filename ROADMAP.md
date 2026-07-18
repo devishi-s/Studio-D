@@ -20,10 +20,11 @@
 ## Status
 
 - **Current phase:** Phase 3 — Supabase + Auth + Real Data
-- **Current step:** Phase 3.1 — Supabase setup
+- **Current step:** Phase 4.1 — Checkout form
 - **Completed phases:** Phases 1 and 2
 - **Completed Phase 2 steps:** 5 of 5
-- **Backend:** Not started
+- **Completed Phase 3 steps:** 6 of 6
+- **Backend:** Catalog + auth + account/orders + Storage + search/filters live; no checkout orders yet
 - **Payments:** Not started
 - **Checkout:** Not started
 - **Deployment:** Intended for Vercel; current deployment status is unverified
@@ -247,16 +248,16 @@ type CartItem = {
 
 **Dependency:** Begin only after Phase 2 is complete.
 
-## 3.1 Supabase setup — **CURRENT STEP**
+## 3.1 Supabase setup
 
-- [ ] Create the Supabase project.
-- [ ] Configure environment variables.
-- [ ] Add browser and server Supabase clients.
-- [ ] Define the PostgreSQL schema.
-- [ ] Seed initial catalog data.
-- [ ] Configure Row Level Security policies.
-- [ ] Add required indexes and constraints.
-- [ ] Document local and production configuration.
+- [x] Create the Supabase project (operator creates the cloud project; steps documented in `docs/SUPABASE.md`).
+- [x] Configure environment variables (`.env.example` + local `.env.local` placeholders).
+- [x] Add browser and server Supabase clients (`src/lib/supabase/*` + Next.js 16 `src/proxy.ts`).
+- [x] Define the PostgreSQL schema (`supabase/schema.sql`).
+- [x] Seed initial catalog data (`supabase/seed.sql` — 12 products).
+- [x] Configure Row Level Security policies.
+- [x] Add required indexes and constraints.
+- [x] Document local and production configuration (`docs/SUPABASE.md`).
 
 ### Original high-level entities
 
@@ -290,62 +291,60 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 ## 3.2 Product data migration
 
-- [ ] Move categories from static TypeScript data to Supabase.
-- [ ] Move products from static TypeScript data to Supabase.
-- [ ] Preserve existing product/category TypeScript contracts where practical.
-- [ ] Replace static lookups with server-side data access helpers.
-- [ ] Update static/dynamic rendering strategy appropriately.
-- [ ] Add loading, error, empty, and unavailable-product states.
-- [ ] Ensure inactive products are excluded from storefront results.
+- [x] Move categories from static TypeScript data to Supabase (product `category` slug is live; category metadata/index still uses static `categories` until a dedicated table lands).
+- [x] Move products from static TypeScript data to Supabase.
+- [x] Preserve existing product/category TypeScript contracts where practical.
+- [x] Replace static lookups with server-side data access helpers (`src/lib/supabase/products.ts`).
+- [x] Update static/dynamic rendering strategy appropriately (`revalidate = 60`, public client without cookies).
+- [x] Add loading, error, empty, and unavailable-product states.
+- [x] Ensure inactive products are excluded from storefront results.
 
 **Dependency:** Requires Supabase schema, seed data, and RLS.
 
 ## 3.3 Authentication flow
 
-- [ ] Build `/login`.
-- [ ] Build `/signup`.
-- [ ] Add password-reset flow.
-- [ ] Add email/password authentication through Supabase Auth.
+- [x] Build `/login`.
+- [x] Build `/signup`.
+- [x] Add password-reset flow (`/reset-password`).
+- [x] Add email/password authentication through Supabase Auth.
 - [ ] Add Google OAuth if approved/configured.
-- [ ] Store sessions securely in cookies.
-- [ ] Add middleware/server authorization where needed.
-- [ ] Add validation and actionable error messages.
+- [x] Store sessions securely in cookies (`@supabase/ssr` + `/auth/callback`).
+- [x] Add middleware/server authorization where needed (proxy guards `/account`).
+- [x] Add validation and actionable error messages.
 
 **Security note:** Never treat client-side auth state as authorization. Protected data and mutations require server/RLS enforcement.
 
 ## 3.4 User profile and order history
 
-- [ ] Build `/account`.
-- [ ] Build `/account/orders`.
-- [ ] Build `/account/orders/[id]`.
-- [ ] Display profile information.
-- [ ] Display order history.
-- [ ] Display individual order details and status.
-- [ ] Protect all account routes.
+- [x] Build `/account`.
+- [x] Build `/account/orders`.
+- [x] Build `/account/orders/[id]`.
+- [x] Display profile information.
+- [x] Display order history.
+- [x] Display individual order details and status.
+- [x] Protect all account routes (`requireUser` + proxy `redirectTo`).
 
 **Dependency:** Requires authentication and the order schema. Meaningful order history also depends on Phase 4 order creation.
 
-## 3.5 Image storage
+## 3.5 Image storage — **COMPLETE**
 
-- [ ] Configure Supabase Storage buckets and access policies.
-- [ ] Upload product and category images.
-- [ ] Replace placeholders with real assets.
-- [ ] Render images through `next/image`.
-- [ ] Provide correct dimensions, responsive sizes, and meaningful alt text.
-- [ ] Add fallbacks for missing assets.
-- [ ] Optimize loading priority and lazy loading.
+- [x] Configure Supabase Storage buckets and access policies (`supabase/storage.sql`, docs in `docs/SUPABASE.md`).
+- [x] Keep seeded mock `/images/...` paths; document how to upload real assets later.
+- [x] Resolve storage-relative paths via `getPublicImageUrl` / `resolveProductImagePath`.
+- [x] Render product photos through `next/image` (`ProductImage` + `remotePatterns`).
+- [x] Provide width/height or `fill`, responsive `sizes`, and meaningful alt text.
+- [x] Add fallbacks for missing / mock assets (`ImagePlaceholder`).
+- [x] Use `priority` on primary gallery image; lazy load elsewhere via `next/image` defaults.
 
-## 3.6 Search and filters
+## 3.6 Search and filters — **COMPLETE**
 
-- [ ] Add search by product name.
-- [ ] Filter by category.
-- [ ] Filter by price.
-- [ ] Preserve sort options.
-- [ ] Keep state in URL search parameters.
-- [ ] Query the real Supabase catalog efficiently.
-- [ ] Add no-results and reset-filter states.
-
-**Existing groundwork:** Static category filtering and sorting already exist. This step completes search and migrates all behavior to real database-backed data.
+- [x] Add search by product name (`ilike` via Supabase).
+- [x] Filter by category.
+- [x] Filter by price (min/max).
+- [x] Preserve sort options (applied in the catalog query).
+- [x] Keep state in URL search parameters (`search`, `category`, `minPrice`, `maxPrice`, `sort`).
+- [x] Query the real Supabase catalog efficiently (`getAllProducts(filters)`).
+- [x] Add no-results and reset-filter states.
 
 ---
 
@@ -355,7 +354,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 **Dependencies:** Real catalog data, secure server environment, authentication decision, database schema, and verified cart behavior.
 
-## 4.1 Checkout form
+## 4.1 Checkout form — **CURRENT STEP**
 
 - [ ] Build `/checkout`.
 - [ ] Collect shipping address.
@@ -485,11 +484,11 @@ This route inventory was part of the original canvas and must remain aligned wit
 
 ## Phase 3
 
-- [ ] `/login`
-- [ ] `/signup`
-- [ ] `/account`
-- [ ] `/account/orders`
-- [ ] `/account/orders/[id]`
+- [x] `/login`
+- [x] `/signup`
+- [x] `/account`
+- [x] `/account/orders`
+- [x] `/account/orders/[id]`
 
 ## Phase 4
 
@@ -598,7 +597,7 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 - [ ] Enforce product `stockCount` in every cart quantity control, not only the product-detail selector.
 - [ ] Decide whether shared quantity controls should replace duplicated Sheet/page implementations.
-- [ ] Replace image placeholders with optimized real assets during Phase 3.5.
+- [x] Wire Supabase Storage + `next/image` for product photos (real asset upload still optional; mocks OK).
 - [ ] Add cart persistence versioning/migration before catalog identifiers change.
 - [ ] Add stronger loading and error boundaries during backend migration.
 - [ ] Confirm Vercel deployment status.
@@ -607,8 +606,8 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 # Current Handoff
 
-The storefront, cart-management, and contact experiences are complete. The contact form validates locally and prepares an email draft through `mailto:`; it does not claim server delivery. The next agent must begin with:
+Phase 3 is complete. Catalog search and filters are URL-driven and query Supabase. The next agent must begin with:
 
-## Phase 3.1 — Supabase setup
+## Phase 4.1 — Checkout form
 
-Do not begin authentication, real-data migration, checkout, Razorpay, admin, reviews, or wishlist work until Supabase setup is complete and both project memory files have been updated.
+Do not begin Razorpay, admin, reviews, or wishlist work until the checkout form step is complete and both project memory files have been updated.

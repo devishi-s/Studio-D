@@ -1,14 +1,16 @@
+import type { Product } from "@/types";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { getFeaturedProducts } from "@/data/products";
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/common/section-header";
 import { ProductGrid } from "@/components/product/product-grid";
 
-export function FeaturedProducts() {
-  const featured = getFeaturedProducts();
+type FeaturedProductsProps = {
+  products: Product[];
+};
 
+export function FeaturedProducts({ products }: FeaturedProductsProps) {
   return (
     <section className="bg-brand-cream/50 py-16 sm:py-20">
       <Container>
@@ -18,7 +20,13 @@ export function FeaturedProducts() {
         />
 
         <div className="mt-10">
-          <ProductGrid products={featured} columns={4} />
+          {products.length > 0 ? (
+            <ProductGrid products={products} columns={4} />
+          ) : (
+            <p className="text-center text-sm text-muted-foreground">
+              Featured pieces will appear here soon.
+            </p>
+          )}
         </div>
 
         <div className="mt-10 text-center">

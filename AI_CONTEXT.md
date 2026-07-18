@@ -44,7 +44,7 @@ The experience should combine the cleanliness of Apple, Notion, and Muji with th
 - Zustand with persistence for cart state
 - Sonner for toast feedback
 - Lucide React for icons
-- Supabase later: PostgreSQL, Auth, Storage, and RLS
+- Supabase: `@supabase/supabase-js` + `@supabase/ssr` (clients, schema SQL, RLS, seed prepared; storefront still static until 3.2)
 - Razorpay later: payments
 - React Hook Form + Zod later: validated forms
 - Embla Carousel later if the gallery needs a full carousel
@@ -94,14 +94,17 @@ src/
 ├── lib/
 │   ├── constants.ts
 │   ├── format.ts
-│   └── utils.ts
+│   ├── products.ts         # in-memory sort/filter for fetched lists
+│   ├── utils.ts
+│   └── supabase/           # browser, server, proxy, and product helpers
 ├── store/
 │   └── cart.store.ts
 └── types/
-    └── index.ts
+    ├── index.ts
+    └── database.ts         # Supabase table types
 ```
 
-Planned route groups `(auth)` and `(account)`, Supabase helpers, checkout, contact, and admin areas should be added only when their roadmap steps begin.
+Planned route groups `(auth)` and `(account)`, checkout, and admin areas should be added only when their roadmap steps begin. SQL lives in `supabase/`; setup docs in `docs/SUPABASE.md`.
 
 ## Routing Structure
 
@@ -114,21 +117,21 @@ Planned route groups `(auth)` and `(account)`, Supabase helpers, checkout, conta
 - `/categories/[slug]` — category listing
 - `/about` — brand story
 - `/cart` — cart management
+- `/contact` — contact form (`mailto:` draft handoff)
+- `/login` · `/signup` · `/reset-password` — email/password auth
+- `/auth/callback` — Supabase auth code exchange
+- `/account` — profile + edit name
+- `/account/orders` — order history
+- `/account/orders/[id]` — order detail
 
 ### Planned
 
-- `/contact`
 - `/checkout`
-- `/login`
-- `/signup`
-- `/account`
-- `/account/orders`
-- `/account/orders/[id]`
 - `/admin`
 - `/admin/products`
 - `/admin/orders`
 
-Dynamic product routes use `generateStaticParams()`. Invalid product and category slugs use `notFound()`.
+The Next.js 16 proxy (`src/proxy.ts`) refreshes Supabase sessions and redirects unauthenticated users away from `/account` and `/orders` to `/login`.
 
 ## Design System
 
@@ -192,7 +195,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 
 ### Product
 
-`ProductCard`, `ProductGrid`, `ProductFilters`, `ImageGallery`, `AddToCartButton`, `QuantitySelector`, and `ProductDetailCart`.
+`ProductCard`, `ProductGrid`, `ProductFilters`, `ProductCatalogFilters`, `ImageGallery`, `ProductImage`, `AddToCartButton`, `QuantitySelector`, and `ProductDetailCart`.
 
 ### Cart
 
@@ -232,19 +235,41 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Disabled checkout placeholders to prevent implying payment support
 - Responsive `/contact` page with contact details and social placeholder
 - Accessible contact form with local validation, inline errors, toast feedback, and an honest `mailto:` draft handoff
+- Supabase client libraries and typed browser/server/proxy helpers
+- Environment placeholders (`.env.example`, `.env.local`) for URL and anon key
+- PostgreSQL schema, indexes, profile trigger, and RLS in `supabase/schema.sql`
+- Catalog seed SQL for all 12 static products in `supabase/seed.sql`
+- Setup documentation in `docs/SUPABASE.md`
+- Storefront product queries via `src/lib/supabase/products.ts` (active products only)
+- Route-level loading skeletons for shop, product detail, and categories
+- Static `src/data/products.ts` retained as deprecated fallback/reference
+- Email/password auth: `/login`, `/signup`, `/reset-password`, `/auth/callback`
+- Navbar auth state from server session (Login vs avatar/Account/Sign out)
+- Logout server action (`src/lib/actions/auth.ts`)
+- Protected `/account` profile (avatar placeholder, edit full name)
+- Protected `/account/orders` and `/account/orders/[id]` with user-scoped queries
+- Shared `requireUser()` guard using `/login?redirectTo=…`
+- Public `product-images` Storage bucket + policies (`supabase/storage.sql`)
+- Storage helpers (`getPublicImageUrl`, `uploadProductImage`, `resolveProductImagePath`)
+- `ProductImage` component using `next/image` with placeholder fallback for mock paths
+- Supabase host allowed in `next.config.ts` `images.remotePatterns`
+- Catalog search/filters: URL params + Supabase `ilike`/price/category (`ProductCatalogFilters`)
 
 ## Current Project State
 
-- **Roadmap phase:** Phase 3 — Supabase + Auth + Real Data
-- **Current step:** Phase 3.1 — Supabase setup
-- Phase 1 storefront implementation is complete.
-- Phase 2 cart, interactivity, and contact work is complete.
-- Product/category data remains static.
-- Images remain branded placeholders.
-- Cart data persists locally under `studio-d-cart`.
-- Contact messages are not delivered by a backend; the form prepares a draft in the visitor's email app.
-- Checkout, backend, authentication, orders, payments, and admin are not implemented.
-- The last reported production build passed with the static `/contact` route.
+- **Roadmap phase:** Phase 4 — Checkout + Payments
+- **Current step:** Phase 4.1 — Checkout form
+- Phase 1–3 complete.
+- Shop and product pages read from Supabase; category metadata still static.
+- `/products` supports combinable search, category, price range, and sort via URL query params.
+- Auth uses Supabase email/password with cookie sessions via `@supabase/ssr`.
+- Account routes are protected by proxy + `requireUser`.
+- Order history UI is ready; no orders exist until Phase 4 checkout writes them.
+- Google OAuth is not implemented.
+- Cart still resolves line items from the static catalog array.
+- Contact form still uses `mailto:` draft handoff.
+- Product images: Storage + `ProductImage` wired; seeded mock paths still show placeholders until uploads.
+- Checkout, payments, and admin are not implemented.
 - Vercel deployment status is not verified.
 
 ## Important Decisions and Why

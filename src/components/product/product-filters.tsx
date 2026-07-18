@@ -3,14 +3,14 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-import type { Category, SortOption } from "@/types";
-import { cn } from "@/lib/utils";
+import type { SortOption } from "@/types";
 
 type ProductFiltersProps = {
-  categories: Category[];
-  activeCategory: string;
+  /** Kept for call-site compatibility; category pills live on `/products`. */
+  categories?: unknown[];
+  activeCategory?: string;
   activeSort: SortOption;
-  productCount: number;
+  productCount?: number;
 };
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
@@ -20,23 +20,22 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "name-asc", label: "Name: A to Z" },
 ];
 
-export function ProductFilters({
-  categories,
-  activeCategory,
-  activeSort,
-  productCount,
-}: ProductFiltersProps) {
+/**
+ * Lightweight sort control for category listing pages.
+ * Full search / category / price filters live in `ProductCatalogFilters`.
+ */
+export function ProductFilters({ activeSort }: ProductFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const updateParams = useCallback(
-    (key: string, value: string) => {
+  const updateSort = useCallback(
+    (value: string) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (value === "all" || value === "newest") {
-        params.delete(key);
+      if (value === "newest") {
+        params.delete("sort");
       } else {
-        params.set(key, value);
+        params.set("sort", value);
       }
       const qs = params.toString();
       router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
@@ -44,58 +43,18 @@ export function ProductFilters({
     [router, pathname, searchParams]
   );
 
-  const showCategoryPills = categories.length > 0;
-
   return (
-    <div
-      className={cn(
-        "flex gap-4",
-        showCategoryPills
-          ? "flex-col sm:flex-row sm:items-center sm:justify-between"
-          : "justify-end"
-      )}
+    <select
+      value={activeSort}
+      onChange={(e) => updateSort(e.target.value)}
+      className="h-8 rounded-lg border border-border bg-card px-3 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring/50"
+      aria-label="Sort products"
     >
-      {showCategoryPills && (
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => updateParams("category", "all")}
-            className={cn(
-              "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
-              activeCategory === "all"
-                ? "bg-brand-brown text-primary-foreground"
-                : "bg-brand-blush text-brand-brown-light hover:bg-brand-blush/80 hover:text-brand-brown"
-            )}
-          >
-            All ({productCount})
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.slug}
-              onClick={() => updateParams("category", cat.slug)}
-              className={cn(
-                "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
-                activeCategory === cat.slug
-                  ? "bg-brand-brown text-primary-foreground"
-                  : "bg-brand-blush text-brand-brown-light hover:bg-brand-blush/80 hover:text-brand-brown"
-              )}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <select
-        value={activeSort}
-        onChange={(e) => updateParams("sort", e.target.value)}
-        className="h-8 rounded-lg border border-border bg-card px-3 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring/50"
-      >
-        {SORT_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </div>
+      {SORT_OPTIONS.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
   );
 }

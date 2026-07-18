@@ -10,7 +10,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import { useCartStore, getItemsWithProducts, getCartItemCount, getCartSubtotal } from "@/store/cart.store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ImagePlaceholder } from "@/components/common/image-placeholder";
+import { ProductImage } from "@/components/product/product-image";
 import {
   Sheet,
   SheetContent,
@@ -92,12 +92,13 @@ export function CartSheet() {
                     <Link
                       href={`/products/${product.slug}`}
                       onClick={() => setOpen(false)}
-                      className="flex-shrink-0"
+                      className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg"
                     >
-                      <ImagePlaceholder
-                        label={product.name}
-                        variant="blush"
-                        className="h-20 w-20 rounded-lg"
+                      <ProductImage
+                        src={product.images[0]}
+                        alt={product.name}
+                        fill
+                        sizes="80px"
                       />
                     </Link>
 

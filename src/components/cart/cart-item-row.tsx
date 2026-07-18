@@ -6,7 +6,7 @@ import { Trash2, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 import { useCartStore } from "@/store/cart.store";
-import { ImagePlaceholder } from "@/components/common/image-placeholder";
+import { ProductImage } from "@/components/product/product-image";
 import type { CartItemWithProduct } from "@/types";
 
 type CartItemRowProps = {
@@ -24,12 +24,13 @@ export function CartItemRow({ item }: CartItemRowProps) {
       {/* Product image */}
       <Link
         href={`/products/${product.slug}`}
-        className="flex-shrink-0"
+        className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg sm:h-28 sm:w-28"
       >
-        <ImagePlaceholder
-          label={product.name}
-          variant="blush"
-          className="h-24 w-24 rounded-lg sm:h-28 sm:w-28"
+        <ProductImage
+          src={product.images[0]}
+          alt={product.name}
+          fill
+          sizes="112px"
         />
       </Link>
 

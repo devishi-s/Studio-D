@@ -15,8 +15,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  MobileAuthLinks,
+  type AuthUserSummary,
+} from "@/components/auth/auth-nav";
 
-export function MobileNav() {
+type MobileNavProps = {
+  user: AuthUserSummary | null;
+};
+
+export function MobileNav({ user }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -67,6 +75,8 @@ export function MobileNav() {
             );
           })}
         </nav>
+
+        <MobileAuthLinks user={user} onNavigate={() => setOpen(false)} />
 
         <div className="mt-auto border-t border-border px-4 py-4">
           <p className="text-xs text-muted-foreground">

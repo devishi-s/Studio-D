@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import type { CartItem, CartItemWithProduct, Product } from "@/types";
+// Temporary fallback until cart resolution moves to live catalog data.
+// Product IDs match Supabase seed rows (prod-1 …).
 import { products as allProducts } from "@/data/products";
 import { MAX_CART_ITEMS } from "@/lib/constants";
 

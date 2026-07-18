@@ -5,7 +5,7 @@ export type Product = {
   description: string;
   price: number;
   compareAtPrice?: number;
-  images: string[];
+  images: string[]; // absolute https URLs, storage-relative paths, or mock `/images/...` paths
   category: Category;
   tags: string[];
   materials: string[];
