@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 import { useMounted } from "@/hooks/use-mounted";
 import { useCartStore, getItemsWithProducts, getCartItemCount, getCartSubtotal } from "@/store/cart.store";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/product/product-image";
 import {
@@ -179,13 +178,13 @@ export function CartSheet() {
                 View Full Cart
               </Link>
 
-              <Button
-                size="lg"
-                className="w-full rounded-full"
-                disabled
+              <Link
+                href="/checkout"
+                onClick={() => setOpen(false)}
+                className="inline-flex h-10 w-full items-center justify-center rounded-full bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
               >
-                Checkout — Coming Soon
-              </Button>
+                Proceed to Checkout
+              </Link>
 
               <button
                 className="text-xs text-muted-foreground underline-offset-2 hover:text-brand-coral hover:underline"

@@ -19,12 +19,12 @@
 
 ## Status
 
-- **Current phase:** Phase 3 — Supabase + Auth + Real Data
-- **Current step:** Phase 4.1 — Checkout form
-- **Completed phases:** Phases 1 and 2
+- **Current phase:** Phase 4 — Checkout + Payments
+- **Current step:** Phase 4.2 — Razorpay integration
+- **Completed phases:** Phases 1, 2, and 3
 - **Completed Phase 2 steps:** 5 of 5
 - **Completed Phase 3 steps:** 6 of 6
-- **Backend:** Catalog + auth + account/orders + Storage + search/filters live; no checkout orders yet
+- **Backend:** Catalog + auth + account/orders + Storage + search/filters + checkout form live; payment not started
 - **Payments:** Not started
 - **Checkout:** Not started
 - **Deployment:** Intended for Vercel; current deployment status is unverified
@@ -354,19 +354,19 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 **Dependencies:** Real catalog data, secure server environment, authentication decision, database schema, and verified cart behavior.
 
-## 4.1 Checkout form — **CURRENT STEP**
+## 4.1 Checkout form — **COMPLETE**
 
-- [ ] Build `/checkout`.
-- [ ] Collect shipping address.
-- [ ] Collect customer contact information.
-- [ ] Display an order summary.
-- [ ] Validate forms with React Hook Form and Zod.
-- [ ] Revalidate product existence, prices, quantities, and stock on the server.
-- [ ] Define shipping and tax behavior.
-- [ ] Prevent checkout for invalid or unavailable items.
-- [ ] Keep sensitive logic off the client.
+- [x] Build `/checkout`.
+- [x] Collect shipping address.
+- [x] Collect customer contact information.
+- [x] Display an order summary.
+- [x] Validate forms with React Hook Form and Zod.
+- [x] Revalidate product existence, prices, quantities, and stock on the server.
+- [x] Define shipping and tax behavior (flat ₹79 delivery under ₹999; prices tax-inclusive).
+- [x] Prevent checkout for invalid or unavailable items.
+- [x] Keep sensitive logic off the client (server `validateCheckoutCart`; no payment yet).
 
-## 4.2 Razorpay integration
+## 4.2 Razorpay integration — **CURRENT STEP**
 
 - [ ] Create Razorpay orders on the server.
 - [ ] Launch Razorpay checkout from the client using the server-created order.
@@ -606,8 +606,8 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 # Current Handoff
 
-Phase 3 is complete. Catalog search and filters are URL-driven and query Supabase. The next agent must begin with:
+Checkout collects contact + delivery details, validates the cart on the server, and holds a draft for payment. The next agent must begin with:
 
-## Phase 4.1 — Checkout form
+## Phase 4.2 — Razorpay integration
 
-Do not begin Razorpay, admin, reviews, or wishlist work until the checkout form step is complete and both project memory files have been updated.
+Do not begin admin, reviews, or wishlist work until Razorpay integration is complete and both project memory files have been updated.

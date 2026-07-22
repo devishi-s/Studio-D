@@ -32,3 +32,5 @@ export const CURRENCY_SYMBOL = "\u20B9";
 
 export const MAX_CART_ITEMS = 99;
 export const FREE_SHIPPING_THRESHOLD = 999;
+/** Flat delivery fee (INR) when subtotal is below the free-shipping threshold. */
+export const FLAT_DELIVERY_FEE = 79;

@@ -70,7 +70,9 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isProtectedRoute =
-    pathname.startsWith("/account") || pathname.startsWith("/orders");
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/orders") ||
+    pathname.startsWith("/checkout");
 
   if (!user && isProtectedRoute) {
     const loginUrl = request.nextUrl.clone();

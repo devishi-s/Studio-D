@@ -205,6 +205,10 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 
 `Logo`, `SectionHeader`, `ImagePlaceholder`, and `CategoryCard`.
 
+### Checkout
+
+`CheckoutForm` (contact, delivery, order summary, held draft for payment).
+
 ### Patterns to Reuse
 
 - Compose pages from section components.
@@ -254,22 +258,24 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - `ProductImage` component using `next/image` with placeholder fallback for mock paths
 - Supabase host allowed in `next.config.ts` `images.remotePatterns`
 - Catalog search/filters: URL params + Supabase `ilike`/price/category (`ProductCatalogFilters`)
+- Checkout form at `/checkout` (RHF + Zod); server cart revalidation; draft held for Razorpay
+- Dependencies: `react-hook-form`, `zod`, `@hookform/resolvers`
 
 ## Current Project State
 
 - **Roadmap phase:** Phase 4 — Checkout + Payments
-- **Current step:** Phase 4.1 — Checkout form
-- Phase 1–3 complete.
+- **Current step:** Phase 4.2 — Razorpay integration
+- Phase 1–3 complete; Phase 4.1 complete.
 - Shop and product pages read from Supabase; category metadata still static.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
 - Auth uses Supabase email/password with cookie sessions via `@supabase/ssr`.
-- Account routes are protected by proxy + `requireUser`.
-- Order history UI is ready; no orders exist until Phase 4 checkout writes them.
+- Account and checkout routes are protected by proxy + `requireUser`.
+- Checkout validates cart server-side and stores an in-memory draft; no payment or order rows yet.
 - Google OAuth is not implemented.
-- Cart still resolves line items from the static catalog array.
+- Cart still resolves line items from the static catalog array (checkout validation uses Supabase).
 - Contact form still uses `mailto:` draft handoff.
 - Product images: Storage + `ProductImage` wired; seeded mock paths still show placeholders until uploads.
-- Checkout, payments, and admin are not implemented.
+- Razorpay, order persistence, and admin are not implemented.
 - Vercel deployment status is not verified.
 
 ## Important Decisions and Why

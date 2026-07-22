@@ -156,6 +156,7 @@ The proxy redirects unauthenticated visitors away from:
 
 - `/account` and nested paths
 - `/orders` and nested paths
+- `/checkout`
 
 Redirect target: `/login?redirectTo=…`.
 

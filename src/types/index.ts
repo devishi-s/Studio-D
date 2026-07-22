@@ -58,3 +58,34 @@ export type NavLink = {
 };
 
 export type SortOption = "newest" | "price-asc" | "price-desc" | "name-asc";
+
+/** Checkout contact + delivery fields collected before payment (Phase 4.1). */
+export type CheckoutAddress = {
+  fullName: string;
+  email: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+};
+
+/** Server-validated line ready for Razorpay / order creation. */
+export type CheckoutLine = {
+  productId: string;
+  name: string;
+  slug: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+};
+
+/** Held checkout draft after form + cart validation (no payment yet). */
+export type CheckoutDraft = {
+  address: CheckoutAddress;
+  lines: CheckoutLine[];
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+};
