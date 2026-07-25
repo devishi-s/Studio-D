@@ -207,7 +207,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 
 ### Checkout
 
-`CheckoutForm` (contact, delivery, order summary, held draft for payment).
+`CheckoutForm` (contact, delivery, order summary, Razorpay modal + payment confirmation).
 
 ### Patterns to Reuse
 
@@ -258,25 +258,30 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - `ProductImage` component using `next/image` with placeholder fallback for mock paths
 - Supabase host allowed in `next.config.ts` `images.remotePatterns`
 - Catalog search/filters: URL params + Supabase `ilike`/price/category (`ProductCatalogFilters`)
-- Checkout form at `/checkout` (RHF + Zod); server cart revalidation; draft held for Razorpay
-- Dependencies: `react-hook-form`, `zod`, `@hookform/resolvers`
+- Checkout form at `/checkout` (RHF + Zod); Razorpay Checkout.js + signature verify + order persistence
+- Dependencies: `react-hook-form`, `zod`, `@hookform/resolvers`, `razorpay`
+- Payment docs: `docs/PAYMENTS.md`
+- Order confirmation at `/order-confirmation/[orderId]`; `createOrder` / `updateProductStock` helpers
+- Admin dashboard at `/admin` (products CRUD including create, orders, stats) behind `is_admin`
+- Resend order confirmation + admin alert (`docs/EMAIL.md`); placeholder key skips sends
 
 ## Current Project State
 
-- **Roadmap phase:** Phase 4 — Checkout + Payments
-- **Current step:** Phase 4.2 — Razorpay integration
-- Phase 1–3 complete; Phase 4.1 complete.
+- **Roadmap phase:** Phase 5 — Polish + Launch
+- **Current step:** Phase 5.1 — SEO
+- Phase 1–4 complete (shipping-status emails deferred).
 - Shop and product pages read from Supabase; category metadata still static.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
 - Auth uses Supabase email/password with cookie sessions via `@supabase/ssr`.
-- Account and checkout routes are protected by proxy + `requireUser`.
-- Checkout validates cart server-side and stores an in-memory draft; no payment or order rows yet.
+- Account, checkout, order-confirmation, and admin routes are protected; admin also requires `profiles.is_admin`.
+- Checkout recalculates totals, creates Razorpay orders, verifies signatures, writes orders/items, decrements stock, and attempts Resend emails.
 - Google OAuth is not implemented.
 - Cart still resolves line items from the static catalog array (checkout validation uses Supabase).
 - Contact form still uses `mailto:` draft handoff.
 - Product images: Storage + `ProductImage` wired; seeded mock paths still show placeholders until uploads.
-- Razorpay, order persistence, and admin are not implemented.
 - Vercel deployment status is not verified.
+- Existing remote DBs need `orders-checkout.sql` and `admin-rls.sql` applied; set `is_admin` for your user.
+- `RESEND_API_KEY` is placeholder until a real Resend key + domain are configured.
 
 ## Important Decisions and Why
 

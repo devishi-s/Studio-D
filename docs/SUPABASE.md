@@ -44,9 +44,11 @@ Until real values replace the placeholders, `src/lib/supabase/middleware.ts` ski
 
 In the Supabase dashboard **SQL Editor**, run in order:
 
-1. `supabase/schema.sql` — tables, indexes, profile trigger, RLS
+1. `supabase/schema.sql` — tables, indexes, profile trigger, RLS, stock RPC
 2. `supabase/seed.sql` — all 12 catalog products
 3. `supabase/storage.sql` — `product-images` bucket + Storage policies
+4. `supabase/orders-checkout.sql` — **required for existing projects** that already ran an older `schema.sql` (adds Razorpay/shipping columns + insert policies + stock RPC)
+5. `supabase/admin-rls.sql` — `profiles.is_admin`, admin RLS, promote yourself via the SQL comment at the bottom
 
 To regenerate the seed after editing the static catalog:
 
@@ -119,7 +121,7 @@ After that, `getAllProducts` / `getProductBySlug` resolve the path to a public U
 | --- | --- |
 | `products` | `id` is text (`prod-1` …) matching the static catalog so cart `productId` values stay valid. `category` stores the category **slug**. Extra columns `compare_at_price`, `tags`, and `is_active` preserve catalog fidelity. |
 | `profiles` | `id` references `auth.users`. A trigger creates/updates the row on signup. |
-| `orders` | Minimal shape: `user_id`, `status`, `total`, `created_at`. Shipping/payment fields arrive with checkout. |
+| `orders` | `user_id`, `status`, `total`, `shipping_address` (JSONB), `razorpay_order_id`, `razorpay_payment_id`, `needs_manual_review`, `review_notes`. |
 | `order_items` | Snapshots `price_at_purchase` with `quantity` and `product_id`. |
 
 ### Status values
@@ -132,11 +134,23 @@ After that, `getAllProducts` / `getProductBySlug` resolve the path to a public U
 | --- | --- |
 | `products` | Public `SELECT` for `anon` and `authenticated`. No client write policies — product writes use the **service role** (admin tooling later). |
 | `profiles` | Authenticated users can `SELECT` / `INSERT` / `UPDATE` only their own row (`auth.uid() = id`). |
-| `orders` | Authenticated users can `SELECT` only their own orders. |
-| `order_items` | Authenticated users can `SELECT` items whose parent order belongs to them. |
+| `profiles` | Authenticated users can `SELECT` / `INSERT` / `UPDATE` only their own row (`auth.uid() = id`). Admins can `SELECT` all profiles. `is_admin` changes are blocked for non-admins via trigger. |
+| `orders` | Authenticated users can `SELECT` / `INSERT` / `UPDATE` only their own orders. Admins can `SELECT` / `UPDATE` all orders. |
+| `order_items` | Authenticated users can `SELECT` / `INSERT` items whose parent order belongs to them. Admins can `SELECT` all items. |
+| `products` | Public `SELECT`. Admins can `INSERT` / `UPDATE` / `DELETE`. |
 | `storage.objects` (`product-images`) | Public `SELECT`; authenticated `INSERT` / `UPDATE` / `DELETE`. |
+| `decrement_product_stock()` | Security-definer RPC; `authenticated` can execute (used after paid checkout). |
+| `is_admin()` | Security-definer helper for admin RLS policies. |
 
-Order creation and payment mutations are intentionally omitted until Phase 4 server actions exist.
+Promote an admin after applying `admin-rls.sql` (run in the SQL Editor — it has no JWT, so bootstrapping is allowed):
+
+```sql
+update public.profiles set is_admin = true where email = 'you@example.com';
+```
+
+If you already applied an older `admin-rls.sql` and the promote step fails with `Only an existing admin can change is_admin`, re-run the updated `prevent_is_admin_escalation` function from `admin-rls.sql` (or the bootstrap snippet in the handoff), then run the update again.
+
+Order creation runs from `POST /api/checkout/verify-payment` after Razorpay signature verification.
 
 ## App clients
 
@@ -157,6 +171,8 @@ The proxy redirects unauthenticated visitors away from:
 - `/account` and nested paths
 - `/orders` and nested paths
 - `/checkout`
+- `/order-confirmation` and nested paths
+- `/admin` and nested paths (also requires `profiles.is_admin` via `requireAdmin`)
 
 Redirect target: `/login?redirectTo=…`.
 
@@ -180,11 +196,12 @@ Email confirmation and password-reset links must land on `/auth/callback` so the
 3. Run `supabase/schema.sql`.
 4. Run `supabase/seed.sql`.
 5. Run `supabase/storage.sql`.
-6. Confirm `select count(*) from products;` returns `12`.
-7. Confirm bucket `product-images` exists under **Storage**.
-8. Set Auth redirect URLs (see above).
-9. Restart the Next.js app.
-10. Visit shop pages (placeholders until you upload real images) and `/account` after signing in.
+6. Run `supabase/orders-checkout.sql` if the project was created before Phase 4.3.
+7. Confirm `select count(*) from products;` returns `12`.
+8. Confirm bucket `product-images` exists under **Storage**.
+9. Set Auth redirect URLs (see above).
+10. Restart the Next.js app.
+11. Visit shop pages and `/account` after signing in.
 
 ## Out of scope (deferred)
 

@@ -46,10 +46,14 @@ create table if not exists public.profiles (
   full_name text,
   email text,
   avatar_url text,
+  is_admin boolean not null default false,
   created_at timestamptz not null default timezone('utc', now())
 );
 
 create index if not exists profiles_email_idx on public.profiles (email);
+create index if not exists profiles_is_admin_idx
+  on public.profiles (is_admin)
+  where is_admin = true;
 
 -- Keep profiles in sync when a user signs up.
 create or replace function public.handle_new_user()
@@ -91,12 +95,23 @@ create table if not exists public.orders (
   status text not null default 'pending'
     check (status in ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')),
   total numeric(12, 2) not null check (total >= 0),
+  shipping_address jsonb,
+  razorpay_order_id text,
+  razorpay_payment_id text,
+  needs_manual_review boolean not null default false,
+  review_notes text,
   created_at timestamptz not null default timezone('utc', now())
 );
 
 create index if not exists orders_user_id_idx on public.orders (user_id);
 create index if not exists orders_status_idx on public.orders (status);
 create index if not exists orders_created_at_idx on public.orders (created_at desc);
+create unique index if not exists orders_razorpay_order_id_uidx
+  on public.orders (razorpay_order_id)
+  where razorpay_order_id is not null;
+create unique index if not exists orders_razorpay_payment_id_uidx
+  on public.orders (razorpay_payment_id)
+  where razorpay_payment_id is not null;
 
 -- ── order_items ──────────────────────────────────────────────
 
@@ -149,7 +164,7 @@ create policy "Users can update own profile"
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
--- orders: users read their own orders only
+-- orders: users read/insert/update their own orders
 drop policy if exists "Users can read own orders" on public.orders;
 create policy "Users can read own orders"
   on public.orders
@@ -157,7 +172,22 @@ create policy "Users can read own orders"
   to authenticated
   using (auth.uid() = user_id);
 
--- order_items: users read items belonging to their orders only
+drop policy if exists "Users can insert own orders" on public.orders;
+create policy "Users can insert own orders"
+  on public.orders
+  for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own orders" on public.orders;
+create policy "Users can update own orders"
+  on public.orders
+  for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+-- order_items: users read/insert items belonging to their orders only
 drop policy if exists "Users can read own order items" on public.order_items;
 create policy "Users can read own order items"
   on public.order_items
@@ -171,5 +201,77 @@ create policy "Users can read own order items"
         and public.orders.user_id = auth.uid()
     )
   );
+
+drop policy if exists "Users can insert own order items" on public.order_items;
+create policy "Users can insert own order items"
+  on public.order_items
+  for insert
+  to authenticated
+  with check (
+    exists (
+      select 1
+      from public.orders
+      where public.orders.id = order_items.order_id
+        and public.orders.user_id = auth.uid()
+    )
+  );
+
+-- Atomic stock decrement for checkout (race-safe shortfall reporting)
+create or replace function public.decrement_product_stock(
+  p_product_id text,
+  p_quantity integer
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  current_stock integer;
+  applied integer;
+  shortfall integer := 0;
+begin
+  if p_quantity is null or p_quantity < 1 then
+    return jsonb_build_object('ok', false, 'error', 'invalid_quantity');
+  end if;
+
+  select stock_count
+  into current_stock
+  from public.products
+  where id = p_product_id
+  for update;
+
+  if not found then
+    return jsonb_build_object(
+      'ok', false,
+      'error', 'not_found',
+      'shortfall', p_quantity
+    );
+  end if;
+
+  if current_stock >= p_quantity then
+    applied := p_quantity;
+    shortfall := 0;
+  else
+    applied := current_stock;
+    shortfall := p_quantity - current_stock;
+  end if;
+
+  update public.products
+  set stock_count = current_stock - applied
+  where id = p_product_id;
+
+  return jsonb_build_object(
+    'ok', true,
+    'previous', current_stock,
+    'applied', applied,
+    'remaining', current_stock - applied,
+    'shortfall', shortfall
+  );
+end;
+$$;
+
+revoke all on function public.decrement_product_stock(text, integer) from public;
+grant execute on function public.decrement_product_stock(text, integer) to authenticated;
 
 commit;

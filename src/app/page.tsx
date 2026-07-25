@@ -11,6 +11,10 @@ import { SectionHeader } from "@/components/common/section-header";
 
 export const revalidate = 60;
 
+type HomePageProps = {
+  searchParams: Promise<{ error?: string }>;
+};
+
 async function FeaturedProductsSection() {
   const featured = await getFeaturedProducts();
   return <FeaturedProducts products={featured} />;
@@ -32,9 +36,18 @@ function FeaturedProductsFallback() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const showUnauthorized = params.error === "unauthorized";
+
   return (
     <>
+      {showUnauthorized ? (
+        <div className="border-b border-destructive/20 bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
+          You don&apos;t have access to the admin area. If you believe this is a
+          mistake, ask an existing admin to enable your account.
+        </div>
+      ) : null}
       <HeroBanner />
       <CategoryShowcase />
       <Suspense fallback={<FeaturedProductsFallback />}>

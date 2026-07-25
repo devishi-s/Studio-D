@@ -20,11 +20,11 @@
 ## Status
 
 - **Current phase:** Phase 4 — Checkout + Payments
-- **Current step:** Phase 4.2 — Razorpay integration
-- **Completed phases:** Phases 1, 2, and 3
+- **Current step:** Phase 5.1 — SEO
+- **Completed phases:** Phases 1, 2, 3, and 4
 - **Completed Phase 2 steps:** 5 of 5
 - **Completed Phase 3 steps:** 6 of 6
-- **Backend:** Catalog + auth + account/orders + Storage + search/filters + checkout form live; payment not started
+- **Backend:** Full Phase 4 commerce path live (checkout, Razorpay, orders, admin, Resend hooks)
 - **Payments:** Not started
 - **Checkout:** Not started
 - **Deployment:** Intended for Vercel; current deployment status is unverified
@@ -366,46 +366,47 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 - [x] Prevent checkout for invalid or unavailable items.
 - [x] Keep sensitive logic off the client (server `validateCheckoutCart`; no payment yet).
 
-## 4.2 Razorpay integration — **CURRENT STEP**
+## 4.2 Razorpay integration — **COMPLETE**
 
-- [ ] Create Razorpay orders on the server.
-- [ ] Launch Razorpay checkout from the client using the server-created order.
-- [ ] Verify payment signatures on the server.
-- [ ] Handle Razorpay webhooks securely and idempotently.
-- [ ] Store provider order/payment identifiers.
-- [ ] Handle success, failure, cancellation, retry, and duplicate-event cases.
-- [ ] Show an order confirmation only after verified server state.
+- [x] Create Razorpay orders on the server (`/api/checkout/create-order`).
+- [x] Launch Razorpay checkout from the client using the server-created order.
+- [x] Verify payment signatures on the server (`/api/checkout/verify-payment`).
+- [x] Handle Razorpay webhooks securely (`/api/checkout/webhook`; fulfillment idempotency in 4.3).
+- [x] Store provider order/payment identifiers (returned to client; DB persistence in 4.3).
+- [x] Handle success, failure, cancellation, retry, and duplicate-event cases (client toasts + verify; DB dedupe in 4.3).
+- [x] Show an order confirmation only after verified server state (payment-received UI; full order page in 4.3).
 
 **Non-negotiable security rule:** Never trust prices, totals, inventory, user identity, or payment success supplied by the browser.
 
-## 4.3 Order management
+## 4.3 Order management — **COMPLETE**
 
-- [ ] Create orders and immutable order-item snapshots.
-- [ ] Track order status.
-- [ ] Reserve/decrement inventory safely.
-- [ ] Handle failed or abandoned payments.
-- [ ] Add order-confirmation experience.
-- [ ] Expose customer order history.
-- [ ] Support operational status updates.
+- [x] Create orders and immutable order-item snapshots.
+- [x] Track order status (`confirmed` on paid checkout; history UI already live).
+- [x] Reserve/decrement inventory safely (`decrement_product_stock` + shortfall review flag).
+- [x] Handle failed or abandoned payments (no DB row until verify; paid-but-save-failed support message).
+- [x] Add order-confirmation experience (`/order-confirmation/[orderId]`).
+- [x] Expose customer order history (`/account/orders` — already wired; now receives real rows).
+- [x] Support operational status updates (schema + account badges; admin tooling in 4.4).
 
-## 4.4 Admin dashboard
+## 4.4 Admin dashboard — **COMPLETE**
 
-- [ ] Build protected `/admin`.
-- [ ] Build `/admin/products`.
-- [ ] Build `/admin/orders`.
-- [ ] Add product creation, editing, activation, and inventory management.
-- [ ] Add order listing, detail, and status management.
-- [ ] Add basic analytics.
-- [ ] Enforce admin authorization on the server and through RLS.
+- [x] Build protected `/admin` (`requireAdmin` + `profiles.is_admin` + RLS).
+- [x] Build `/admin/products` (list, featured/stock controls, add/edit/delete).
+- [x] Build `/admin/orders` (list, detail, status updates).
+- [x] Add product creation, editing, activation, and inventory management.
+- [x] Add order listing, detail, and status management.
+- [x] Add basic analytics (orders, revenue, low stock, recent orders).
+- [x] Enforce admin authorization on the server and through RLS (`supabase/admin-rls.sql`).
 
-## 4.5 Email notifications
+## 4.5 Email notifications — **COMPLETE**
 
-- [ ] Select Resend or Supabase Edge Functions.
-- [ ] Send order confirmation.
-- [ ] Send shipping/status updates.
-- [ ] Use branded responsive templates.
-- [ ] Handle delivery failures and retries.
-- [ ] Keep email credentials server-side.
+- [x] Select Resend (React Email templates + server helpers).
+- [x] Send order confirmation (customer) after verified payment.
+- [x] Send new-order admin alert at the same time.
+- [ ] Send shipping/status updates (deferred — admin status changes can hook later).
+- [x] Use branded responsive templates (`lib/email/templates`).
+- [x] Handle delivery failures without blocking orders (log + continue).
+- [x] Keep email credentials server-side (`RESEND_API_KEY`).
 
 ---
 
@@ -415,7 +416,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 **Dependency:** Core purchase flow must be secure and stable.
 
-## 5.1 SEO
+## 5.1 SEO — **CURRENT STEP**
 
 - [ ] Add complete page metadata.
 - [ ] Add canonical URLs.
@@ -606,8 +607,10 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 # Current Handoff
 
-Checkout collects contact + delivery details, validates the cart on the server, and holds a draft for payment. The next agent must begin with:
+Phase 4 is complete (checkout through Resend email hooks). Shipping-status emails are deferred. The next agent must begin with:
 
-## Phase 4.2 — Razorpay integration
+## Phase 5.1 — SEO
 
-Do not begin admin, reviews, or wishlist work until Razorpay integration is complete and both project memory files have been updated.
+Do not begin reviews or wishlist work until SEO is complete and both project memory files have been updated.
+
+**Ops reminder:** Real Resend sends need `RESEND_API_KEY` + a verified domain — see `docs/EMAIL.md`.

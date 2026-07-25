@@ -38,7 +38,7 @@ export default async function AccountOrdersPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             {orders.length > 0
               ? `${orders.length} ${orders.length === 1 ? "order" : "orders"}`
-              : "Orders will appear here after checkout is available."}
+              : "Orders will appear here after you complete checkout."}
           </p>
 
           {orders.length === 0 ? (

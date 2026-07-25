@@ -118,6 +118,32 @@ export default async function OrderDetailPage({
 
             <Separator className="my-5" />
 
+            {order.shippingAddress ? (
+              <>
+                <div className="mb-5">
+                  <h3 className="text-sm font-medium text-brand-brown">
+                    Shipping address
+                  </h3>
+                  <div className="mt-2 space-y-0.5 text-sm text-muted-foreground">
+                    <p>{order.shippingAddress.fullName}</p>
+                    <p>
+                      {order.shippingAddress.addressLine1}
+                      {order.shippingAddress.addressLine2
+                        ? `, ${order.shippingAddress.addressLine2}`
+                        : ""}
+                    </p>
+                    <p>
+                      {order.shippingAddress.city},{" "}
+                      {order.shippingAddress.state}{" "}
+                      {order.shippingAddress.pincode}
+                    </p>
+                    <p>{order.shippingAddress.phone}</p>
+                  </div>
+                </div>
+                <Separator className="my-5" />
+              </>
+            ) : null}
+
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-brand-brown">Order total</p>
               <p className="text-lg font-semibold text-brand-brown">

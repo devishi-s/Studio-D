@@ -18,6 +18,10 @@ import {
 import { FREE_SHIPPING_THRESHOLD } from "@/lib/constants";
 import { formatPrice } from "@/lib/format";
 import { validateCheckoutCart } from "@/lib/actions/checkout";
+import {
+  openRazorpayCheckout,
+  type RazorpaySuccessResponse,
+} from "@/lib/razorpay-client";
 import { useMounted } from "@/hooks/use-mounted";
 import {
   getCartItemCount,
@@ -25,7 +29,7 @@ import {
   getItemsWithProducts,
   useCartStore,
 } from "@/store/cart.store";
-import type { CheckoutDraft } from "@/types";
+import type { CheckoutAddress, CheckoutDraft } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/product/product-image";
@@ -39,8 +43,10 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
   const router = useRouter();
   const mounted = useMounted();
   const items = useCartStore((s) => s.items);
+  const clearCart = useCartStore((s) => s.clearCart);
   const [draft, setDraft] = useState<CheckoutDraft | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
 
   const resolved = getItemsWithProducts(items);
   const itemCount = getCartItemCount(items);
@@ -69,10 +75,132 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
 
   useEffect(() => {
     if (!mounted) return;
-    if (items.length === 0 && !draft) {
+    if (items.length === 0 && !draft && !isPaying) {
       router.replace("/cart");
     }
-  }, [mounted, items.length, draft, router]);
+  }, [mounted, items.length, draft, isPaying, router]);
+
+  async function launchPayment(address: CheckoutAddress) {
+    setIsPaying(true);
+
+    try {
+      const createRes = await fetch("/api/checkout/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items, address }),
+      });
+
+      let createData: {
+        error?: string;
+        razorpayOrderId?: string;
+        amount?: number;
+        currency?: string;
+        keyId?: string;
+        lines?: CheckoutDraft["lines"];
+        subtotal?: number;
+        deliveryFee?: number;
+        total?: number;
+      };
+
+      try {
+        createData = await createRes.json();
+      } catch {
+        toast.error("Network error while starting payment.");
+        setIsPaying(false);
+        return;
+      }
+
+      if (!createRes.ok || !createData.razorpayOrderId || !createData.keyId) {
+        toast.error(createData.error ?? "Could not start payment.");
+        setIsPaying(false);
+        return;
+      }
+
+      if (
+        createData.lines &&
+        createData.subtotal != null &&
+        createData.deliveryFee != null &&
+        createData.total != null
+      ) {
+        setDraft({
+          address,
+          lines: createData.lines,
+          subtotal: createData.subtotal,
+          deliveryFee: createData.deliveryFee,
+          total: createData.total,
+        });
+      }
+
+      await openRazorpayCheckout({
+        keyId: createData.keyId,
+        orderId: createData.razorpayOrderId,
+        amountPaise: createData.amount ?? 0,
+        currency: createData.currency,
+        address,
+        onSuccess: async (response: RazorpaySuccessResponse) => {
+          try {
+            const verifyRes = await fetch("/api/checkout/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                address,
+                items,
+              }),
+            });
+
+            let verifyData: {
+              error?: string;
+              orderId?: string;
+              razorpayPaymentId?: string;
+              razorpayOrderId?: string;
+              redirectTo?: string;
+              paid?: boolean;
+            };
+
+            try {
+              verifyData = await verifyRes.json();
+            } catch {
+              toast.error("Network error while verifying payment.");
+              return;
+            }
+
+            if (!verifyRes.ok || !verifyData.orderId) {
+              toast.error(
+                verifyData.error ??
+                  "Payment could not be completed. Please contact support."
+              );
+              return;
+            }
+
+            clearCart();
+            toast.success("Order confirmed — thank you.");
+            router.push(
+              verifyData.redirectTo ??
+                `/order-confirmation/${verifyData.orderId}`
+            );
+          } catch {
+            toast.error("Network error while verifying payment.");
+          } finally {
+            setIsPaying(false);
+          }
+        },
+        onDismiss: () => {
+          setIsPaying(false);
+          toast.message("Payment cancelled.");
+        },
+        onFailure: (message) => {
+          setIsPaying(false);
+          toast.error(message);
+        },
+      });
+    } catch {
+      toast.error("Network error. Please try again.");
+      setIsPaying(false);
+    }
+  }
 
   async function onSubmit(values: CheckoutFormValues) {
     if (items.length === 0) {
@@ -100,7 +228,7 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
         total: result.total,
       });
 
-      toast.success("Details saved — payment comes next.");
+      await launchPayment(address);
     } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
@@ -117,7 +245,7 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
     );
   }
 
-  if (items.length === 0 && !draft) {
+  if (items.length === 0 && !draft && !isPaying) {
     return (
       <div className="py-16 text-center text-sm text-muted-foreground">
         Redirecting to your cart…
@@ -134,8 +262,7 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
             Ready for payment
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Your delivery details and cart totals are held for the next step.
-            Razorpay checkout arrives in Phase 4.2 — nothing has been charged.
+            Review your delivery details, then pay securely with Razorpay.
           </p>
 
           <Separator className="my-6" />
@@ -195,16 +322,25 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
           <Button
             type="button"
             size="lg"
-            className="mt-6 w-full rounded-full"
-            disabled
+            className="mt-6 w-full rounded-full bg-brand-brown text-white hover:bg-brand-brown/85"
+            disabled={isPaying}
+            onClick={() => launchPayment(draft.address)}
           >
-            Pay with Razorpay — Coming Soon
+            {isPaying ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Opening Razorpay…
+              </>
+            ) : (
+              "Pay with Razorpay"
+            )}
           </Button>
 
           <button
             type="button"
             onClick={() => setDraft(null)}
-            className="mt-4 w-full text-center text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-brand-coral hover:underline"
+            disabled={isPaying}
+            className="mt-4 w-full text-center text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-brand-coral hover:underline disabled:opacity-50"
           >
             Edit delivery details
           </button>
@@ -348,6 +484,7 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
             deliveryFee={clientDeliveryFee}
             total={clientTotal}
             isSubmitting={isSubmitting}
+            isPaying={isPaying}
           />
         </div>
       </div>
@@ -361,6 +498,7 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
             deliveryFee={clientDeliveryFee}
             total={clientTotal}
             isSubmitting={isSubmitting}
+            isPaying={isPaying}
           />
         </div>
       </aside>
@@ -399,6 +537,7 @@ function CheckoutSummaryCard({
   deliveryFee,
   total,
   isSubmitting,
+  isPaying,
 }: {
   resolved: ReturnType<typeof getItemsWithProducts>;
   itemCount: number;
@@ -406,6 +545,7 @@ function CheckoutSummaryCard({
   deliveryFee: number;
   total: number;
   isSubmitting: boolean;
+  isPaying: boolean;
 }) {
   const remainingForFree =
     subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD
@@ -489,12 +629,12 @@ function CheckoutSummaryCard({
         type="submit"
         size="lg"
         className="mt-5 w-full rounded-full bg-brand-brown text-white hover:bg-brand-brown/85"
-        disabled={isSubmitting || resolved.length === 0}
+        disabled={isSubmitting || isPaying || resolved.length === 0}
       >
-        {isSubmitting ? (
+        {isSubmitting || isPaying ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Saving details…
+            {isPaying ? "Opening Razorpay…" : "Saving details…"}
           </>
         ) : (
           "Continue to payment"
@@ -503,7 +643,7 @@ function CheckoutSummaryCard({
 
       <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
         <Lock className="h-3 w-3" />
-        Payment is not charged yet — Razorpay comes next.
+        Secured by Razorpay. Totals are verified on our servers.
       </p>
 
       <p className="mt-2 text-center text-xs">

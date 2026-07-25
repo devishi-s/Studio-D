@@ -49,8 +49,8 @@ export default async function CheckoutPage() {
             Checkout
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Confirm your details and review your handmade pieces. Payment with
-            Razorpay is next — nothing is charged on this step.
+            Confirm your details and review your handmade pieces. Payment is
+            secured by Razorpay after you continue.
           </p>
         </div>
 

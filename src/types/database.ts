@@ -74,6 +74,7 @@ export type Database = {
           full_name: string | null;
           email: string | null;
           avatar_url: string | null;
+          is_admin: boolean;
           created_at: string;
         };
         Insert: {
@@ -81,6 +82,7 @@ export type Database = {
           full_name?: string | null;
           email?: string | null;
           avatar_url?: string | null;
+          is_admin?: boolean;
           created_at?: string;
         };
         Update: {
@@ -88,6 +90,7 @@ export type Database = {
           full_name?: string | null;
           email?: string | null;
           avatar_url?: string | null;
+          is_admin?: boolean;
           created_at?: string;
         };
         Relationships: [];
@@ -98,6 +101,11 @@ export type Database = {
           user_id: string;
           status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
           total: number;
+          shipping_address: Json | null;
+          razorpay_order_id: string | null;
+          razorpay_payment_id: string | null;
+          needs_manual_review: boolean;
+          review_notes: string | null;
           created_at: string;
         };
         Insert: {
@@ -105,6 +113,11 @@ export type Database = {
           user_id: string;
           status?: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
           total: number;
+          shipping_address?: Json | null;
+          razorpay_order_id?: string | null;
+          razorpay_payment_id?: string | null;
+          needs_manual_review?: boolean;
+          review_notes?: string | null;
           created_at?: string;
         };
         Update: {
@@ -112,9 +125,22 @@ export type Database = {
           user_id?: string;
           status?: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
           total?: number;
+          shipping_address?: Json | null;
+          razorpay_order_id?: string | null;
+          razorpay_payment_id?: string | null;
+          needs_manual_review?: boolean;
+          review_notes?: string | null;
           created_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "users",
+            referencedColumns: ["id"],
+          },
+        ];
       };
       order_items: {
         Row: {
@@ -138,11 +164,34 @@ export type Database = {
           quantity?: number;
           price_at_purchase?: number;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey",
+            columns: ["order_id"],
+            isOneToOne: false,
+            referencedRelation: "orders",
+            referencedColumns: ["id"],
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey",
+            columns: ["product_id"],
+            isOneToOne: false,
+            referencedRelation: "products",
+            referencedColumns: ["id"],
+          },
+        ];
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      decrement_product_stock: {
+        Args: {
+          p_product_id: string;
+          p_quantity: number;
+        };
+        Returns: Json;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
