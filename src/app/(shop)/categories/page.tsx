@@ -2,17 +2,20 @@ import type { Metadata } from "next";
 
 import { categories } from "@/data/products";
 import { getProductsByCategory } from "@/lib/supabase/products";
+import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/common/section-header";
 import { CategoryCard } from "@/components/common/category-card";
 
-export const metadata: Metadata = {
-  title: "Categories",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Shop by Category",
   description:
-    "Browse Studio D collections — crochet flowers, paintings, handmade gifts, and decorative items.",
-};
+    "Explore Studio D collections — crochet flowers, paintings, handmade gifts, and decorative items.",
+  path: "/categories",
+});
 
-export const revalidate = 60;
+/** Keep in sync with PRODUCT_REVALIDATE_SECONDS in src/lib/cache.ts */
+export const revalidate = 3600;
 
 export default async function CategoriesPage() {
   const categoriesWithCount = await Promise.all(

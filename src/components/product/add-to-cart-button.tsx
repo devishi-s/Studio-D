@@ -5,12 +5,14 @@ import { ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
+import { trackAddToCart } from "@/lib/analytics";
 import { useCartStore } from "@/store/cart.store";
 import { Button } from "@/components/ui/button";
 
 type AddToCartButtonProps = {
   productId: string;
   productName: string;
+  price: number;
   inStock: boolean;
   quantity?: number;
   compact?: boolean;
@@ -20,6 +22,7 @@ type AddToCartButtonProps = {
 export function AddToCartButton({
   productId,
   productName,
+  price,
   inStock,
   quantity = 1,
   compact = false,
@@ -33,6 +36,7 @@ export function AddToCartButton({
     e.stopPropagation();
 
     addItem(productId, quantity);
+    trackAddToCart({ productId, productName, price });
     setAdded(true);
     toast.success("Added to cart", { description: productName });
     setTimeout(() => setAdded(false), 1500);

@@ -1,12 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 
 import type { Category, SortOption } from "@/types";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import {
+  trackCategoryFiltered,
+  trackSearchPerformed,
+} from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 
 type ProductCatalogFiltersProps = {
@@ -53,6 +57,8 @@ export function ProductCatalogFilters({
     activeMaxPrice != null ? String(activeMaxPrice) : ""
   );
 
+  const lastTrackedSearch = useRef<string | null>(null);
+
   useEffect(() => {
     setSearchDraft(activeSearch);
   }, [activeSearch]);
@@ -64,6 +70,18 @@ export function ProductCatalogFilters({
   useEffect(() => {
     setMaxDraft(activeMaxPrice != null ? String(activeMaxPrice) : "");
   }, [activeMaxPrice]);
+
+  // Fire after the URL search term resolves so resultCount matches the query.
+  useEffect(() => {
+    const term = activeSearch.trim();
+    if (!term) {
+      lastTrackedSearch.current = "";
+      return;
+    }
+    if (lastTrackedSearch.current === term) return;
+    lastTrackedSearch.current = term;
+    trackSearchPerformed({ searchTerm: term, resultCount });
+  }, [activeSearch, resultCount]);
 
   const pushParams = useCallback(
     (mutate: (params: URLSearchParams) => void) => {
@@ -127,6 +145,14 @@ export function ProductCatalogFilters({
     router.push(pathname, { scroll: false });
   }, [router, pathname]);
 
+  const selectCategory = useCallback(
+    (category: string) => {
+      trackCategoryFiltered({ category });
+      setParam("category", category, "all");
+    },
+    [setParam]
+  );
+
   const categoryLabel =
     categories.find((c) => c.slug === activeCategory)?.name ?? null;
 
@@ -186,7 +212,7 @@ export function ProductCatalogFilters({
             <li>
               <button
                 type="button"
-                onClick={() => setParam("category", "all", "all")}
+                onClick={() => selectCategory("all")}
                 className={cn(
                   "w-full border-l-2 py-1.5 pl-3 text-left text-sm transition-colors",
                   activeCategory === "all"
@@ -201,7 +227,7 @@ export function ProductCatalogFilters({
               <li key={cat.slug}>
                 <button
                   type="button"
-                  onClick={() => setParam("category", cat.slug)}
+                  onClick={() => selectCategory(cat.slug)}
                   className={cn(
                     "w-full border-l-2 py-1.5 pl-3 text-left text-sm transition-colors",
                     activeCategory === cat.slug

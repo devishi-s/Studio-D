@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 
 import { Container } from "@/components/layout/container";
 import { CartPageContent } from "@/components/cart/cart-page-content";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Your Cart",
-  description: "Review and manage the items in your shopping cart.",
-};
+  description: "Review and manage the items in your Studio D shopping cart.",
+  path: "/cart",
+  noIndex: true,
+});
 
 export default function CartPage() {
   return (

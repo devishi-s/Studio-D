@@ -7,16 +7,19 @@ import {
 } from "lucide-react";
 
 import { SITE_NAME } from "@/lib/constants";
+import { buildPageMetadata, localBusinessJsonLd } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/common/section-header";
 import { ImagePlaceholder } from "@/components/common/image-placeholder";
 import { Separator } from "@/components/ui/separator";
+import { JsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "About",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Our Story",
   description:
-    "The story behind Studio D — handmade crochet, original paintings, and thoughtful gifts crafted with love in India.",
-};
+    "Meet the makers behind Studio D — handmade crochet, original paintings, and thoughtful gifts crafted with love in India.",
+  path: "/about",
+});
 
 // ─── Data ────────────────────────────────────────────────────
 
@@ -80,6 +83,7 @@ const MILESTONES = [
 export default function AboutPage() {
   return (
     <>
+      <JsonLd data={localBusinessJsonLd()} />
       {/* ── Hero ── */}
       <section className="relative overflow-hidden bg-brand-cream py-16 sm:py-24">
         <div className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full bg-brand-blush/50" />

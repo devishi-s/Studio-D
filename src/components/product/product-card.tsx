@@ -5,16 +5,24 @@ import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "@/components/product/product-image";
 import { AddToCartButton } from "@/components/product/add-to-cart-button";
+import { WishlistButton } from "@/components/product/wishlist-button";
 
 type ProductCardProps = {
   product: Product;
   className?: string;
+  /** Eager-load LCP-critical card images (hero row / first grid cells). */
+  priority?: boolean;
 };
 
-export function ProductCard({ product, className }: ProductCardProps) {
+export function ProductCard({
+  product,
+  className,
+  priority = false,
+}: ProductCardProps) {
   const hasDiscount =
     product.compareAtPrice && product.compareAtPrice > product.price;
   const primaryImage = product.images[0];
+  const redirectPath = `/products/${product.slug}`;
 
   return (
     <div
@@ -23,36 +31,46 @@ export function ProductCard({ product, className }: ProductCardProps) {
         className
       )}
     >
-      <Link
-        href={`/products/${product.slug}`}
-        className="relative block aspect-square overflow-hidden"
-      >
-        <ProductImage
-          src={primaryImage}
-          alt={product.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="transition-transform duration-500 group-hover:scale-105"
-        />
+      <div className="relative">
+        <Link
+          href={`/products/${product.slug}`}
+          className="relative block aspect-square overflow-hidden"
+        >
+          <ProductImage
+            src={primaryImage}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            priority={priority}
+            className="transition-transform duration-500 group-hover:scale-105"
+          />
 
-        <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-          {hasDiscount && (
-            <span className="rounded-full bg-brand-coral px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-              Sale
-            </span>
-          )}
-          {product.tags.includes("bestseller") && (
-            <span className="rounded-full bg-brand-sage px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-              Bestseller
-            </span>
-          )}
-          {product.tags.includes("new") && (
-            <span className="rounded-full bg-brand-gold px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-              New
-            </span>
-          )}
-        </div>
-      </Link>
+          <div className="absolute left-3 top-3 flex flex-col gap-1.5">
+            {hasDiscount && (
+              <span className="rounded-full bg-brand-coral px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                Sale
+              </span>
+            )}
+            {product.tags.includes("bestseller") && (
+              <span className="rounded-full bg-brand-sage px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                Bestseller
+              </span>
+            )}
+            {product.tags.includes("new") && (
+              <span className="rounded-full bg-brand-gold px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                New
+              </span>
+            )}
+          </div>
+        </Link>
+
+        <WishlistButton
+          productId={product.id}
+          redirectPath={redirectPath}
+          size="sm"
+          className="absolute right-3 top-3 z-10"
+        />
+      </div>
 
       <div className="flex flex-1 flex-col p-4">
         <span className="text-[11px] font-medium uppercase tracking-wider text-brand-coral">
@@ -86,6 +104,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           <AddToCartButton
             productId={product.id}
             productName={product.name}
+            price={product.price}
             inStock={product.stockCount > 0}
             compact
           />

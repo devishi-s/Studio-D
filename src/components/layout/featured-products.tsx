@@ -21,7 +21,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
 
         <div className="mt-10">
           {products.length > 0 ? (
-            <ProductGrid products={products} columns={4} />
+            <ProductGrid products={products} columns={4} priorityCount={4} />
           ) : (
             <p className="text-center text-sm text-muted-foreground">
               Featured pieces will appear here soon.

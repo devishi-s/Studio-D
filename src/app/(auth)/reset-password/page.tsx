@@ -3,11 +3,14 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Reset password",
   description: "Reset your Studio D account password.",
-};
+  path: "/reset-password",
+  noIndex: true,
+});
 
 export default async function ResetPasswordPage() {
   const supabase = await createClient();

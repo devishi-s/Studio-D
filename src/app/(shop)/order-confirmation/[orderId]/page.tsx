@@ -6,11 +6,13 @@ import { CheckCircle2, Package, ShoppingBag } from "lucide-react";
 import { requireUser } from "@/lib/supabase/require-user";
 import { getOrderById } from "@/lib/supabase/orders";
 import { formatDate, formatPrice } from "@/lib/format";
+import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/product/product-image";
 import { OrderStatusBadge } from "@/components/account/order-status-badge";
 import { buttonVariants } from "@/components/ui/button";
+import { AnalyticsEvent } from "@/components/analytics/analytics-event";
 import { cn } from "@/lib/utils";
 
 type OrderConfirmationPageProps = {
@@ -21,10 +23,12 @@ export async function generateMetadata({
   params,
 }: OrderConfirmationPageProps): Promise<Metadata> {
   const { orderId } = await params;
-  return {
+  return buildPageMetadata({
     title: `Order confirmed · ${orderId.slice(0, 8).toUpperCase()}`,
     description: "Thank you for your Studio D order.",
-  };
+    path: `/order-confirmation/${orderId}`,
+    noIndex: true,
+  });
 }
 
 export default async function OrderConfirmationPage({
@@ -40,6 +44,11 @@ export default async function OrderConfirmationPage({
 
   return (
     <section className="py-12 sm:py-16">
+      <AnalyticsEvent
+        event="order_completed"
+        orderId={order.id}
+        total={order.total}
+      />
       <Container>
         <div className="mx-auto max-w-2xl">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-sage/15 text-brand-sage">

@@ -9,29 +9,56 @@ import {
   getAllProducts,
 } from "@/lib/supabase/products";
 import { formatPrice } from "@/lib/format";
+import { buildPageMetadata, productJsonLd } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
 import { Separator } from "@/components/ui/separator";
 import { SectionHeader } from "@/components/common/section-header";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ImageGallery } from "@/components/product/image-gallery";
 import { ProductDetailCart } from "@/components/product/product-detail-cart";
+import { ProductReviewsSection } from "@/components/product/product-reviews-section";
+import { StarRating } from "@/components/product/star-rating";
+import { WishlistButton } from "@/components/product/wishlist-button";
+import { JsonLd } from "@/components/seo/json-ld";
+import { AnalyticsEvent } from "@/components/analytics/analytics-event";
+import {
+  getApprovedReviews,
+  getAverageRating,
+  getUserReview,
+} from "@/lib/supabase/reviews";
+import { createClient } from "@/lib/supabase/server";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export const revalidate = 60;
+/** Keep in sync with PRODUCT_REVALIDATE_SECONDS in src/lib/cache.ts */
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  if (!product) return { title: "Product Not Found" };
-  return {
+  if (!product) {
+    return buildPageMetadata({
+      title: "Product Not Found",
+      description: "This Studio D piece could not be found.",
+      path: `/products/${slug}`,
+      noIndex: true,
+    });
+  }
+
+  const description = `${product.description.slice(0, 140)} From ${formatPrice(product.price)}.`;
+  const image =
+    product.images.find((src) => src.startsWith("http")) ?? undefined;
+
+  return buildPageMetadata({
     title: product.name,
-    description: product.description.slice(0, 160),
-  };
+    description,
+    path: `/products/${product.slug}`,
+    image,
+  });
 }
 
 export async function generateStaticParams() {
@@ -58,8 +85,30 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
 
+  const [reviewSummary, approvedReviews, auth] = await Promise.all([
+    getAverageRating(product.id),
+    getApprovedReviews(product.id),
+    createClient().then(async (supabase) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      return user;
+    }),
+  ]);
+
+  const existingReview = auth
+    ? await getUserReview(auth.id, product.id)
+    : null;
+
   return (
     <section className="py-10 sm:py-14">
+      <AnalyticsEvent
+        event="product_viewed"
+        productId={product.id}
+        productName={product.name}
+        category={product.category.slug}
+      />
+      <JsonLd data={productJsonLd(product)} />
       <Container>
         <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
           <Link
@@ -94,6 +143,20 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             <h1 className="mt-2 font-heading text-2xl font-semibold tracking-tight text-brand-brown sm:text-3xl">
               {product.name}
             </h1>
+
+            {reviewSummary.count > 0 ? (
+              <div className="mt-3 flex items-center gap-2">
+                <StarRating
+                  rating={reviewSummary.average}
+                  size="sm"
+                  label={`${reviewSummary.average} out of 5 stars`}
+                />
+                <span className="text-sm text-muted-foreground">
+                  {reviewSummary.average.toFixed(1)} · {reviewSummary.count}{" "}
+                  {reviewSummary.count === 1 ? "review" : "reviews"}
+                </span>
+              </div>
+            ) : null}
 
             <div className="mt-3 flex items-baseline gap-3">
               <span className="text-2xl font-semibold text-brand-brown">
@@ -146,12 +209,22 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
             <Separator className="my-5" />
 
-            <ProductDetailCart
-              productId={product.id}
-              productName={product.name}
-              inStock={product.stockCount > 0}
-              maxQuantity={product.stockCount}
-            />
+            <div className="flex items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <ProductDetailCart
+                  productId={product.id}
+                  productName={product.name}
+                  price={product.price}
+                  inStock={product.stockCount > 0}
+                  maxQuantity={product.stockCount}
+                />
+              </div>
+              <WishlistButton
+                productId={product.id}
+                redirectPath={`/products/${product.slug}`}
+                className="mt-0.5 shrink-0"
+              />
+            </div>
             <p className="mt-2 text-center text-xs text-muted-foreground">
               {product.stockCount > 0
                 ? `${product.stockCount} in stock — ready to ship`
@@ -194,10 +267,19 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               subtitle={`More from ${product.category.name}`}
             />
             <div className="mt-8">
-              <ProductGrid products={relatedProducts} columns={4} />
+              <ProductGrid products={relatedProducts} columns={4} priorityCount={0} />
             </div>
           </div>
         )}
+
+        <ProductReviewsSection
+          productId={product.id}
+          productSlug={product.slug}
+          summary={reviewSummary}
+          reviews={approvedReviews}
+          isAuthenticated={Boolean(auth)}
+          existingReview={existingReview}
+        />
       </Container>
     </section>
   );

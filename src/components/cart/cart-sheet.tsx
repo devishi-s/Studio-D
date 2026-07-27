@@ -43,11 +43,16 @@ export function CartSheet() {
         }
       >
         <ShoppingBag className="h-5 w-5" />
-        {mounted && itemCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-brand-coral text-[10px] font-bold text-white">
-            {itemCount > 99 ? "99+" : itemCount}
-          </span>
-        )}
+        {/* Always reserve badge box to avoid CLS when count hydrates from localStorage */}
+        <span
+          className={cn(
+            "absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-coral px-1 text-[10px] font-bold leading-none text-white tabular-nums",
+            (!mounted || itemCount === 0) && "invisible"
+          )}
+          aria-hidden={!mounted || itemCount === 0}
+        >
+          {itemCount > 99 ? "99+" : Math.max(itemCount, 0)}
+        </span>
       </SheetTrigger>
 
       <SheetContent side="right" className="flex w-full flex-col bg-brand-cream sm:max-w-md">

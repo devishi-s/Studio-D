@@ -1,6 +1,7 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { categories } from "@/data/products";
+import { cachedQuery, PRODUCT_REVALIDATE_SECONDS } from "@/lib/cache";
 import {
   escapeIlikePattern,
   type ProductQueryFilters,
@@ -70,6 +71,11 @@ function mapProduct(row: ProductRow): Product {
   };
 }
 
+/** Maps a products table row to the storefront `Product` shape. */
+export function mapProductRow(row: ProductRow): Product {
+  return mapProduct(row);
+}
+
 function assertNoError(error: { message: string } | null, context: string) {
   if (error) {
     throw new Error(`Supabase ${context}: ${error.message}`);
@@ -92,92 +98,150 @@ function applySort<
   }
 }
 
+function filtersCacheKey(filters: ProductQueryFilters): string {
+  return JSON.stringify({
+    search: filters.search ?? "",
+    category: filters.category ?? "all",
+    minPrice: filters.minPrice ?? null,
+    maxPrice: filters.maxPrice ?? null,
+    sort: filters.sort ?? "newest",
+  });
+}
+
 /**
  * Active products for the storefront.
  * Pass filters to apply name search, category, price range, and sort in Supabase.
+ * Results are cached for {@link PRODUCT_REVALIDATE_SECONDS}.
  */
 export async function getAllProducts(
   filters: ProductQueryFilters = {}
 ): Promise<Product[]> {
-  const supabase = createPublicClient();
-  const { search, category, minPrice, maxPrice, sort = "newest" } = filters;
+  const key = filtersCacheKey(filters);
 
-  let query = supabase.from("products").select("*").eq("is_active", true);
+  return cachedQuery(
+    async () => {
+      const supabase = createPublicClient();
+      const { search, category, minPrice, maxPrice, sort = "newest" } = filters;
 
-  if (search) {
-    query = query.ilike("name", `%${escapeIlikePattern(search)}%`);
-  }
-  if (category && category !== "all") {
-    query = query.eq("category", category);
-  }
-  if (minPrice != null) {
-    query = query.gte("price", minPrice);
-  }
-  if (maxPrice != null) {
-    query = query.lte("price", maxPrice);
-  }
+      let query = supabase.from("products").select("*").eq("is_active", true);
 
-  query = applySort(query, sort);
+      if (search) {
+        query = query.ilike("name", `%${escapeIlikePattern(search)}%`);
+      }
+      if (category && category !== "all") {
+        query = query.eq("category", category);
+      }
+      if (minPrice != null) {
+        query = query.gte("price", minPrice);
+      }
+      if (maxPrice != null) {
+        query = query.lte("price", maxPrice);
+      }
 
-  const { data, error } = await query;
-  assertNoError(error, "getAllProducts");
-  return (data ?? []).map(mapProduct);
+      query = applySort(query, sort);
+
+      const { data, error } = await query;
+      assertNoError(error, "getAllProducts");
+      return (data ?? []).map(mapProduct);
+    },
+    {
+      keyParts: ["products", "all", key],
+      tags: ["products"],
+      revalidate: PRODUCT_REVALIDATE_SECONDS,
+    }
+  );
 }
 
 /** Count of all active catalog products (unfiltered). */
 export async function getActiveProductCount(): Promise<number> {
-  const supabase = createPublicClient();
-  const { count, error } = await supabase
-    .from("products")
-    .select("*", { count: "exact", head: true })
-    .eq("is_active", true);
+  return cachedQuery(
+    async () => {
+      const supabase = createPublicClient();
+      const { count, error } = await supabase
+        .from("products")
+        .select("*", { count: "exact", head: true })
+        .eq("is_active", true);
 
-  assertNoError(error, "getActiveProductCount");
-  return count ?? 0;
+      assertNoError(error, "getActiveProductCount");
+      return count ?? 0;
+    },
+    {
+      keyParts: ["products", "active-count"],
+      tags: ["products"],
+      revalidate: PRODUCT_REVALIDATE_SECONDS,
+    }
+  );
 }
 
 /** Single active product by slug, or `null` when missing. */
 export async function getProductBySlug(
   slug: string
 ): Promise<Product | null> {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .maybeSingle();
+  return cachedQuery(
+    async () => {
+      const supabase = createPublicClient();
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("slug", slug)
+        .eq("is_active", true)
+        .maybeSingle();
 
-  assertNoError(error, "getProductBySlug");
-  return data ? mapProduct(data) : null;
+      assertNoError(error, "getProductBySlug");
+      return data ? mapProduct(data) : null;
+    },
+    {
+      keyParts: ["products", "slug", slug],
+      tags: ["products", `product:${slug}`],
+      revalidate: PRODUCT_REVALIDATE_SECONDS,
+    }
+  );
 }
 
 /** Active products in a category (category slug), newest first. */
 export async function getProductsByCategory(
   category: string
 ): Promise<Product[]> {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("category", category)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
+  return cachedQuery(
+    async () => {
+      const supabase = createPublicClient();
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("category", category)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
 
-  assertNoError(error, "getProductsByCategory");
-  return (data ?? []).map(mapProduct);
+      assertNoError(error, "getProductsByCategory");
+      return (data ?? []).map(mapProduct);
+    },
+    {
+      keyParts: ["products", "category", category],
+      tags: ["products", `category:${category}`],
+      revalidate: PRODUCT_REVALIDATE_SECONDS,
+    }
+  );
 }
 
 /** Active featured products, newest first. */
 export async function getFeaturedProducts(): Promise<Product[]> {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("featured", true)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
+  return cachedQuery(
+    async () => {
+      const supabase = createPublicClient();
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("featured", true)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
 
-  assertNoError(error, "getFeaturedProducts");
-  return (data ?? []).map(mapProduct);
+      assertNoError(error, "getFeaturedProducts");
+      return (data ?? []).map(mapProduct);
+    },
+    {
+      keyParts: ["products", "featured"],
+      tags: ["products"],
+      revalidate: PRODUCT_REVALIDATE_SECONDS,
+    }
+  );
 }

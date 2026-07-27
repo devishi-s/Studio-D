@@ -268,20 +268,27 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 ## Current Project State
 
 - **Roadmap phase:** Phase 5 — Polish + Launch
-- **Current step:** Phase 5.1 — SEO
-- Phase 1–4 complete (shipping-status emails deferred).
+- **Current step:** Deployment and Launch checklist (Phase 5 feature steps 5.1–5.5 complete)
+- Phase 1–4 complete (shipping-status emails deferred); Phase 5.1–5.5 complete.
 - Shop and product pages read from Supabase; category metadata still static.
+- Catalog reads use `unstable_cache` (3600s); product routes revalidate hourly; orders stay uncached for freshness.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
 - Auth uses Supabase email/password with cookie sessions via `@supabase/ssr`.
 - Account, checkout, order-confirmation, and admin routes are protected; admin also requires `profiles.is_admin`.
 - Checkout recalculates totals, creates Razorpay orders, verifies signatures, writes orders/items, decrements stock, and attempts Resend emails.
+- Reviews: approved-only public display + pending moderation at `/admin/reviews` (run `reviews.sql` on remote DB).
+- Wishlist: heart toggle on cards/detail, `/account/wishlist`, optimistic UI via `useWishlist` + provider (run `wishlist.sql`).
+- Global + page metadata, Organization/Product/LocalBusiness JSON-LD, `sitemap.ts`, and `robots.ts` are in place; OG image is still a placeholder.
+- Performance: Server `ProductImage`, lazy cart/mobile nav, Suspense skeletons, font `display: swap`, cart badge CLS guard, `@next/bundle-analyzer` (`npm run analyze`).
+- Analytics: Vercel Analytics + Speed Insights in root layout; funnel events via `src/lib/analytics.ts` (no PII). Dashboard data only on Vercel deploy.
 - Google OAuth is not implemented.
 - Cart still resolves line items from the static catalog array (checkout validation uses Supabase).
 - Contact form still uses `mailto:` draft handoff.
 - Product images: Storage + `ProductImage` wired; seeded mock paths still show placeholders until uploads.
 - Vercel deployment status is not verified.
-- Existing remote DBs need `orders-checkout.sql` and `admin-rls.sql` applied; set `is_admin` for your user.
+- Existing remote DBs need `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, and `wishlist.sql` applied; set `is_admin` for your user.
 - `RESEND_API_KEY` is placeholder until a real Resend key + domain are configured.
+- **There is no Phase 6** — remaining work is the Phase 5 Deployment and Launch checklist.
 
 ## Important Decisions and Why
 

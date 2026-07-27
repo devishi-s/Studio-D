@@ -69,6 +69,12 @@ export function AuthNav({ user }: AuthNavProps) {
         </span>
         <span className="max-w-[9rem] truncate">{label}</span>
       </Link>
+      <Link
+        href="/account/wishlist"
+        className="rounded-full px-3 py-2 text-sm font-medium text-brand-brown-light transition-colors hover:text-brand-brown"
+      >
+        Wishlist
+      </Link>
       <form action={logout}>
         <LogoutSubmitButton />
       </form>
@@ -111,6 +117,13 @@ export function MobileAuthLinks({ user, onNavigate }: MobileAuthLinksProps) {
         className="block rounded-md px-3 py-2.5 text-sm font-medium text-brand-brown"
       >
         Account
+      </Link>
+      <Link
+        href="/account/wishlist"
+        onClick={onNavigate}
+        className="block rounded-md px-3 py-2.5 text-sm font-medium text-brand-brown-light"
+      >
+        Wishlist
       </Link>
       <form action={logout}>
         <Button

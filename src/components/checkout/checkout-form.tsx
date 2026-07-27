@@ -17,6 +17,7 @@ import {
 } from "@/lib/checkout";
 import { FREE_SHIPPING_THRESHOLD } from "@/lib/constants";
 import { formatPrice } from "@/lib/format";
+import { trackPaymentInitiated } from "@/lib/analytics";
 import { validateCheckoutCart } from "@/lib/actions/checkout";
 import {
   openRazorpayCheckout,
@@ -131,6 +132,7 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
         });
       }
 
+      trackPaymentInitiated();
       await openRazorpayCheckout({
         keyId: createData.keyId,
         orderId: createData.razorpayOrderId,

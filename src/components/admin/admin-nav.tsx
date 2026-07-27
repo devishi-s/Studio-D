@@ -17,6 +17,11 @@ const ADMIN_NAV = [
     label: "Orders",
     match: (path: string) => path.startsWith("/admin/orders"),
   },
+  {
+    href: "/admin/reviews",
+    label: "Reviews",
+    match: (path: string) => path.startsWith("/admin/reviews"),
+  },
 ] as const;
 
 export function AdminNav() {

@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 
 import { cn } from "@/lib/utils";
@@ -19,12 +17,19 @@ type ProductImageProps = {
   height?: number;
   sizes?: string;
   priority?: boolean;
+  /**
+   * Prefer `"empty"` until real blur hashes exist for Storage assets.
+   * Avoids shipping large inline blurDataURLs.
+   */
+  placeholder?: "empty" | "blur";
+  blurDataURL?: string;
   placeholderVariant?: "cream" | "blush" | "sage" | "coral";
 };
 
 /**
  * Renders a product photo with `next/image` when a real remote URL is available.
  * Falls back to the branded placeholder for missing or mock `/images/...` paths.
+ * Server Component — no client JS.
  */
 export function ProductImage({
   src,
@@ -35,6 +40,8 @@ export function ProductImage({
   height,
   sizes = "(max-width: 768px) 100vw, 33vw",
   priority = false,
+  placeholder = "empty",
+  blurDataURL,
   placeholderVariant = "blush",
 }: ProductImageProps) {
   if (!canOptimizeProductImage(src)) {
@@ -47,6 +54,11 @@ export function ProductImage({
     );
   }
 
+  const blurProps =
+    placeholder === "blur" && blurDataURL
+      ? { placeholder: "blur" as const, blurDataURL }
+      : { placeholder: "empty" as const };
+
   if (fill) {
     return (
       <Image
@@ -55,6 +67,7 @@ export function ProductImage({
         fill
         sizes={sizes}
         priority={priority}
+        {...blurProps}
         className={cn("object-cover", className)}
       />
     );
@@ -68,6 +81,7 @@ export function ProductImage({
       height={height ?? 400}
       sizes={sizes}
       priority={priority}
+      {...blurProps}
       className={cn("object-cover", className)}
     />
   );

@@ -181,6 +181,90 @@ export type Database = {
           },
         ];
       };
+      reviews: {
+        Row: {
+          id: string;
+          product_id: string;
+          user_id: string;
+          rating: number;
+          title: string;
+          body: string;
+          is_approved: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          user_id: string;
+          rating: number;
+          title: string;
+          body: string;
+          is_approved?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          product_id?: string;
+          user_id?: string;
+          rating?: number;
+          title?: string;
+          body?: string;
+          is_approved?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey",
+            columns: ["product_id"],
+            isOneToOne: false,
+            referencedRelation: "products",
+            referencedColumns: ["id"],
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "profiles",
+            referencedColumns: ["id"],
+          },
+        ];
+      };
+      wishlist: {
+        Row: {
+          id: string;
+          user_id: string;
+          product_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          product_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          product_id?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_product_id_fkey",
+            columns: ["product_id"],
+            isOneToOne: false,
+            referencedRelation: "products",
+            referencedColumns: ["id"],
+          },
+          {
+            foreignKeyName: "wishlist_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "profiles",
+            referencedColumns: ["id"],
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {

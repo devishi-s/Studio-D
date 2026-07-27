@@ -4,11 +4,14 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "@/components/auth/login-form";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Sign in",
   description: "Sign in to your Studio D account.",
-};
+  path: "/login",
+  noIndex: true,
+});
 
 export default async function LoginPage() {
   const supabase = await createClient();

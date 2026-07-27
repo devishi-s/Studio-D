@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { requireUser } from "@/lib/supabase/require-user";
 import { getOrderById } from "@/lib/supabase/orders";
 import { formatDate, formatPrice } from "@/lib/format";
+import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/product/product-image";
@@ -19,10 +20,12 @@ export async function generateMetadata({
   params,
 }: OrderDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  return {
+  return buildPageMetadata({
     title: `Order ${id.slice(0, 8).toUpperCase()}`,
     description: "Studio D order details.",
-  };
+    path: `/account/orders/${id}`,
+    noIndex: true,
+  });
 }
 
 export default async function OrderDetailPage({

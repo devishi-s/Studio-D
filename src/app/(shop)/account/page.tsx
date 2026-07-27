@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronRight, Package, ShoppingBag } from "lucide-react";
+import { ChevronRight, Heart, Package, ShoppingBag } from "lucide-react";
 
 import { requireUser } from "@/lib/supabase/require-user";
 import { createClient } from "@/lib/supabase/server";
@@ -9,11 +9,14 @@ import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { AccountAvatar } from "@/components/account/account-avatar";
 import { ProfileEditForm } from "@/components/account/profile-edit-form";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Account",
   description: "Manage your Studio D profile and orders.",
-};
+  path: "/account",
+  noIndex: true,
+});
 
 export default async function AccountPage() {
   const user = await requireUser("/account");
@@ -92,6 +95,24 @@ export default async function AccountPage() {
                 <p className="font-medium text-brand-brown">Order history</p>
                 <p className="text-sm text-muted-foreground">
                   View past and current orders
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+
+          <Link
+            href="/account/wishlist"
+            className="mt-3 flex items-center justify-between rounded-2xl border border-border bg-white px-5 py-4 transition-colors hover:border-brand-coral/40 hover:bg-brand-blush/30"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blush">
+                <Heart className="h-4 w-4 text-brand-coral" />
+              </span>
+              <div>
+                <p className="font-medium text-brand-brown">Wishlist</p>
+                <p className="text-sm text-muted-foreground">
+                  Saved pieces for later
                 </p>
               </div>
             </div>

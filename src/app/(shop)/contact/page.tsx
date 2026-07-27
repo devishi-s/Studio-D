@@ -4,12 +4,14 @@ import { AtSign, Clock3, Mail, MapPin } from "lucide-react";
 
 import { ContactForm } from "@/components/common/contact-form";
 import { Container } from "@/components/layout/container";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Contact",
   description:
     "Get in touch with Studio D about handmade products, custom orders, thoughtful gifts, or order support.",
-};
+  path: "/contact",
+});
 
 const CONTACT_DETAILS = [
   {

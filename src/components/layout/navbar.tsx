@@ -3,10 +3,9 @@ import Link from "next/link";
 import { SITE_NAME } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/layout/container";
-import { MobileNav } from "@/components/layout/mobile-nav";
 import { NavLinks } from "@/components/layout/nav-links";
-import { CartSheet } from "@/components/cart/cart-sheet";
-import { AuthNav, type AuthUserSummary } from "@/components/auth/auth-nav";
+import { NavbarActions } from "@/components/layout/navbar-actions";
+import type { AuthUserSummary } from "@/components/auth/auth-nav";
 
 async function getAuthUser(): Promise<AuthUserSummary | null> {
   const supabase = await createClient();
@@ -42,11 +41,7 @@ export async function Navbar() {
 
           <NavLinks />
 
-          <div className="flex items-center gap-1 sm:gap-2">
-            <AuthNav user={user} />
-            <CartSheet />
-            <MobileNav user={user} />
-          </div>
+          <NavbarActions user={user} />
         </div>
       </Container>
     </header>

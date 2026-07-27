@@ -8,6 +8,7 @@ import { QuantitySelector } from "@/components/product/quantity-selector";
 type ProductDetailCartProps = {
   productId: string;
   productName: string;
+  price: number;
   inStock: boolean;
   maxQuantity: number;
 };
@@ -15,6 +16,7 @@ type ProductDetailCartProps = {
 export function ProductDetailCart({
   productId,
   productName,
+  price,
   inStock,
   maxQuantity,
 }: ProductDetailCartProps) {
@@ -35,6 +37,7 @@ export function ProductDetailCart({
       <AddToCartButton
         productId={productId}
         productName={productName}
+        price={price}
         inStock={inStock}
         quantity={quantity}
       />

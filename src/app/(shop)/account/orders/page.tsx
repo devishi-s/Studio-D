@@ -7,11 +7,14 @@ import { getOrdersByUser } from "@/lib/supabase/orders";
 import { formatDate, formatPrice } from "@/lib/format";
 import { Container } from "@/components/layout/container";
 import { OrderStatusBadge } from "@/components/account/order-status-badge";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Orders",
   description: "Your Studio D order history.",
-};
+  path: "/account/orders",
+  noIndex: true,
+});
 
 export default async function AccountOrdersPage() {
   const user = await requireUser("/account/orders");

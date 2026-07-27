@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { getFeaturedProducts } from "@/lib/supabase/products";
+import { buildPageMetadata, organizationJsonLd } from "@/lib/seo";
 import { HeroBanner } from "@/components/layout/hero-banner";
 import { CategoryShowcase } from "@/components/layout/category-showcase";
 import { FeaturedProducts } from "@/components/layout/featured-products";
@@ -8,8 +10,18 @@ import { BrandStory } from "@/components/layout/brand-story";
 import { ProductGridSkeleton } from "@/components/product/product-grid-skeleton";
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/common/section-header";
+import { JsonLd } from "@/components/seo/json-ld";
 
-export const revalidate = 60;
+/** Keep in sync with PRODUCT_REVALIDATE_SECONDS in src/lib/cache.ts */
+export const revalidate = 3600;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Studio D | Handmade Crochet, Paintings & Thoughtful Gifts",
+  description:
+    "Studio D crafts handmade crochet flowers, original paintings, and warm home decor — made slowly, meant to last.",
+  path: "/",
+  absoluteTitle: true,
+});
 
 type HomePageProps = {
   searchParams: Promise<{ error?: string }>;
@@ -42,6 +54,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   return (
     <>
+      <JsonLd data={organizationJsonLd()} />
       {showUnauthorized ? (
         <div className="border-b border-destructive/20 bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
           You don&apos;t have access to the admin area. If you believe this is a

@@ -59,6 +59,24 @@ export type NavLink = {
 
 export type SortOption = "newest" | "price-asc" | "price-desc" | "name-asc";
 
+/** Approved (or own) product review for storefront / account display. */
+export type ProductReview = {
+  id: string;
+  productId: string;
+  userId: string;
+  rating: number;
+  title: string;
+  body: string;
+  isApproved: boolean;
+  createdAt: string;
+  reviewerName: string;
+};
+
+export type ReviewRatingSummary = {
+  average: number;
+  count: number;
+};
+
 /** Checkout contact + delivery fields collected before payment (Phase 4.1). */
 export type CheckoutAddress = {
   fullName: string;

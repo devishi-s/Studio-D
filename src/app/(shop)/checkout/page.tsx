@@ -6,11 +6,15 @@ import { requireUser } from "@/lib/supabase/require-user";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/layout/container";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { AnalyticsEvent } from "@/components/analytics/analytics-event";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Checkout",
   description: "Enter your delivery details to complete your Studio D order.",
-};
+  path: "/checkout",
+  noIndex: true,
+});
 
 export default async function CheckoutPage() {
   const user = await requireUser("/checkout");
@@ -32,6 +36,7 @@ export default async function CheckoutPage() {
 
   return (
     <section className="py-10 sm:py-14">
+      <AnalyticsEvent event="checkout_started" />
       <Container>
         <nav className="mb-6">
           <Link

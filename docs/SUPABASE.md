@@ -49,6 +49,8 @@ In the Supabase dashboard **SQL Editor**, run in order:
 3. `supabase/storage.sql` — `product-images` bucket + Storage policies
 4. `supabase/orders-checkout.sql` — **required for existing projects** that already ran an older `schema.sql` (adds Razorpay/shipping columns + insert policies + stock RPC)
 5. `supabase/admin-rls.sql` — `profiles.is_admin`, admin RLS, promote yourself via the SQL comment at the bottom
+6. `supabase/reviews.sql` — Phase 5.4 product reviews + moderation RLS
+7. `supabase/wishlist.sql` — Phase 5.5 authenticated save-for-later wishlist
 
 To regenerate the seed after editing the static catalog:
 

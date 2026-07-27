@@ -19,14 +19,13 @@
 
 ## Status
 
-- **Current phase:** Phase 4 — Checkout + Payments
-- **Current step:** Phase 5.1 — SEO
+- **Current phase:** Phase 5 — Polish + Launch
+- **Current step:** Deployment and Launch checklist
 - **Completed phases:** Phases 1, 2, 3, and 4
-- **Completed Phase 2 steps:** 5 of 5
-- **Completed Phase 3 steps:** 6 of 6
+- **Completed Phase 5 steps:** 5.1 SEO, 5.2 Performance, 5.3 Analytics, 5.4 Reviews, 5.5 Wishlist
 - **Backend:** Full Phase 4 commerce path live (checkout, Razorpay, orders, admin, Resend hooks)
-- **Payments:** Not started
-- **Checkout:** Not started
+- **Payments:** Razorpay wired (real keys still required for live charges)
+- **Checkout:** Complete
 - **Deployment:** Intended for Vercel; current deployment status is unverified
 
 ## Original Delivery Strategy
@@ -416,53 +415,53 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 **Dependency:** Core purchase flow must be secure and stable.
 
-## 5.1 SEO — **CURRENT STEP**
+## 5.1 SEO — **COMPLETE**
 
-- [ ] Add complete page metadata.
-- [ ] Add canonical URLs.
-- [ ] Add Open Graph and social sharing metadata.
-- [ ] Add product and organization JSON-LD.
-- [ ] Generate `sitemap.xml`.
-- [ ] Configure `robots.txt`.
-- [ ] Verify indexability and invalid-page behavior.
+- [x] Add complete page metadata.
+- [x] Add canonical URLs.
+- [x] Add Open Graph and social sharing metadata.
+- [x] Add product and organization JSON-LD.
+- [x] Generate `sitemap.xml`.
+- [x] Configure `robots.txt`.
+- [x] Verify indexability and invalid-page behavior.
 - [ ] Add meaningful alt text and semantic headings.
 
-## 5.2 Performance
+## 5.2 Performance — **COMPLETE**
 
-- [ ] Optimize all images.
-- [ ] Add lazy loading where appropriate.
-- [ ] Tune Core Web Vitals.
-- [ ] Minimize Client Component boundaries and shipped JavaScript.
-- [ ] Add loading skeletons where they improve perceived speed.
-- [ ] Audit fonts, caching, data fetching, and bundle size.
+- [x] Optimize all images.
+- [x] Add lazy loading where appropriate.
+- [x] Tune Core Web Vitals.
+- [x] Minimize Client Component boundaries and shipped JavaScript.
+- [x] Add loading skeletons where they improve perceived speed.
+- [x] Audit fonts, caching, data fetching, and bundle size.
 - [ ] Test on slower mobile devices and networks.
 
-## 5.3 Analytics
+## 5.3 Analytics — **COMPLETE**
 
-- [ ] Select Google Analytics or Plausible.
-- [ ] Add privacy-conscious page analytics.
-- [ ] Track product views.
-- [ ] Track Add to Cart.
-- [ ] Track checkout progress.
-- [ ] Track purchase conversion.
-- [ ] Avoid collecting sensitive customer/payment information.
+- [x] Select Google Analytics or Plausible. → Chose Vercel Analytics + Speed Insights
+- [x] Add privacy-conscious page analytics.
+- [x] Track product views.
+- [x] Track Add to Cart.
+- [x] Track checkout progress.
+- [x] Track purchase conversion.
+- [x] Avoid collecting sensitive customer/payment information.
 
-## 5.4 Reviews system
+## 5.4 Reviews system — **COMPLETE**
 
-- [ ] Add customer ratings and reviews to product pages.
-- [ ] Build a reusable `StarRating`.
-- [ ] Restrict submission appropriately.
-- [ ] Add moderation/approval.
-- [ ] Add empty, loading, and error states.
-- [ ] Ensure aggregate rating data is accurate.
+- [x] Add customer ratings and reviews to product pages.
+- [x] Build a reusable `StarRating`.
+- [x] Restrict submission appropriately.
+- [x] Add moderation/approval.
+- [x] Add empty, loading, and error states.
+- [x] Ensure aggregate rating data is accurate.
 
-## 5.5 Wishlist
+## 5.5 Wishlist — **COMPLETE**
 
-- [ ] Add authenticated “save for later” behavior.
-- [ ] Add wishlist UI on product cards and details.
-- [ ] Add an account wishlist view.
-- [ ] Persist wishlist data in Supabase.
-- [ ] Handle signed-out users gracefully.
+- [x] Add authenticated “save for later” behavior.
+- [x] Add wishlist UI on product cards and details.
+- [x] Add an account wishlist view.
+- [x] Persist wishlist data in Supabase.
+- [x] Handle signed-out users gracefully.
 
 ---
 
@@ -493,10 +492,15 @@ This route inventory was part of the original canvas and must remain aligned wit
 
 ## Phase 4
 
-- [ ] `/checkout`
-- [ ] `/admin`
-- [ ] `/admin/products`
-- [ ] `/admin/orders`
+- [x] `/checkout`
+- [x] `/admin`
+- [x] `/admin/products`
+- [x] `/admin/orders`
+
+## Phase 5
+
+- [x] `/admin/reviews`
+- [x] `/account/wishlist`
 
 ---
 
@@ -607,10 +611,6 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 # Current Handoff
 
-Phase 4 is complete (checkout through Resend email hooks). Shipping-status emails are deferred. The next agent must begin with:
+Phase 5 feature steps (5.1–5.5) are complete. The next authorized work is the Phase 5 **Deployment and Launch** checklist (env separation, Vercel deploy when requested, production smoke tests). There is no Phase 6.
 
-## Phase 5.1 — SEO
-
-Do not begin reviews or wishlist work until SEO is complete and both project memory files have been updated.
-
-**Ops reminder:** Real Resend sends need `RESEND_API_KEY` + a verified domain — see `docs/EMAIL.md`.
+**Ops reminder:** Run `supabase/wishlist.sql` (and earlier migrations if needed) in the Supabase SQL Editor — see `docs/SUPABASE.md`.
