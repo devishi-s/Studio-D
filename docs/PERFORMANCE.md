@@ -64,7 +64,7 @@ Do **not** mark a component `"use client"` unless it uses hooks, events, browser
 
 - `src/lib/cache.ts` — `PRODUCT_REVALIDATE_SECONDS` (3600), `ORDER_REVALIDATE_SECONDS` (30), `cachedQuery`
 - `src/lib/supabase/products.ts` — all public catalog reads go through `cachedQuery` with `tags: ["products"]`
-- After admin product edits, consider `revalidateTag("products")` (follow-up when admin mutation path is extended)
+- Admin product create/update/delete call `updateTag("products")` (and related tags) so the storefront refreshes immediately
 
 Orders stay on the authenticated Supabase server client without catalog-style hour-long caching.
 

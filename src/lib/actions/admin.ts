@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { requireAdmin } from "@/lib/supabase/require-admin";
 import {
@@ -8,6 +8,7 @@ import {
   deleteProduct,
   updateOrderStatus,
   updateProduct,
+  type AdminProduct,
 } from "@/lib/supabase/admin";
 import type { OrderStatus } from "@/types";
 import type { Database } from "@/types/database";
@@ -19,15 +20,38 @@ export type AdminActionResult =
   | { ok: true; id?: string }
   | { ok: false; error: string };
 
+/** Bust catalog `unstable_cache` + refresh storefront/admin product views. */
+function revalidateProductCatalog(
+  product?: Partial<Pick<AdminProduct, "id" | "slug" | "category">>
+) {
+  // Server Actions: updateTag expires tagged caches immediately (Next.js 16+).
+  updateTag("products");
+  if (product?.slug) updateTag(`product:${product.slug}`);
+  if (product?.category) updateTag(`category:${product.category}`);
+
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/categories", "layout");
+  revalidatePath("/admin");
+  revalidatePath("/admin/products");
+  if (product?.id) {
+    revalidatePath(`/admin/products/${product.id}/edit`);
+  }
+  if (product?.slug) {
+    revalidatePath(`/products/${product.slug}`);
+  }
+  if (product?.category) {
+    revalidatePath(`/categories/${product.category}`);
+  }
+}
+
 export async function adminCreateProductAction(
   input: ProductInsert
 ): Promise<AdminActionResult> {
   await requireAdmin();
   try {
     const product = await createProduct(input);
-    revalidatePath("/admin");
-    revalidatePath("/admin/products");
-    revalidatePath("/products");
+    revalidateProductCatalog(product);
     return { ok: true, id: product.id };
   } catch (err) {
     return {
@@ -43,11 +67,8 @@ export async function adminUpdateProductAction(
 ): Promise<AdminActionResult> {
   await requireAdmin();
   try {
-    await updateProduct(id, patch);
-    revalidatePath("/admin");
-    revalidatePath("/admin/products");
-    revalidatePath(`/admin/products/${id}/edit`);
-    revalidatePath("/products");
+    const product = await updateProduct(id, patch);
+    revalidateProductCatalog(product);
     return { ok: true, id };
   } catch (err) {
     return {
@@ -63,9 +84,7 @@ export async function adminDeleteProductAction(
   await requireAdmin();
   try {
     await deleteProduct(id);
-    revalidatePath("/admin");
-    revalidatePath("/admin/products");
-    revalidatePath("/products");
+    revalidateProductCatalog({ id });
     return { ok: true };
   } catch (err) {
     return {
