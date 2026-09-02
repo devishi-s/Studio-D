@@ -4,17 +4,19 @@ import Link from "next/link";
 import { ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react";
 
 import { useMounted } from "@/hooks/use-mounted";
-import { useCartStore, getItemsWithProducts, getCartItemCount } from "@/store/cart.store";
+import { useResolvedCart } from "@/hooks/use-resolved-cart";
 import { CartItemRow } from "@/components/cart/cart-item-row";
 import { CartSummary } from "@/components/cart/cart-summary";
 
-export function CartPageContent() {
-  const mounted = useMounted();
-  const items = useCartStore((s) => s.items);
-  const resolved = getItemsWithProducts(items);
-  const itemCount = getCartItemCount(items);
+type CartPageContentProps = {
+  isSignedIn?: boolean;
+};
 
-  if (!mounted) {
+export function CartPageContent({ isSignedIn = false }: CartPageContentProps) {
+  const mounted = useMounted();
+  const { items, resolved, itemCount, isLoading } = useResolvedCart();
+
+  if (!mounted || (items.length > 0 && isLoading)) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-brown border-t-transparent" />
@@ -48,7 +50,6 @@ export function CartPageContent() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-10">
-      {/* Left: Cart items */}
       <div>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-heading text-lg font-semibold text-brand-brown">
@@ -70,9 +71,8 @@ export function CartPageContent() {
         </div>
       </div>
 
-      {/* Right: Order summary */}
       <div className="lg:sticky lg:top-24">
-        <CartSummary />
+        <CartSummary isSignedIn={isSignedIn} />
       </div>
     </div>
   );

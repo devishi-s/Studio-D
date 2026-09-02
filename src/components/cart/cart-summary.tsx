@@ -6,11 +6,8 @@ import { Truck, Shield, Undo2 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import { FREE_SHIPPING_THRESHOLD } from "@/lib/constants";
 import { getDeliveryFee } from "@/lib/checkout";
-import {
-  useCartStore,
-  getCartItemCount,
-  getCartSubtotal,
-} from "@/store/cart.store";
+import { useResolvedCart } from "@/hooks/use-resolved-cart";
+import { useCartStore } from "@/store/cart.store";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -21,13 +18,19 @@ const PERKS = [
   { icon: Undo2, text: "Easy 7-day returns" },
 ] as const;
 
-export function CartSummary() {
-  const items = useCartStore((s) => s.items);
+export function CartSummary({ isSignedIn = false }: { isSignedIn?: boolean }) {
   const clearCart = useCartStore((s) => s.clearCart);
-  const itemCount = getCartItemCount(items);
-  const subtotal = getCartSubtotal(items);
+  const { itemCount, subtotal, isLoading } = useResolvedCart();
   const deliveryFee = getDeliveryFee(subtotal);
   const total = subtotal + deliveryFee;
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[200px] items-center justify-center rounded-xl border border-border/40 bg-card p-6">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-brown border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-xl border border-border/40 bg-card p-6">
@@ -80,7 +83,9 @@ export function CartSummary() {
       </Link>
 
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        Sign in required. Delivery calculated at checkout.
+        {isSignedIn
+          ? "Delivery is confirmed at checkout."
+          : "Sign in required. Delivery calculated at checkout."}
       </p>
 
       <div className="mt-5 grid grid-cols-3 gap-2">

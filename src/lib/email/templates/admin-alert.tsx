@@ -95,8 +95,6 @@ export function AdminOrderAlertEmail({
   );
 }
 
-export default AdminOrderAlertEmail;
-
 const styles: Record<string, CSSProperties> = {
   body: {
     backgroundColor: colors.cream,

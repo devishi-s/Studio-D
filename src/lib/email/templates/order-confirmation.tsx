@@ -150,8 +150,6 @@ export function OrderConfirmationEmail({
   );
 }
 
-export default OrderConfirmationEmail;
-
 const styles: Record<string, CSSProperties> = {
   body: {
     backgroundColor: colors.cream,

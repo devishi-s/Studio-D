@@ -2,9 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import type { CartItem, CartItemWithProduct, Product } from "@/types";
-// Temporary fallback until cart resolution moves to live catalog data.
-// Product IDs match Supabase seed rows (prod-1 …).
-import { products as allProducts } from "@/data/products";
 import { MAX_CART_ITEMS } from "@/lib/constants";
 
 // ─── Store shape ─────────────────────────────────────────────
@@ -72,20 +69,25 @@ export const useCartStore = create<CartStore>()(
   )
 );
 
-// ─── Derived selectors (called outside the store) ────────────
+// ─── Derived helpers (need a live catalog map from Supabase) ─
 
-function resolveProduct(productId: string): Product | undefined {
-  return allProducts.find((p) => p.id === productId);
+function resolveProduct(
+  productId: string,
+  catalog: Map<string, Product> | ReadonlyMap<string, Product>
+): Product | undefined {
+  return catalog.get(productId);
 }
 
 /**
- * Returns cart items with full Product data attached.
- * Filters out any items whose product no longer exists
- * (e.g. if a product was removed from the catalog).
+ * Returns cart items with full Product data attached from a live catalog map.
+ * Filters out lines whose product is missing (inactive / deleted).
  */
-export function getItemsWithProducts(items: CartItem[]): CartItemWithProduct[] {
+export function getItemsWithProducts(
+  items: CartItem[],
+  catalog: Map<string, Product> | ReadonlyMap<string, Product>
+): CartItemWithProduct[] {
   return items.reduce<CartItemWithProduct[]>((acc, item) => {
-    const product = resolveProduct(item.productId);
+    const product = resolveProduct(item.productId, catalog);
     if (product) {
       acc.push({ product, quantity: item.quantity });
     }
@@ -99,8 +101,11 @@ export function getCartItemCount(items: CartItem[]): number {
 }
 
 /** Cart subtotal in the base currency (before shipping/tax). */
-export function getCartSubtotal(items: CartItem[]): number {
-  return getItemsWithProducts(items).reduce(
+export function getCartSubtotal(
+  items: CartItem[],
+  catalog: Map<string, Product> | ReadonlyMap<string, Product>
+): number {
+  return getItemsWithProducts(items, catalog).reduce(
     (sum, { product, quantity }) => sum + product.price * quantity,
     0
   );

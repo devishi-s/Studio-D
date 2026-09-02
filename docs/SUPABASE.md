@@ -81,7 +81,7 @@ node --experimental-strip-types scripts/generate-seed.mjs
 | --- | --- | --- |
 | `getPublicImageUrl(bucket, path)` | `src/lib/supabase/storage.ts` | Builds `{SUPABASE_URL}/storage/v1/object/public/{bucket}/{path}` |
 | `resolveProductImagePath(path)` | same | Absolute URLs stay as-is; `/images/...` mocks stay as-is; relative paths become public Storage URLs |
-| `uploadProductImage(file, path)` | same | Uploads to `product-images` (for future admin); requires an authenticated session |
+| `getPublicImageUrl` / `resolveProductImagePath` | `src/lib/supabase/storage.ts` | Build public URLs / normalize product image paths |
 | `ProductImage` | `src/components/product/product-image.tsx` | Uses `next/image` for remote URLs; branded placeholder for mocks / missing |
 
 `next.config.ts` allows your Supabase host under `/storage/v1/object/public/**` so `next/image` can optimize Storage URLs.
@@ -105,7 +105,7 @@ When you are ready to replace placeholders:
 3. Upload under a stable path convention, e.g. `{productId}/main.jpg`, `{productId}/detail-1.jpg`.
 4. Either:
    - Use the dashboard to upload into bucket `product-images`, then update `products.images` to the object paths, or
-   - Call `uploadProductImage(file, "prod-1/main.jpg")` from future admin tooling and save the returned `path` on the product row.
+- Call `getPublicImageUrl` / set `products.images` to storage object paths after uploading in the Supabase dashboard, or paste public URLs in admin.
 
 Example SQL after uploading `prod-1/main.jpg` in the dashboard:
 

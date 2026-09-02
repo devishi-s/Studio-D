@@ -38,7 +38,7 @@ export type CartItem = {
 /**
  * Resolved cart item with full product data attached.
  * Used by UI components that need to display product details.
- * Created on-the-fly by the cart store's `getItemsWithProducts()` helper.
+ * Created on-the-fly by `getItemsWithProducts()` with a live Supabase catalog map.
  */
 export type CartItemWithProduct = {
   product: Product;

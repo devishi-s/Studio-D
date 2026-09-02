@@ -13,15 +13,6 @@ export type WishlistActionResult =
   | { ok: true; wishlisted: boolean }
   | { ok: false; error: string; requiresAuth?: boolean };
 
-export async function getMyWishlistIdsAction(): Promise<string[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
-  return getWishlistProductIds(user.id);
-}
-
 export async function toggleWishlistAction(
   productId: string
 ): Promise<WishlistActionResult> {

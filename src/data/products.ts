@@ -1,14 +1,11 @@
 /**
- * @deprecated Phase 3.2 — product catalog reads now go through
- * `src/lib/supabase/products.ts`. This file remains as a local fallback and
- * reference (categories metadata, cart product resolution, rollback).
- * Do not add new storefront page imports for product queries from here.
- * Prefer `getAllProducts`, `getProductBySlug`, `getProductsByCategory`, and
- * `getFeaturedProducts` from `@/lib/supabase/products`.
- * Sorting/filtering helpers for fetched lists live in `@/lib/products`.
+ * Static categories + legacy seed catalog.
+ * Storefront product queries use `src/lib/supabase/products.ts`.
+ * The `products` array remains for `scripts/generate-seed.mjs` only.
+ * Cart resolution uses live Supabase via `useResolvedCart`.
  */
 
-import type { Product, Category, SortOption } from "@/types";
+import type { Product, Category } from "@/types";
 
 // ─── Categories ──────────────────────────────────────────────
 
@@ -316,52 +313,6 @@ export const products: Product[] = [
   },
 ];
 
-// ─── Query helpers ───────────────────────────────────────────
-
-export function getProductBySlug(slug: string): Product | undefined {
-  return products.find((p) => p.slug === slug);
-}
-
-export function getProductsByCategory(categorySlug: string): Product[] {
-  return products.filter(
-    (p) => p.category.slug === categorySlug && p.isActive
-  );
-}
-
-export function getFeaturedProducts(): Product[] {
-  return products.filter((p) => p.isFeatured && p.isActive);
-}
-
 export function getCategoryBySlug(slug: string): Category | undefined {
   return categories.find((c) => c.slug === slug);
-}
-
-export function getAllActiveProducts(): Product[] {
-  return products.filter((p) => p.isActive);
-}
-
-export function sortProducts(items: Product[], sort: SortOption): Product[] {
-  const sorted = [...items];
-  switch (sort) {
-    case "price-asc":
-      return sorted.sort((a, b) => a.price - b.price);
-    case "price-desc":
-      return sorted.sort((a, b) => b.price - a.price);
-    case "name-asc":
-      return sorted.sort((a, b) => a.name.localeCompare(b.name));
-    case "newest":
-    default:
-      return sorted.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  }
-}
-
-export function filterProducts(
-  items: Product[],
-  categorySlug?: string
-): Product[] {
-  if (!categorySlug || categorySlug === "all") return items;
-  return items.filter((p) => p.category.slug === categorySlug);
 }

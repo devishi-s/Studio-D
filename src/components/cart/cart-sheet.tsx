@@ -7,7 +7,8 @@ import { ShoppingBag, Trash2, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 import { useMounted } from "@/hooks/use-mounted";
-import { useCartStore, getItemsWithProducts, getCartItemCount, getCartSubtotal } from "@/store/cart.store";
+import { useResolvedCart } from "@/hooks/use-resolved-cart";
+import { useCartStore } from "@/store/cart.store";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/product/product-image";
 import {
@@ -23,14 +24,14 @@ export function CartSheet() {
   const [open, setOpen] = useState(false);
   const mounted = useMounted();
 
-  const items = useCartStore((s) => s.items);
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const clearCart = useCartStore((s) => s.clearCart);
+  const { items, resolved, itemCount, subtotal, isLoading } = useResolvedCart();
 
-  const resolved = getItemsWithProducts(items);
-  const itemCount = getCartItemCount(items);
-  const subtotal = getCartSubtotal(items);
+  const showEmpty = mounted && items.length === 0;
+  const showLoading = mounted && items.length > 0 && isLoading;
+  const showItems = mounted && resolved.length > 0 && !isLoading;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -43,7 +44,6 @@ export function CartSheet() {
         }
       >
         <ShoppingBag className="h-5 w-5" />
-        {/* Always reserve badge box to avoid CLS when count hydrates from localStorage */}
         <span
           className={cn(
             "absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-coral px-1 text-[10px] font-bold leading-none text-white tabular-nums",
@@ -68,7 +68,11 @@ export function CartSheet() {
           </SheetTitle>
         </SheetHeader>
 
-        {resolved.length === 0 ? (
+        {showLoading ? (
+          <div className="flex flex-1 items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-brown border-t-transparent" />
+          </div>
+        ) : showEmpty || (!showItems && mounted) ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 text-center">
             <div className="rounded-full bg-brand-blush p-6">
               <ShoppingBag className="h-8 w-8 text-brand-brown-light" />
@@ -87,7 +91,7 @@ export function CartSheet() {
               Browse Products
             </Link>
           </div>
-        ) : (
+        ) : showItems ? (
           <>
             <div className="flex-1 overflow-y-auto px-4 py-2">
               <ul className="space-y-4">
@@ -125,7 +129,9 @@ export function CartSheet() {
                               "inline-flex h-6 w-6 items-center justify-center rounded-full text-brand-brown-light transition-colors hover:bg-brand-blush hover:text-brand-brown",
                               quantity <= 1 && "opacity-40"
                             )}
-                            onClick={() => updateQuantity(product.id, quantity - 1)}
+                            onClick={() =>
+                              updateQuantity(product.id, quantity - 1)
+                            }
                             disabled={quantity <= 1}
                             aria-label="Decrease quantity"
                           >
@@ -136,7 +142,9 @@ export function CartSheet() {
                           </span>
                           <button
                             className="inline-flex h-6 w-6 items-center justify-center rounded-full text-brand-brown-light transition-colors hover:bg-brand-blush hover:text-brand-brown"
-                            onClick={() => updateQuantity(product.id, quantity + 1)}
+                            onClick={() =>
+                              updateQuantity(product.id, quantity + 1)
+                            }
                             aria-label="Increase quantity"
                           >
                             <Plus className="h-3 w-3" />
@@ -199,6 +207,10 @@ export function CartSheet() {
               </button>
             </SheetFooter>
           </>
+        ) : (
+          <div className="flex flex-1 items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-brown border-t-transparent" />
+          </div>
         )}
       </SheetContent>
     </Sheet>

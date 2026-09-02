@@ -98,12 +98,3 @@ export function sortProducts(items: Product[], sort: SortOption): Product[] {
       );
   }
 }
-
-/** Pure in-memory category filter for already-fetched product lists. */
-export function filterProducts(
-  items: Product[],
-  categorySlug?: string
-): Product[] {
-  if (!categorySlug || categorySlug === "all") return items;
-  return items.filter((p) => p.category.slug === categorySlug);
-}

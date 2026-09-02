@@ -1,8 +1,3 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-
-import { createClient as createBrowserClient } from "@/lib/supabase/client";
-import type { Database } from "@/types/database";
-
 /** Public Storage bucket for catalog product photos. */
 export const PRODUCT_IMAGES_BUCKET = "product-images";
 
@@ -42,40 +37,4 @@ export function canOptimizeProductImage(src: string | null | undefined): boolean
   // Seeded mock paths are not real files under /public — keep placeholders.
   if (src.startsWith("/images/")) return false;
   return src.startsWith("http://") || src.startsWith("https://");
-}
-
-export type UploadProductImageResult = {
-  path: string;
-  publicUrl: string;
-};
-
-/**
- * Uploads a product image to the `product-images` bucket.
- * Intended for future admin tooling. Requires an authenticated session
- * (or pass a privileged Supabase client).
- */
-export async function uploadProductImage(
-  file: File | Blob,
-  path: string,
-  client?: SupabaseClient<Database>
-): Promise<UploadProductImageResult> {
-  const supabase = client ?? createBrowserClient();
-  const cleanPath = path.replace(/^\/+/, "");
-
-  const { data, error } = await supabase.storage
-    .from(PRODUCT_IMAGES_BUCKET)
-    .upload(cleanPath, file, {
-      upsert: true,
-      contentType: file.type || undefined,
-    });
-
-  if (error) {
-    throw new Error(`Supabase uploadProductImage: ${error.message}`);
-  }
-
-  const storedPath = data.path;
-  return {
-    path: storedPath,
-    publicUrl: getPublicImageUrl(PRODUCT_IMAGES_BUCKET, storedPath),
-  };
 }

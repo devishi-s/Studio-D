@@ -3,12 +3,6 @@ import { unstable_cache } from "next/cache";
 /** Catalog / product pages — 1 hour ISR-style cache. */
 export const PRODUCT_REVALIDATE_SECONDS = 3600;
 
-/**
- * Account/order data must stay fresh. Prefer no `unstable_cache`
- * (or a very short window) because responses are user-scoped.
- */
-export const ORDER_REVALIDATE_SECONDS = 30;
-
 type CacheOptions = {
   keyParts: string[];
   tags?: string[];

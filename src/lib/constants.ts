@@ -20,15 +20,7 @@ export const FOOTER_LINKS: NavLink[] = [
   { label: "Contact", href: "/contact" },
 ];
 
-export const CATEGORIES = [
-  "crochet-flowers",
-  "paintings",
-  "handmade-gifts",
-  "decorative-items",
-] as const;
-
 export const CURRENCY = "INR";
-export const CURRENCY_SYMBOL = "\u20B9";
 
 export const MAX_CART_ITEMS = 99;
 export const FREE_SHIPPING_THRESHOLD = 999;

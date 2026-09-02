@@ -24,13 +24,9 @@ import {
   type RazorpaySuccessResponse,
 } from "@/lib/razorpay-client";
 import { useMounted } from "@/hooks/use-mounted";
-import {
-  getCartItemCount,
-  getCartSubtotal,
-  getItemsWithProducts,
-  useCartStore,
-} from "@/store/cart.store";
-import type { CheckoutAddress, CheckoutDraft } from "@/types";
+import { useResolvedCart } from "@/hooks/use-resolved-cart";
+import { useCartStore } from "@/store/cart.store";
+import type { CartItemWithProduct, CheckoutAddress, CheckoutDraft } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/product/product-image";
@@ -43,15 +39,13 @@ type CheckoutFormProps = {
 export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
   const router = useRouter();
   const mounted = useMounted();
-  const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
+  const { items, resolved, itemCount, subtotal: clientSubtotal, isLoading } =
+    useResolvedCart();
   const [draft, setDraft] = useState<CheckoutDraft | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
 
-  const resolved = getItemsWithProducts(items);
-  const itemCount = getCartItemCount(items);
-  const clientSubtotal = getCartSubtotal(items);
   const { deliveryFee: clientDeliveryFee, total: clientTotal } =
     getCheckoutTotal(clientSubtotal);
 
@@ -238,7 +232,7 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
     }
   }
 
-  if (!mounted) {
+  if (!mounted || (items.length > 0 && isLoading && !draft)) {
     return (
       <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
         <div className="h-96 animate-pulse rounded-2xl bg-brand-blush/40" />
@@ -541,7 +535,7 @@ function CheckoutSummaryCard({
   isSubmitting,
   isPaying,
 }: {
-  resolved: ReturnType<typeof getItemsWithProducts>;
+  resolved: CartItemWithProduct[];
   itemCount: number;
   subtotal: number;
   deliveryFee: number;

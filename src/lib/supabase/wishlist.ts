@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { mapProductRow } from "@/lib/supabase/products";
+import { mapProductRow } from "@/lib/supabase/map-product";
 import type { Database } from "@/types/database";
 import type { Product } from "@/types";
 
@@ -51,16 +51,6 @@ export async function getWishlistProductIds(userId: string): Promise<string[]> {
   return (data ?? []).map((row) => row.product_id);
 }
 
-/** Wishlist IDs for the current session user, or `null` when signed out. */
-export async function getCurrentUserWishlistIds(): Promise<string[] | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  return getWishlistProductIds(user.id);
-}
-
 export async function addToWishlist(
   userId: string,
   productId: string
@@ -89,20 +79,4 @@ export async function removeFromWishlist(
     .eq("product_id", productId);
 
   assertNoError(error, "removeFromWishlist");
-}
-
-export async function isWishlisted(
-  userId: string,
-  productId: string
-): Promise<boolean> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("wishlist")
-    .select("id")
-    .eq("user_id", userId)
-    .eq("product_id", productId)
-    .maybeSingle();
-
-  assertNoError(error, "isWishlisted");
-  return Boolean(data);
 }

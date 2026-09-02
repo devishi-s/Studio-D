@@ -1,16 +1,17 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
-import { categories } from "@/data/products";
 import { cachedQuery, PRODUCT_REVALIDATE_SECONDS } from "@/lib/cache";
 import {
   escapeIlikePattern,
   type ProductQueryFilters,
 } from "@/lib/products";
-import { resolveProductImagePath } from "@/lib/supabase/storage";
+import { mapProductRow } from "@/lib/supabase/map-product";
 import type { Database } from "@/types/database";
-import type { Category, Product, SortOption } from "@/types";
+import type { Product, SortOption } from "@/types";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
+
+export { mapProductRow };
 
 function createPublicClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -31,49 +32,6 @@ function createPublicClient() {
       detectSessionInUrl: false,
     },
   });
-}
-
-function resolveCategory(slug: string): Category {
-  const match = categories.find((category) => category.slug === slug);
-  if (match) return match;
-
-  return {
-    id: slug,
-    name: slug
-      .split("-")
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(" "),
-    slug,
-    description: "",
-    image: "",
-    displayOrder: 0,
-  };
-}
-
-function mapProduct(row: ProductRow): Product {
-  return {
-    id: row.id,
-    name: row.name,
-    slug: row.slug,
-    description: row.description,
-    price: Number(row.price),
-    compareAtPrice:
-      row.compare_at_price == null ? undefined : Number(row.compare_at_price),
-    images: (row.images ?? []).map(resolveProductImagePath),
-    category: resolveCategory(row.category),
-    tags: row.tags ?? [],
-    materials: row.materials ?? [],
-    dimensions: row.dimensions ?? "",
-    stockCount: row.stock_count,
-    isFeatured: row.featured,
-    isActive: row.is_active,
-    createdAt: row.created_at,
-  };
-}
-
-/** Maps a products table row to the storefront `Product` shape. */
-export function mapProductRow(row: ProductRow): Product {
-  return mapProduct(row);
 }
 
 function assertNoError(error: { message: string } | null, context: string) {
@@ -142,7 +100,7 @@ export async function getAllProducts(
 
       const { data, error } = await query;
       assertNoError(error, "getAllProducts");
-      return (data ?? []).map(mapProduct);
+      return (data ?? []).map(mapProductRow);
     },
     {
       keyParts: ["products", "all", key],
@@ -188,7 +146,7 @@ export async function getProductBySlug(
         .maybeSingle();
 
       assertNoError(error, "getProductBySlug");
-      return data ? mapProduct(data) : null;
+      return data ? mapProductRow(data) : null;
     },
     {
       keyParts: ["products", "slug", slug],
@@ -213,7 +171,7 @@ export async function getProductsByCategory(
         .order("created_at", { ascending: false });
 
       assertNoError(error, "getProductsByCategory");
-      return (data ?? []).map(mapProduct);
+      return (data ?? []).map(mapProductRow);
     },
     {
       keyParts: ["products", "category", category],
@@ -236,7 +194,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
         .order("created_at", { ascending: false });
 
       assertNoError(error, "getFeaturedProducts");
-      return (data ?? []).map(mapProduct);
+      return (data ?? []).map(mapProductRow);
     },
     {
       keyParts: ["products", "featured"],
