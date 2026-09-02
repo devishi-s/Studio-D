@@ -2,6 +2,11 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 
+import {
+  categoryHref,
+  getCategoryBySlug,
+  getMainCategoryBySlug,
+} from "@/data/categories";
 import { requireAdmin } from "@/lib/supabase/require-admin";
 import {
   createProduct,
@@ -27,7 +32,21 @@ function revalidateProductCatalog(
   // Server Actions: updateTag expires tagged caches immediately (Next.js 16+).
   updateTag("products");
   if (product?.slug) updateTag(`product:${product.slug}`);
-  if (product?.category) updateTag(`category:${product.category}`);
+
+  const categorySlug = product?.category;
+  if (categorySlug) {
+    updateTag(`category:${categorySlug}`);
+    const node = getCategoryBySlug(categorySlug);
+    if (node?.parentSlug) {
+      updateTag(`category:${node.parentSlug}`);
+    }
+    const main = getMainCategoryBySlug(categorySlug);
+    if (main) {
+      for (const child of main.children) {
+        updateTag(`category:${child.slug}`);
+      }
+    }
+  }
 
   revalidatePath("/");
   revalidatePath("/products");
@@ -40,8 +59,16 @@ function revalidateProductCatalog(
   if (product?.slug) {
     revalidatePath(`/products/${product.slug}`);
   }
-  if (product?.category) {
-    revalidatePath(`/categories/${product.category}`);
+  if (categorySlug) {
+    const node = getCategoryBySlug(categorySlug);
+    if (node) {
+      revalidatePath(categoryHref(node));
+      if (node.parentSlug) {
+        revalidatePath(`/categories/${node.parentSlug}`);
+      }
+    } else {
+      revalidatePath(`/categories/${categorySlug}`);
+    }
   }
 }
 

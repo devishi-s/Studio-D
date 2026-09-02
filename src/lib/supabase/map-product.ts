@@ -1,26 +1,9 @@
-import { categories } from "@/data/products";
 import { resolveProductImagePath } from "@/lib/supabase/storage";
+import { resolveCategory } from "@/data/categories";
 import type { Database } from "@/types/database";
-import type { Category, Product } from "@/types";
+import type { Product } from "@/types";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
-
-function resolveCategory(slug: string): Category {
-  const match = categories.find((category) => category.slug === slug);
-  if (match) return match;
-
-  return {
-    id: slug,
-    name: slug
-      .split("-")
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(" "),
-    slug,
-    description: "",
-    image: "",
-    displayOrder: 0,
-  };
-}
 
 /** Maps a products table row to the storefront `Product` shape. */
 export function mapProductRow(row: ProductRow): Product {

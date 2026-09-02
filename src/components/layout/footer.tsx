@@ -6,15 +6,14 @@ import {
   SITE_TAGLINE,
   FOOTER_LINKS,
 } from "@/lib/constants";
+import { mainCategories } from "@/data/categories";
 import { Container } from "@/components/layout/container";
 import { Separator } from "@/components/ui/separator";
 
-const CATEGORY_LINKS = [
-  { label: "Crochet Flowers", href: "/categories/crochet-flowers" },
-  { label: "Paintings", href: "/categories/paintings" },
-  { label: "Handmade Gifts", href: "/categories/handmade-gifts" },
-  { label: "Decorative Items", href: "/categories/decorative-items" },
-];
+const CATEGORY_LINKS = mainCategories.map((cat) => ({
+  label: cat.name,
+  href: `/categories/${cat.slug}`,
+}));
 
 const SOCIAL_LINKS = [
   { label: "Instagram", href: "#", icon: AtSign },

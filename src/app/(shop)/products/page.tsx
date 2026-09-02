@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 
-import { categories } from "@/data/products";
 import {
   countActiveProductFilters,
   parseProductSearchParams,
@@ -69,7 +68,6 @@ async function ProductsCatalog({
 
   return (
     <ProductCatalogFilters
-      categories={categories}
       activeSearch={filters.search ?? ""}
       activeCategory={activeCategory}
       activeMinPrice={filters.minPrice}

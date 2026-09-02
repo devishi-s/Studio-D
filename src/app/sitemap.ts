@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { categories } from "@/data/products";
+import { categoryHref, mainCategories } from "@/data/categories";
 import { SITE_URL } from "@/lib/constants";
 import { getAllProducts } from "@/lib/supabase/products";
 
@@ -36,12 +36,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const categoryRoutes: MetadataRoute.Sitemap = categories.map((category) => ({
-    url: `${base}/categories/${category.slug}`,
-    lastModified: now,
-    changeFrequency: "weekly",
-    priority: 0.75,
-  }));
+  const categoryRoutes: MetadataRoute.Sitemap = mainCategories.flatMap(
+    (main) => [
+      {
+        url: `${base}/categories/${main.slug}`,
+        lastModified: now,
+        changeFrequency: "weekly" as const,
+        priority: 0.75,
+      },
+      ...main.children.map((sub) => ({
+        url: `${base}${categoryHref(sub)}`,
+        lastModified: now,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      })),
+    ]
+  );
 
   let productRoutes: MetadataRoute.Sitemap = [];
   try {
@@ -51,7 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: product.createdAt
         ? new Date(product.createdAt)
         : now,
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: 0.85,
     }));
   } catch (error) {

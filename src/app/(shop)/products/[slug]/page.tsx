@@ -8,6 +8,7 @@ import {
   getProductsByCategory,
   getAllProducts,
 } from "@/lib/supabase/products";
+import { categoryHref } from "@/data/categories";
 import { formatPrice } from "@/lib/format";
 import { buildPageMetadata, productJsonLd } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
@@ -120,10 +121,12 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           </Link>
           <span>/</span>
           <Link
-            href={`/categories/${product.category.slug}`}
+            href={categoryHref(product.category)}
             className="transition-colors hover:text-brand-brown"
           >
-            {product.category.name}
+            {product.category.parentName
+              ? `${product.category.parentName} · ${product.category.name}`
+              : product.category.name}
           </Link>
           <span>/</span>
           <span className="text-foreground">{product.name}</span>
@@ -134,7 +137,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
           <div className="flex flex-col">
             <Link
-              href={`/categories/${product.category.slug}`}
+              href={categoryHref(product.category)}
               className="text-xs font-medium uppercase tracking-widest text-brand-coral transition-colors hover:text-brand-brown"
             >
               {product.category.name}

@@ -1,4 +1,4 @@
-import { categories } from "@/data/products";
+import { mainCategories } from "@/data/categories";
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/common/section-header";
 import { CategoryCard } from "@/components/common/category-card";
@@ -9,11 +9,11 @@ export function CategoryShowcase() {
       <Container>
         <SectionHeader
           title="Explore by Category"
-          subtitle="From delicate crochet flowers to original paintings — find something that speaks to you."
+          subtitle="Wearables, charms, crochet creations, and art — find something that speaks to you."
         />
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((category, i) => (
+          {mainCategories.map((category, i) => (
             <CategoryCard
               key={category.id}
               category={category}

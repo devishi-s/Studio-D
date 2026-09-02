@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { categories } from "@/data/products";
+import { mainCategories } from "@/data/categories";
 import { getProductsByCategory } from "@/lib/supabase/products";
 import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
@@ -10,7 +10,7 @@ import { CategoryCard } from "@/components/common/category-card";
 export const metadata: Metadata = buildPageMetadata({
   title: "Shop by Category",
   description:
-    "Explore Studio D collections — crochet flowers, paintings, handmade gifts, and decorative items.",
+    "Explore Studio D collections — wearables, keychains & charms, crochet creations, and art & decor.",
   path: "/categories",
 });
 
@@ -19,7 +19,7 @@ export const revalidate = 3600;
 
 export default async function CategoriesPage() {
   const categoriesWithCount = await Promise.all(
-    categories.map(async (cat) => {
+    mainCategories.map(async (cat) => {
       const products = await getProductsByCategory(cat.slug);
       return {
         ...cat,
@@ -46,6 +46,8 @@ export default async function CategoriesPage() {
               <p className="mt-1.5 text-center text-xs text-muted-foreground">
                 {cat.productCount}{" "}
                 {cat.productCount === 1 ? "product" : "products"}
+                {" · "}
+                {cat.children.map((c) => c.name).join(", ")}
               </p>
             </div>
           ))}

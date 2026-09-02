@@ -7,6 +7,7 @@ import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { NAV_LINKS, SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
+import { categoryHref, mainCategories } from "@/data/categories";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -51,8 +52,54 @@ export function MobileNav({ user }: MobileNavProps) {
           <p className="text-xs text-brand-brown-light">{SITE_TAGLINE}</p>
         </SheetHeader>
 
-        <nav className="flex flex-col gap-1 px-4 pt-2">
+        <nav className="flex flex-col gap-1 overflow-y-auto px-4 pt-2 pb-4">
           {NAV_LINKS.map((link) => {
+            if (link.href === "/categories") {
+              const isActive = pathname.startsWith("/categories");
+              return (
+                <div key={link.href} className="space-y-1">
+                  <Link
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "block rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-brand-blush text-brand-brown"
+                        : "text-brand-brown-light hover:bg-brand-blush/60 hover:text-brand-brown"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                  <div className="ml-2 space-y-3 border-l border-border/60 pl-3">
+                    {mainCategories.map((main) => (
+                      <div key={main.slug}>
+                        <Link
+                          href={`/categories/${main.slug}`}
+                          onClick={() => setOpen(false)}
+                          className="block py-1 text-xs font-semibold text-brand-brown"
+                        >
+                          {main.name}
+                        </Link>
+                        <ul className="space-y-0.5">
+                          {main.children.map((sub) => (
+                            <li key={sub.slug}>
+                              <Link
+                                href={categoryHref(sub)}
+                                onClick={() => setOpen(false)}
+                                className="block py-1 text-xs text-muted-foreground hover:text-brand-brown"
+                              >
+                                {sub.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
             const isActive =
               link.href === "/"
                 ? pathname === "/"

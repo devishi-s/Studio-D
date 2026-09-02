@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { categories } from "@/data/products";
+import { AdminCategorySelect } from "@/components/admin/admin-category-select";
 import {
   ADMIN_FIELD_CLASS,
   isValidProductSlug,
@@ -165,18 +165,11 @@ export function AdminProductEditForm({ product }: AdminProductEditFormProps) {
         </Field>
       </div>
 
-      <Field label="Category" error={errors.category}>
-        <select
-          name="category"
-          className={ADMIN_FIELD_CLASS}
+      <Field label="Category / subcategory" error={errors.category}>
+        <AdminCategorySelect
           defaultValue={product.category}
-        >
-          {categories.map((cat) => (
-            <option key={cat.slug} value={cat.slug}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+          aria-invalid={!!errors.category}
+        />
       </Field>
 
       <Field label="Image URLs (one per line)">

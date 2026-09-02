@@ -23,6 +23,9 @@ export type Category = {
   description: string;
   image: string;
   displayOrder: number;
+  /** Set when this node is a subcategory under a main category. */
+  parentSlug?: string;
+  parentName?: string;
 };
 
 /**

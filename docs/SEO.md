@@ -12,7 +12,8 @@ How search metadata, structured data, sitemap, and robots are set up — and wha
 | Default share image | `/og-image.jpg` | Placeholder until a branded 1200×630 asset is ready |
 | Private routes | `noIndex` metadata + `robots.txt` disallow | Account, cart, checkout, auth, and order confirmation should not rank |
 | Product URLs in sitemap | Fetched via `getAllProducts()` | Keeps sitemap in sync with Supabase catalog |
-| Categories in sitemap | Static `categories` from `src/data/products.ts` | Matches current category route source |
+| Categories in sitemap | `mainCategories` from `src/data/categories.ts` (main + subcategory URLs) | Matches two-level category routes |
+
 | Currency in Product JSON-LD | `INR` | Matches storefront pricing |
 
 ## Global metadata (`src/app/layout.tsx`)
@@ -35,7 +36,9 @@ Shared helpers live in `src/lib/seo.ts` (`buildPageMetadata`, `absoluteUrl`, JSO
 | `/products` | Yes | “Shop Handmade Gifts & Decor \| Studio D” |
 | `/products/[slug]` | Yes | Dynamic name, description (includes price), Product JSON-LD |
 | `/categories` | Yes | Category index |
-| `/categories/[slug]` | Yes | Dynamic category title/description |
+| `/categories/[slug]` | Yes | Main category |
+| `/categories/[slug]/[subSlug]` | Yes | Subcategory |
+
 | `/about` | Yes | Story-focused + LocalBusiness JSON-LD |
 | `/contact` | Yes | Contact-focused |
 | `/cart`, `/checkout` | No | `noIndex` + robots disallow |
@@ -61,7 +64,7 @@ Social links currently use placeholder Instagram `https://instagram.com/studiod`
 Includes:
 
 - Static: `/`, `/products`, `/categories`, `/about`, `/contact`
-- All `/categories/[slug]`
+- All `/categories/[slug]` and `/categories/[slug]/[subSlug]`
 - All active products as `/products/[slug]` (Supabase; empty product list if fetch fails)
 
 Excludes: `/account`, `/cart`, `/checkout`, `/admin`, auth, API, order confirmation.

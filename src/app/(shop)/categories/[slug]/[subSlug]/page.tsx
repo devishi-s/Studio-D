@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import {
   categoryHref,
   getMainCategoryBySlug,
+  getSubcategory,
   mainCategories,
 } from "@/data/categories";
 import { getProductsByCategory } from "@/lib/supabase/products";
@@ -19,8 +20,8 @@ import { ProductGridSkeleton } from "@/components/product/product-grid-skeleton"
 import { ProductFilters } from "@/components/product/product-filters";
 import { ImagePlaceholder } from "@/components/common/image-placeholder";
 
-type CategoryPageProps = {
-  params: Promise<{ slug: string }>;
+type SubcategoryPageProps = {
+  params: Promise<{ slug: string; subSlug: string }>;
   searchParams: Promise<{ sort?: string }>;
 };
 
@@ -29,38 +30,44 @@ export const revalidate = 3600;
 
 export async function generateMetadata({
   params,
-}: CategoryPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const category = getMainCategoryBySlug(slug);
-  if (!category) {
+}: SubcategoryPageProps): Promise<Metadata> {
+  const { slug, subSlug } = await params;
+  const main = getMainCategoryBySlug(slug);
+  const sub = getSubcategory(slug, subSlug);
+  if (!main || !sub) {
     return buildPageMetadata({
       title: "Category Not Found",
       description: "This Studio D collection could not be found.",
-      path: `/categories/${slug}`,
+      path: `/categories/${slug}/${subSlug}`,
       noIndex: true,
     });
   }
   return buildPageMetadata({
-    title: `${category.name} | Handmade Collection`,
-    description: category.description,
-    path: `/categories/${category.slug}`,
+    title: `${sub.name} | ${main.name}`,
+    description: sub.description,
+    path: categoryHref(sub),
   });
 }
 
 export function generateStaticParams() {
-  return mainCategories.map((c) => ({ slug: c.slug }));
+  return mainCategories.flatMap((main) =>
+    main.children.map((sub) => ({
+      slug: main.slug,
+      subSlug: sub.slug,
+    }))
+  );
 }
 
 const variantByIndex = ["cream", "sage", "coral", "blush"] as const;
 
-async function CategoryProductList({
-  slug,
+async function SubcategoryProductList({
+  subSlug,
   activeSort,
 }: {
-  slug: string;
+  subSlug: string;
   activeSort: SortOption;
 }) {
-  const categoryProducts = await getProductsByCategory(slug);
+  const categoryProducts = await getProductsByCategory(subSlug);
   const sorted = sortProducts(categoryProducts, activeSort);
 
   return (
@@ -71,7 +78,7 @@ async function CategoryProductList({
         </p>
         <ProductFilters
           categories={[]}
-          activeCategory={slug}
+          activeCategory={subSlug}
           activeSort={activeSort}
           productCount={sorted.length}
         />
@@ -102,7 +109,7 @@ async function CategoryProductList({
   );
 }
 
-function CategoryProductListSkeleton() {
+function ProductListSkeleton() {
   return (
     <>
       <div className="mt-8 flex items-center justify-between">
@@ -116,23 +123,25 @@ function CategoryProductListSkeleton() {
   );
 }
 
-export default async function CategoryPage({
+export default async function SubcategoryPage({
   params,
   searchParams,
-}: CategoryPageProps) {
-  const { slug } = await params;
+}: SubcategoryPageProps) {
+  const { slug, subSlug } = await params;
   const { sort } = await searchParams;
 
-  const category = getMainCategoryBySlug(slug);
-  if (!category) notFound();
+  const main = getMainCategoryBySlug(slug);
+  const sub = getSubcategory(slug, subSlug);
+  if (!main || !sub) notFound();
 
   const activeSort = (sort as SortOption) ?? "newest";
-  const variant = variantByIndex[(category.displayOrder - 1) % 4] ?? "blush";
+  const variant =
+    variantByIndex[(main.displayOrder - 1) % 4] ?? "blush";
 
   return (
     <section className="py-10 sm:py-14">
       <Container>
-        <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+        <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <Link
             href="/categories"
             className="inline-flex items-center gap-1.5 transition-colors hover:text-brand-brown"
@@ -141,58 +150,38 @@ export default async function CategoryPage({
             All Categories
           </Link>
           <span>/</span>
-          <span className="text-foreground">{category.name}</span>
+          <Link
+            href={`/categories/${main.slug}`}
+            className="transition-colors hover:text-brand-brown"
+          >
+            {main.name}
+          </Link>
+          <span>/</span>
+          <span className="text-foreground">{sub.name}</span>
         </nav>
 
         <div className="relative overflow-hidden rounded-xl">
           <ImagePlaceholder
-            label={category.name}
+            label={sub.name}
             variant={variant}
             className="h-44 w-full rounded-none sm:h-56"
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-brown/30 px-4 text-center">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-white/70">
+              {main.name}
+            </p>
             <div className="mb-3 h-px w-10 bg-white/60" />
             <h1 className="font-heading text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              {category.name}
+              {sub.name}
             </h1>
             <p className="mt-2 max-w-md text-sm leading-relaxed text-white/80">
-              {category.description}
+              {sub.description}
             </p>
           </div>
         </div>
 
-        <div className="mt-10">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="font-heading text-lg font-semibold text-brand-brown">
-              Shop by type
-            </h2>
-            <span className="text-xs text-muted-foreground">
-              {category.children.length} collections
-            </span>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {category.children.map((sub) => (
-              <Link
-                key={sub.slug}
-                href={categoryHref(sub)}
-                className="group flex items-center justify-between rounded-xl border border-border/50 bg-card px-4 py-3 transition-colors hover:border-brand-coral/40 hover:bg-brand-blush/30"
-              >
-                <div>
-                  <p className="font-heading text-base font-medium text-brand-brown">
-                    {sub.name}
-                  </p>
-                  <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                    {sub.description}
-                  </p>
-                </div>
-                <ArrowRight className="h-4 w-4 shrink-0 text-brand-coral transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <Suspense fallback={<CategoryProductListSkeleton />}>
-          <CategoryProductList slug={slug} activeSort={activeSort} />
+        <Suspense fallback={<ProductListSkeleton />}>
+          <SubcategoryProductList subSlug={subSlug} activeSort={activeSort} />
         </Suspense>
       </Container>
     </section>

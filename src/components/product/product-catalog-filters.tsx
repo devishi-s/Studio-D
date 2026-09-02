@@ -4,9 +4,13 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 
-import type { Category, SortOption } from "@/types";
+import type { SortOption } from "@/types";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import {
+  getCategoryBySlug,
+  mainCategories,
+} from "@/data/categories";
 import {
   trackCategoryFiltered,
   trackSearchPerformed,
@@ -14,7 +18,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 type ProductCatalogFiltersProps = {
-  categories: Category[];
   activeSearch: string;
   activeCategory: string;
   activeMinPrice?: number;
@@ -34,7 +37,6 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 ];
 
 export function ProductCatalogFilters({
-  categories,
   activeSearch,
   activeCategory,
   activeMinPrice,
@@ -154,7 +156,7 @@ export function ProductCatalogFilters({
   );
 
   const categoryLabel =
-    categories.find((c) => c.slug === activeCategory)?.name ?? null;
+    getCategoryBySlug(activeCategory)?.name ?? null;
 
   return (
     <div className="grid gap-10 lg:grid-cols-[220px_1fr]">
@@ -223,20 +225,38 @@ export function ProductCatalogFilters({
                 All pieces
               </button>
             </li>
-            {categories.map((cat) => (
-              <li key={cat.slug}>
+            {mainCategories.map((main) => (
+              <li key={main.slug} className="space-y-0.5">
                 <button
                   type="button"
-                  onClick={() => selectCategory(cat.slug)}
+                  onClick={() => selectCategory(main.slug)}
                   className={cn(
                     "w-full border-l-2 py-1.5 pl-3 text-left text-sm transition-colors",
-                    activeCategory === cat.slug
+                    activeCategory === main.slug
                       ? "border-brand-coral font-medium text-brand-brown"
                       : "border-transparent text-muted-foreground hover:text-brand-brown"
                   )}
                 >
-                  {cat.name}
+                  {main.name}
                 </button>
+                <ul className="ml-3 space-y-0.5 border-l border-border/50 pl-2">
+                  {main.children.map((sub) => (
+                    <li key={sub.slug}>
+                      <button
+                        type="button"
+                        onClick={() => selectCategory(sub.slug)}
+                        className={cn(
+                          "w-full py-1 pl-2 text-left text-xs transition-colors",
+                          activeCategory === sub.slug
+                            ? "font-medium text-brand-coral"
+                            : "text-muted-foreground hover:text-brand-brown"
+                        )}
+                      >
+                        {sub.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>

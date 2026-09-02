@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 import type { Category } from "@/types";
 import { cn } from "@/lib/utils";
+import { categoryHref } from "@/data/categories";
 import { ImagePlaceholder } from "@/components/common/image-placeholder";
 
 type CategoryCardProps = {
@@ -17,7 +18,7 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
 
   return (
     <Link
-      href={`/categories/${category.slug}`}
+      href={categoryHref(category)}
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-xl border border-border/40 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-brown/5",
         className

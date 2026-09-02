@@ -1,5 +1,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
+import { getCategoryFilterSlugs } from "@/data/categories";
 import { cachedQuery, PRODUCT_REVALIDATE_SECONDS } from "@/lib/cache";
 import {
   escapeIlikePattern,
@@ -87,7 +88,8 @@ export async function getAllProducts(
         query = query.ilike("name", `%${escapeIlikePattern(search)}%`);
       }
       if (category && category !== "all") {
-        query = query.eq("category", category);
+        const slugs = getCategoryFilterSlugs(category);
+        query = query.in("category", slugs);
       }
       if (minPrice != null) {
         query = query.gte("price", minPrice);
@@ -156,17 +158,21 @@ export async function getProductBySlug(
   );
 }
 
-/** Active products in a category (category slug), newest first. */
+/** Active products for a main or subcategory slug, newest first.
+ * Main categories include products tagged with the main slug or any child slug.
+ */
 export async function getProductsByCategory(
   category: string
 ): Promise<Product[]> {
+  const slugs = getCategoryFilterSlugs(category);
+
   return cachedQuery(
     async () => {
       const supabase = createPublicClient();
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .eq("category", category)
+        .in("category", slugs)
         .eq("is_active", true)
         .order("created_at", { ascending: false });
 
@@ -174,8 +180,12 @@ export async function getProductsByCategory(
       return (data ?? []).map(mapProductRow);
     },
     {
-      keyParts: ["products", "category", category],
-      tags: ["products", `category:${category}`],
+      keyParts: ["products", "category", category, slugs.join("|")],
+      tags: [
+        "products",
+        `category:${category}`,
+        ...slugs.map((s) => `category:${s}`),
+      ],
       revalidate: PRODUCT_REVALIDATE_SECONDS,
     }
   );
