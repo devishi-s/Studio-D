@@ -34,7 +34,9 @@ export function resolveProductImagePath(path: string): string {
 /** True when `src` can be passed to `next/image` as a remote/optimized asset. */
 export function canOptimizeProductImage(src: string | null | undefined): boolean {
   if (!src) return false;
-  // Seeded mock paths are not real files under /public — keep placeholders.
+  // Real local category covers under /public (not mock product stubs).
+  if (src.startsWith("/images/categories/")) return true;
+  // Seeded mock product paths are not real files under /public — keep placeholders.
   if (src.startsWith("/images/")) return false;
   return src.startsWith("http://") || src.startsWith("https://");
 }

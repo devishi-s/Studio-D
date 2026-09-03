@@ -1,5 +1,11 @@
 import type { Category } from "@/types";
 
+/** Shared temporary cover until a category has a real product photo. */
+export const TEMPORARY_CATEGORY_COVER = {
+  src: "/images/categories/temporary-cover.jpg",
+  alt: "Studio D handmade collection",
+} as const;
+
 /** Main category with nested subcategories. */
 export type MainCategory = Category & {
   children: Category[];

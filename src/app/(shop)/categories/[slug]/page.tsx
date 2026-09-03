@@ -9,7 +9,10 @@ import {
   getMainCategoryBySlug,
   mainCategories,
 } from "@/data/categories";
-import { getProductsByCategory } from "@/lib/supabase/products";
+import {
+  getLatestCategoryCover,
+  getProductsByCategory,
+} from "@/lib/supabase/products";
 import { sortProducts } from "@/lib/products";
 import type { SortOption } from "@/types";
 import { buildPageMetadata } from "@/lib/seo";
@@ -17,7 +20,7 @@ import { Container } from "@/components/layout/container";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ProductGridSkeleton } from "@/components/product/product-grid-skeleton";
 import { ProductFilters } from "@/components/product/product-filters";
-import { ImagePlaceholder } from "@/components/common/image-placeholder";
+import { CategoryHeroCover } from "@/components/common/category-hero-cover";
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
@@ -128,6 +131,7 @@ export default async function CategoryPage({
 
   const activeSort = (sort as SortOption) ?? "newest";
   const variant = variantByIndex[(category.displayOrder - 1) % 4] ?? "blush";
+  const cover = await getLatestCategoryCover(slug);
 
   return (
     <section className="py-10 sm:py-14">
@@ -145,10 +149,10 @@ export default async function CategoryPage({
         </nav>
 
         <div className="relative overflow-hidden rounded-xl">
-          <ImagePlaceholder
+          <CategoryHeroCover
             label={category.name}
             variant={variant}
-            className="h-44 w-full rounded-none sm:h-56"
+            cover={cover}
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-brown/30 px-4 text-center">
             <div className="mb-3 h-px w-10 bg-white/60" />

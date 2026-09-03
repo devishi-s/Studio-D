@@ -7,6 +7,10 @@ import {
   type ProductQueryFilters,
 } from "@/lib/products";
 import { mapProductRow } from "@/lib/supabase/map-product";
+import {
+  canOptimizeProductImage,
+  resolveProductImagePath,
+} from "@/lib/supabase/storage";
 import type { Database } from "@/types/database";
 import type { Product, SortOption } from "@/types";
 
@@ -181,6 +185,56 @@ export async function getProductsByCategory(
     },
     {
       keyParts: ["products", "category", category, slugs.join("|")],
+      tags: [
+        "products",
+        `category:${category}`,
+        ...slugs.map((s) => `category:${s}`),
+      ],
+      revalidate: PRODUCT_REVALIDATE_SECONDS,
+    }
+  );
+}
+
+export type CategoryCover = {
+  src: string;
+  alt: string;
+};
+
+/**
+ * Newest active product photo for a main or subcategory slug.
+ * Returns `null` when the collection has no usable product images yet
+ * (callers keep the branded placeholder until products are uploaded).
+ */
+export async function getLatestCategoryCover(
+  category: string
+): Promise<CategoryCover | null> {
+  const slugs = getCategoryFilterSlugs(category);
+
+  return cachedQuery(
+    async () => {
+      const supabase = createPublicClient();
+      const { data, error } = await supabase
+        .from("products")
+        .select("name, images")
+        .in("category", slugs)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(12);
+
+      assertNoError(error, "getLatestCategoryCover");
+
+      for (const row of data ?? []) {
+        const images = (row.images ?? []).map(resolveProductImagePath);
+        const src = images.find((image) => canOptimizeProductImage(image));
+        if (src) {
+          return { src, alt: `${row.name} — ${category}` };
+        }
+      }
+
+      return null;
+    },
+    {
+      keyParts: ["products", "category-cover", category, slugs.join("|")],
       tags: [
         "products",
         `category:${category}`,

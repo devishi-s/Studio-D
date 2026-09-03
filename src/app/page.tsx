@@ -62,7 +62,28 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       ) : null}
       <HeroBanner />
-      <CategoryShowcase />
+      <Suspense
+        fallback={
+          <section className="py-16 sm:py-20">
+            <Container>
+              <SectionHeader
+                title="Explore by Category"
+                subtitle="Wearables, charms, crochet creations, and art — find something that speaks to you."
+              />
+              <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="aspect-[4/3] animate-pulse rounded-xl bg-brand-blush/50"
+                  />
+                ))}
+              </div>
+            </Container>
+          </section>
+        }
+      >
+        <CategoryShowcase />
+      </Suspense>
       <Suspense fallback={<FeaturedProductsFallback />}>
         <FeaturedProductsSection />
       </Suspense>

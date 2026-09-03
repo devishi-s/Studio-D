@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 
 import { mainCategories } from "@/data/categories";
-import { getProductsByCategory } from "@/lib/supabase/products";
+import {
+  getLatestCategoryCover,
+  getProductsByCategory,
+} from "@/lib/supabase/products";
 import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/common/section-header";
@@ -20,10 +23,14 @@ export const revalidate = 3600;
 export default async function CategoriesPage() {
   const categoriesWithCount = await Promise.all(
     mainCategories.map(async (cat) => {
-      const products = await getProductsByCategory(cat.slug);
+      const [products, cover] = await Promise.all([
+        getProductsByCategory(cat.slug),
+        getLatestCategoryCover(cat.slug),
+      ]);
       return {
         ...cat,
         productCount: products.length,
+        cover,
       };
     })
   );
@@ -42,7 +49,11 @@ export default async function CategoriesPage() {
               key={cat.id}
               className={`animate-fade-in-up animation-delay-${(i + 1) * 100}`}
             >
-              <CategoryCard category={cat} className="h-full" />
+              <CategoryCard
+                category={cat}
+                cover={cat.cover}
+                className="h-full"
+              />
               <p className="mt-1.5 text-center text-xs text-muted-foreground">
                 {cat.productCount}{" "}
                 {cat.productCount === 1 ? "product" : "products"}
