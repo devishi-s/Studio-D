@@ -44,7 +44,7 @@ export function MobileNav({ user }: MobileNavProps) {
         <Menu className="h-5 w-5" />
       </SheetTrigger>
 
-      <SheetContent side="left" className="w-72 bg-brand-cream">
+      <SheetContent side="left" className="w-72 bg-brand-cream font-ui">
         <SheetHeader className="border-b border-border pb-4">
           <SheetTitle className="font-heading text-xl text-brand-brown">
             {SITE_NAME}

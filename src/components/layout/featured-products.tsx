@@ -16,7 +16,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
       <Container>
         <SectionHeader
           title="Handpicked for You"
-          subtitle="Our most loved pieces — each one crafted with patience, precision, and a whole lot of heart."
+          subtitle="Our most loved pieces, each one crafted with patience, precision, and a whole lot of heart."
         />
 
         <div className="mt-10">

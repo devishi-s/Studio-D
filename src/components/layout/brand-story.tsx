@@ -9,7 +9,7 @@ const values = [
     icon: Heart,
     title: "Made with Love",
     description:
-      "Every stitch, every brushstroke is made by hand — no mass production, no shortcuts.",
+      "Every stitch, every brushstroke is made by hand, no shortcuts.",
   },
   {
     icon: Flower2,
@@ -49,10 +49,10 @@ export function BrandStory() {
               every piece.
             </h2>
             <p className="mt-4 leading-relaxed text-muted-foreground text-center lg:text-left">
-              Studio D was born from a simple belief — that handmade things
+              Studio D was born from a simple belief, that handmade things
               carry a warmth that factory-made items never can. What started
               as a small passion project has grown into a collection of
-              art and craft that brings joy to homes across India.
+              art that brings joy to homes across India.
             </p>
             <p className="mt-3 leading-relaxed text-muted-foreground text-center lg:text-left">
               Each product you see here was made by hand, with patience and

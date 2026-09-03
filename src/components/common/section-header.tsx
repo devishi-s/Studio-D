@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 type SectionHeaderProps = {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   className?: string;
 };
 

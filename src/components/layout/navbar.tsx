@@ -30,7 +30,7 @@ export async function Navbar() {
   const user = await getAuthUser();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-brand-cream/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-brand-cream/90 font-ui backdrop-blur-md">
       <Container>
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">

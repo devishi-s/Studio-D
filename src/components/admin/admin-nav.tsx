@@ -28,7 +28,7 @@ export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-wrap gap-1">
+    <nav className="flex flex-wrap gap-1 font-ui">
       {ADMIN_NAV.map((item) => {
         const active = item.match(pathname);
         return (

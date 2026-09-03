@@ -40,7 +40,13 @@ export default async function CategoriesPage() {
       <Container>
         <SectionHeader
           title="Our Collections"
-          subtitle="Each collection is a labour of love. Explore what speaks to you."
+          subtitle={
+            <>
+              Each collection is a labour of love.
+              <br />
+              Explore what speaks to you.
+            </>
+          }
         />
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2">

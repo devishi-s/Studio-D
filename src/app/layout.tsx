@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import {
+  DM_Serif_Display,
+  Geist_Mono,
+  Lora,
+  Montserrat,
+  Updock,
+} from "next/font/google";
 import "./globals.css";
 
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/constants";
@@ -11,9 +17,10 @@ import { WishlistProviderGate } from "@/components/product/wishlist-provider-gat
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const geistSans = Geist({
+const lora = Lora({
   variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -24,8 +31,22 @@ const geistMono = Geist_Mono({
   preload: false,
 });
 
-const playfair = Playfair_Display({
+const dmSerifDisplay = DM_Serif_Display({
   variable: "--font-heading",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
+const updock = Updock({
+  variable: "--font-brand",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
+const montserrat = Montserrat({
+  variable: "--font-ui",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
@@ -96,7 +117,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
+      className={`${lora.variable} ${geistMono.variable} ${dmSerifDisplay.variable} ${updock.variable} ${montserrat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <WishlistProviderGate>

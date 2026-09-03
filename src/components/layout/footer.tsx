@@ -24,7 +24,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/60 bg-brand-blush/40">
+    <footer className="border-t border-border/60 bg-brand-blush/40 font-ui">
       <Container>
         {/* Main footer grid */}
         <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
@@ -39,8 +39,10 @@ export function Footer() {
               {SITE_TAGLINE}
             </p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Handcrafted crochet flowers, paintings, and decorative pieces —
-              each made with love and attention to detail.
+            Little handmade things,
+            thoughtful details, and art
+            made to make everyday moments
+            feel special.
             </p>
 
             <div className="mt-4 flex items-center gap-1 text-xs text-muted-foreground">

@@ -14,7 +14,13 @@ export async function CategoryShowcase() {
       <Container>
         <SectionHeader
           title="Explore by Category"
-          subtitle="Wearables, charms, crochet creations, and art — find something that speaks to you."
+          subtitle={
+            <>
+              Wearables, charms, crochet creations, and art.
+              <br />
+              Find something that speaks to you.
+            </>
+          }
         />
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
