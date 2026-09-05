@@ -11,6 +11,7 @@ import { ProductGridSkeleton } from "@/components/product/product-grid-skeleton"
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/common/section-header";
 import { JsonLd } from "@/components/seo/json-ld";
+import { VineDecoration } from "@/components/ui/vine-decoration";
 
 /** Keep in sync with PRODUCT_REVALIDATE_SECONDS in src/lib/cache.ts */
 export const revalidate = 3600;
@@ -62,6 +63,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       ) : null}
       <HeroBanner />
+      <VineDecoration />
       <Suspense
         fallback={
           <section className="py-16 sm:py-20">

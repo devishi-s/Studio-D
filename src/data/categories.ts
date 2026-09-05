@@ -22,7 +22,7 @@ export const mainCategories: MainCategory[] = [
     name: "Wearables",
     slug: "wearables",
     description:
-      "Handmade pieces to wear and gift — bracelets, hair accessories, and more.",
+      "Handmade pieces to wear and gift: bracelets, hair accessories, and more.",
     image: "/images/categories/wearables.jpg",
     displayOrder: 1,
     children: [
@@ -53,7 +53,7 @@ export const mainCategories: MainCategory[] = [
     name: "Keychains & Charms",
     slug: "keychains-charms",
     description:
-      "Small keepsakes with big personality — keychains and bag charms.",
+      "Small keepsakes with big personality: keychains and bag charms.",
     image: "/images/categories/keychains-charms.jpg",
     displayOrder: 2,
     children: [
@@ -84,7 +84,7 @@ export const mainCategories: MainCategory[] = [
     name: "Crochet Creations",
     slug: "crochet-creations",
     description:
-      "Soft sculpture and everlasting florals — crochet flowers and plushies.",
+      "Soft sculpture and everlasting florals: crochet flowers and plushies.",
     image: "/images/categories/crochet-creations.jpg",
     displayOrder: 3,
     children: [
@@ -136,7 +136,7 @@ export const mainCategories: MainCategory[] = [
         name: "Decor",
         slug: "decor",
         description:
-          "Handmade decorative pieces — coasters, hangings, and home accents.",
+          "Handmade decorative pieces: coasters, hangings, and home accents.",
         image: "/images/categories/decor.jpg",
         displayOrder: 2,
         parentSlug: "art-decor",

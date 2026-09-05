@@ -24,7 +24,7 @@ export default async function AccountPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, email, avatar_url")
+    .select("full_name, email")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -57,15 +57,6 @@ export default async function AccountPage() {
                 <p className="mt-1 truncate text-sm text-muted-foreground">
                   {email}
                 </p>
-                {profile?.avatar_url ? (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Custom avatar coming soon — using initials for now.
-                  </p>
-                ) : (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Avatar placeholder — initials based on your name.
-                  </p>
-                )}
               </div>
             </div>
 
