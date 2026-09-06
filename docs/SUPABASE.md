@@ -51,6 +51,9 @@ In the Supabase dashboard **SQL Editor**, run in order:
 5. `supabase/admin-rls.sql` — `profiles.is_admin`, admin RLS, promote yourself via the SQL comment at the bottom
 6. `supabase/reviews.sql` — Phase 5.4 product reviews + moderation RLS
 7. `supabase/wishlist.sql` — Phase 5.5 authenticated save-for-later wishlist
+8. `supabase/categories-restructure.sql` — maps old product category slugs → two-level taxonomy (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs)
+
+**Catalog note:** Sample/seed demo products were removed; the live catalog uses real handmade products. Category metadata for the storefront is defined in `src/data/categories.ts` (two-level tree); `products.category` stores a slug from that tree.
 
 To regenerate the seed after editing the static catalog:
 
@@ -196,11 +199,11 @@ Email confirmation and password-reset links must land on `/auth/callback` so the
 1. Create Supabase project.
 2. Fill `.env.local` from `.env.example`.
 3. Run `supabase/schema.sql`.
-4. Run `supabase/seed.sql`.
+4. Run `supabase/seed.sql` (optional — prefer real products over sample seed).
 5. Run `supabase/storage.sql`.
 6. Run `supabase/orders-checkout.sql` if the project was created before Phase 4.3.
-7. Confirm `select count(*) from products;` returns `12`.
-8. Confirm bucket `product-images` exists under **Storage**.
+7. Run `supabase/admin-rls.sql`, then `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql`.
+8. Confirm products exist (`select count(*) from products;`) and bucket `product-images` under **Storage**.
 9. Set Auth redirect URLs (see above).
 10. Restart the Next.js app.
 11. Visit shop pages and `/account` after signing in.

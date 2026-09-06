@@ -1,36 +1,29 @@
-import { ImageOff } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type ImagePlaceholderProps = {
   label?: string;
   className?: string;
+  /** Kept for call-site compatibility; cover image is used for all variants. */
   variant?: "cream" | "blush" | "sage" | "coral";
 };
 
-const bgMap = {
-  cream: "bg-brand-cream",
-  blush: "bg-brand-blush",
-  sage: "bg-brand-sage/10",
-  coral: "bg-brand-coral/10",
-} as const;
+const TEMP_COVER = "/images/categories/temporary-cover.jpg";
 
+/** Empty / missing image fallback — uses the shared temporary cover photo. */
 export function ImagePlaceholder({
   label,
   className,
-  variant = "blush",
 }: ImagePlaceholderProps) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-lg",
-        bgMap[variant],
-        className
-      )}
-    >
-      <ImageOff className="h-6 w-6 text-brand-brown-light/40" />
-      {label && (
-        <span className="text-xs text-brand-brown-light/50">{label}</span>
-      )}
+    <div className={cn("relative overflow-hidden rounded-lg", className)}>
+      <Image
+        src={TEMP_COVER}
+        alt={label ?? "Studio D handmade collection"}
+        fill
+        sizes="(max-width: 768px) 100vw, 40vw"
+        className="object-cover"
+      />
     </div>
   );
 }

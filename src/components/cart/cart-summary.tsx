@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Truck, Shield, Undo2 } from "lucide-react";
+import { Truck, Shield, HandHeart } from "lucide-react";
 
 import { formatPrice } from "@/lib/format";
 import { FREE_SHIPPING_THRESHOLD } from "@/lib/constants";
@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 const PERKS = [
   { icon: Truck, text: "Free shipping over ₹999" },
   { icon: Shield, text: "Quality guaranteed" },
-  { icon: Undo2, text: "Easy 7-day returns" },
+  { icon: HandHeart, text: "100% handmade" },
 ] as const;
 
 export function CartSummary({ isSignedIn = false }: { isSignedIn?: boolean }) {

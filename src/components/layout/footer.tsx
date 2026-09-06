@@ -6,6 +6,7 @@ import {
   SITE_TAGLINE,
   FOOTER_LINKS,
 } from "@/lib/constants";
+import { SITE_SOCIAL } from "@/lib/seo";
 import { mainCategories } from "@/data/categories";
 import { Container } from "@/components/layout/container";
 import { Separator } from "@/components/ui/separator";
@@ -16,8 +17,8 @@ const CATEGORY_LINKS = mainCategories.map((cat) => ({
 }));
 
 const SOCIAL_LINKS = [
-  { label: "Instagram", href: "#", icon: AtSign },
-  { label: "Email", href: "mailto:hello@studiod.in", icon: Mail },
+  { label: "Instagram", href: SITE_SOCIAL.instagram, icon: AtSign, external: true },
+  { label: "Email", href: SITE_SOCIAL.email, icon: Mail, external: false },
 ];
 
 export function Footer() {
@@ -97,13 +98,16 @@ export function Footer() {
             <ul className="mt-3 space-y-2">
               {SOCIAL_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link
+                  <a
                     href={link.href}
+                    {...(link.external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
                     className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-brand-brown"
                   >
                     <link.icon className="h-4 w-4" />
                     {link.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

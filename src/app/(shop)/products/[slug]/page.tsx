@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Truck, Shield, Undo2 } from "lucide-react";
+import { ArrowLeft, Truck, Shield, HandHeart } from "lucide-react";
 
 import {
   getProductBySlug,
@@ -70,7 +70,7 @@ export async function generateStaticParams() {
 const PROMISES = [
   { icon: Truck, text: "Free shipping over ₹999" },
   { icon: Shield, text: "Quality guaranteed" },
-  { icon: Undo2, text: "Easy 7-day returns" },
+  { icon: HandHeart, text: "100% handmade" },
 ] as const;
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {

@@ -19,13 +19,14 @@
 
 ## Status
 
-- **Current phase:** Phase 5 — Polish + Launch
-- **Current step:** Deployment and Launch checklist
-- **Completed phases:** Phases 1, 2, 3, and 4
+- **Current phase:** Post Phase 5 — pre-deployment
+- **Current focus:** UI polish + deployment prep
+- **Completed phases:** Phases 1–5 (feature steps)
 - **Completed Phase 5 steps:** 5.1 SEO, 5.2 Performance, 5.3 Analytics, 5.4 Reviews, 5.5 Wishlist
 - **Backend:** Full Phase 4 commerce path live (checkout, Razorpay, orders, admin, Resend hooks)
 - **Payments:** Razorpay wired (real keys still required for live charges)
 - **Checkout:** Complete
+- **Recent polish:** category restructure, real products, hero/navbar logo + vine animations
 - **Deployment:** Intended for Vercel; current deployment status is unverified
 
 ## Original Delivery Strategy
@@ -611,6 +612,6 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 # Current Handoff
 
-Phase 5 feature steps (5.1–5.5) are complete. The next authorized work is the Phase 5 **Deployment and Launch** checklist (env separation, Vercel deploy when requested, production smoke tests). There is no Phase 6.
+Phases 1–5 feature work are complete. **Current focus:** UI polish + Deployment and Launch checklist (env separation, Vercel deploy when requested, production smoke tests). There is no Phase 6.
 
-**Ops reminder:** Run `supabase/wishlist.sql` (and earlier migrations if needed) in the Supabase SQL Editor — see `docs/SUPABASE.md`.
+**Ops reminder:** Ensure remote DB has `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql` — see `docs/SUPABASE.md`.

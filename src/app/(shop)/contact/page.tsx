@@ -4,7 +4,7 @@ import { AtSign, Clock3, Mail, MapPin } from "lucide-react";
 
 import { ContactForm } from "@/components/common/contact-form";
 import { Container } from "@/components/layout/container";
-import { buildPageMetadata } from "@/lib/seo";
+import { SITE_SOCIAL, buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Contact",
@@ -120,8 +120,16 @@ export default function ContactPage() {
                   <h3 className="text-sm font-semibold">Follow the making</h3>
                 </div>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  Our Instagram link is coming soon. Until then, email is the
-                  best way to reach Studio D.
+                  See new pieces, process shots, and behind-the-scenes moments on{" "}
+                  <a
+                    href={SITE_SOCIAL.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-brand-brown underline-offset-4 hover:underline"
+                  >
+                    Instagram @studio.d.in
+                  </a>
+                  .
                 </p>
               </div>
             </aside>

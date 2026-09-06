@@ -114,7 +114,8 @@ Planned route groups `(auth)` and `(account)`, checkout, and admin areas should 
 - `/products` — product listing, category filtering, and sorting
 - `/products/[slug]` — product details and related products
 - `/categories` — category index
-- `/categories/[slug]` — category listing
+- `/categories/[slug]` — main category
+- `/categories/[slug]/[subSlug]` — subcategory
 - `/about` — brand story
 - `/cart` — cart management
 - `/contact` — contact form (`mailto:` draft handoff)
@@ -153,8 +154,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 
 ### Typography and Shape
 
-- Playfair Display for headings.
-- Geist for body content.
+- Updock for brand wordmark; DM Serif Display for headings; Montserrat for nav/buttons/labels; Lora for body.
 - Rounded cards, pills, and controls.
 - Soft borders and restrained shadows.
 - Generous whitespace and readable line lengths.
@@ -267,28 +267,25 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 
 ## Current Project State
 
-- **Roadmap phase:** Phase 5 — Polish + Launch
-- **Current step:** Deployment and Launch checklist (Phase 5 feature steps 5.1–5.5 complete)
-- Phase 1–4 complete (shipping-status emails deferred); Phase 5.1–5.5 complete.
-- Shop and product pages read from Supabase; category metadata still static.
+- **Roadmap phase:** Post Phase 5 — pre-deployment
+- **Current focus:** Frontend UI polish + deployment prep (Vercel)
+- Phase 1–5 feature work is complete; remaining gate is Deployment and Launch checklist.
+- **Recently completed:** code cleanup/refactor; real products in Supabase; two-level category restructure; hero/navbar logo + vine chroma-key animations; homepage UI polish.
+- Shop and product pages read from Supabase; category taxonomy lives in `src/data/categories.ts` (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs).
 - Catalog reads use `unstable_cache` (3600s); product routes revalidate hourly; orders stay uncached for freshness.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
 - Auth uses Supabase email/password with cookie sessions via `@supabase/ssr`.
 - Account, checkout, order-confirmation, and admin routes are protected; admin also requires `profiles.is_admin`.
 - Checkout recalculates totals, creates Razorpay orders, verifies signatures, writes orders/items, decrements stock, and attempts Resend emails.
-- Reviews: approved-only public display + pending moderation at `/admin/reviews` (run `reviews.sql` on remote DB).
-- Wishlist: heart toggle on cards/detail, `/account/wishlist`, optimistic UI via `useWishlist` + provider (run `wishlist.sql`).
-- Global + page metadata, Organization/Product/LocalBusiness JSON-LD, `sitemap.ts`, and `robots.ts` are in place; OG image is still a placeholder.
-- Performance: Server `ProductImage`, lazy cart/mobile nav, Suspense skeletons, font `display: swap`, cart badge CLS guard, `@next/bundle-analyzer` (`npm run analyze`).
-- Analytics: Vercel Analytics + Speed Insights in root layout; funnel events via `src/lib/analytics.ts` (no PII). Dashboard data only on Vercel deploy.
-- Google OAuth is not implemented.
-- Cart still resolves line items from the static catalog array (checkout validation uses Supabase).
+- Reviews + wishlist live (SQL: `reviews.sql`, `wishlist.sql`).
+- Cart resolves line items from live Supabase product IDs (`useResolvedCart`).
 - Contact form still uses `mailto:` draft handoff.
-- Product images: Storage + `ProductImage` wired; seeded mock paths still show placeholders until uploads.
+- Sample catalog removed; real handmade products uploaded (covers use newest product image or temporary cover).
+- Fonts: Updock (brand), DM Serif Display (headings), Montserrat (UI), Lora (body).
 - Vercel deployment status is not verified.
-- Existing remote DBs need `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, and `wishlist.sql` applied; set `is_admin` for your user.
+- Remote DB should have `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql` applied; set `is_admin` for your user.
 - `RESEND_API_KEY` is placeholder until a real Resend key + domain are configured.
-- **There is no Phase 6** — remaining work is the Phase 5 Deployment and Launch checklist.
+- **There is no Phase 6** — next work is polish + Deployment and Launch.
 
 ## Important Decisions and Why
 

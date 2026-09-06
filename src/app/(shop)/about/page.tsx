@@ -28,54 +28,41 @@ const VALUES = [
     icon: Heart,
     title: "Handmade Quality",
     description:
-      "Every piece passes through human hands — never a machine. We believe that imperfection is what gives handmade work its soul. A slight variation in a petal, a unique brushstroke — these are marks of authenticity, not flaws.",
+      "Every piece passes through human hands, never a machine. We believe that imperfection is what gives handmade work its soul. A slight variation in a petal, a unique brushstroke, these are marks of authenticity, not flaws.",
   },
   {
     icon: Leaf,
     title: "Sustainability",
     description:
-      "We use natural, eco-friendly materials wherever possible — organic cotton yarn, soy-based candles, recycled paper packaging. Our products are made to last, not to be thrown away. Slow craft over fast fashion.",
+      "We use natural, eco-friendly materials wherever possible like organic cotton yarn, soy-based candles, recycled paper packaging. Our products are made to last, not to be thrown away. Slow craft over fast fashion.",
   },
   {
     icon: Sparkles,
     title: "Artistry",
     description:
-      "Each product is designed with intention. We draw inspiration from nature, Indian textiles, and everyday beauty. Our pieces aren't just objects — they're small works of art meant to bring warmth to your space.",
+      "Each product is designed with intention. We draw inspiration from nature, Indian textiles, and everyday beauty. Our pieces aren't just objects, they're small works of art meant to bring warmth to your space.",
   },
   {
     icon: HandHeart,
     title: "Care in Every Detail",
     description:
-      "From the yarn we choose to the way we wrap your order, every detail matters. We write handwritten notes, use tissue paper instead of plastic, and treat each package like a gift — because it is.",
+      "From the yarn we choose to the way we wrap your order, every detail matters. We write handwritten notes, use paper instead of plastic, and treat each package like a gift, because it is.",
   },
 ] as const;
 
 const TEAM = [
   {
     name: "Devishi",
-    role: "Founder & Lead Crafter",
-    bio: "The hands and heart behind Studio D. Devishi taught herself crochet during college and fell in love with the meditative rhythm of handcraft. She designs every product and oversees quality.",
+    role: "Founder & Creative Director",
+    bio: "The brain behind Studio D. Devishi handles the designs, the details, and everything in between. From dreaming up new products to making sure every order feels special. She built this little corner of the internet from scratch.",
     variant: "coral" as const,
   },
   {
-    name: "Arjun",
-    role: "Artist & Illustrator",
-    bio: "Arjun brings the paintings and botanical prints to life. Trained in fine art, he works in watercolor and acrylic — always chasing the perfect balance of colour and calm.",
+    name: "Dishita",
+    role: "Lead Crafter & Crochet Artist",
+    bio: "The hands behind every stitch. Dishita brings each design to life with her crochet work. From delicate plushies to intricate bracelets, her craft and patience are woven into every single piece Studio D creates.",
     variant: "sage" as const,
   },
-  {
-    name: "Meera",
-    role: "Packaging & Operations",
-    bio: "Meera ensures every order reaches you beautifully wrapped and on time. She designs the gift boxes, sources eco-friendly materials, and keeps the studio running smoothly.",
-    variant: "blush" as const,
-  },
-];
-
-const MILESTONES = [
-  { year: "2023", text: "Studio D started as a hobby — the first crochet rose was gifted to a friend." },
-  { year: "2024", text: "First 100 orders. Launched paintings and gift boxes. Got featured on Instagram." },
-  { year: "2025", text: "Grew to 500+ happy customers. Started working with eco-friendly suppliers." },
-  { year: "2026", text: "Launched this website. Every piece still made by hand, with the same love as day one." },
 ];
 
 // ─── Page ────────────────────────────────────────────────────
@@ -101,8 +88,8 @@ export default function AboutPage() {
             </h1>
             <p className="animate-fade-in-up animation-delay-200 mt-6 leading-relaxed text-muted-foreground">
               {SITE_NAME} is a small, independent studio creating handmade
-              crochet flowers, original paintings, and thoughtful gifts. We
-              believe the world has enough mass-produced things — what it needs
+              crochet wearables, plushies, original paintings, and thoughtful gifts.
+              We believe the world has enough mass-produced things; what it needs
               is more things made with care.
             </p>
           </div>
@@ -128,7 +115,7 @@ export default function AboutPage() {
                 How it all began
               </h2>
               <p className="mt-4 leading-relaxed text-muted-foreground">
-                It started with a single crochet rose — made late at night in a
+                It started with a single crochet rose, made late at night in a
                 small room, following a YouTube tutorial. That first flower was
                 imperfect, a little lopsided, but it had something that
                 store-bought flowers didn&apos;t: it was made with intention.
@@ -137,7 +124,7 @@ export default function AboutPage() {
                 Friends asked for one. Then friends of friends. What started as
                 a hobby became a quiet passion, and that passion became
                 {" "}{SITE_NAME}. Today, we create everything from crochet bouquets
-                to original paintings to curated gift boxes — each piece carrying
+                to plushies to wearables, each piece carrying
                 the same care as that very first rose.
               </p>
               <p className="mt-3 leading-relaxed text-muted-foreground">
@@ -159,7 +146,6 @@ export default function AboutPage() {
         <Container>
           <SectionHeader
             title="What We Stand For"
-            subtitle="These aren't marketing slogans. They're promises we keep with every piece we make."
           />
 
           <div className="mt-12 grid gap-8 sm:grid-cols-2">
@@ -187,46 +173,6 @@ export default function AboutPage() {
 
       <Separator className="mx-auto max-w-7xl" />
 
-      {/* ── Timeline ── */}
-      <section className="py-16 sm:py-20">
-        <Container>
-          <SectionHeader
-            title="Our Journey"
-            subtitle="From a single rose to a full collection — here's how we got here."
-          />
-
-          <div className="mx-auto mt-10 max-w-xl space-y-0">
-            {MILESTONES.map((m, i) => (
-              <div
-                key={m.year}
-                className={`animate-fade-in-up animation-delay-${(i + 1) * 100} relative flex gap-6 pb-8 last:pb-0`}
-              >
-                {/* Connector line */}
-                {i < MILESTONES.length - 1 && (
-                  <div className="absolute left-[19px] top-8 h-full w-px bg-border" />
-                )}
-                {/* Dot */}
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-brand-coral/30 bg-brand-cream">
-                  <span className="text-xs font-semibold text-brand-coral">
-                    {m.year.slice(2)}
-                  </span>
-                </div>
-                <div className="pt-1.5">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-brand-brown">
-                    {m.year}
-                  </span>
-                  <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
-                    {m.text}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      <Separator className="mx-auto max-w-7xl" />
-
       {/* ── Team ── */}
       <section className="bg-brand-cream/50 py-16 sm:py-20">
         <Container>
@@ -235,7 +181,7 @@ export default function AboutPage() {
             subtitle="A small team, a big heart, and a whole lot of yarn."
           />
 
-          <div className="mt-10 grid gap-8 sm:grid-cols-3">
+          <div className="mt-10 grid gap-8 sm:grid-cols-2 sm:max-w-2xl sm:mx-auto">
             {TEAM.map((person, i) => (
               <div
                 key={person.name}

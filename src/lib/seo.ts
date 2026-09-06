@@ -11,7 +11,7 @@ import type { Product } from "@/types";
 export const OG_IMAGE_PATH = "/og-image.jpg";
 
 export const SITE_SOCIAL = {
-  instagram: "https://instagram.com/studiod",
+  instagram: "https://www.instagram.com/studio.d.in",
   email: "mailto:hello@studiod.in",
 } as const;
 
