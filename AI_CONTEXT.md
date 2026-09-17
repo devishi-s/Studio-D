@@ -254,7 +254,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Protected `/account/orders` and `/account/orders/[id]` with user-scoped queries
 - Shared `requireUser()` guard using `/login?redirectTo=…`
 - Public `product-images` Storage bucket + policies (`supabase/storage.sql`)
-- Storage helpers (`getPublicImageUrl`, `uploadProductImage`, `resolveProductImagePath`)
+- Storage helpers (`getPublicImageUrl`, `uploadProductImages`, `resolveProductImagePath`)
 - `ProductImage` component using `next/image` with placeholder fallback when `src` is missing
 - Supabase host allowed in `next.config.ts` `images.remotePatterns`
 - Catalog search/filters: URL params + Supabase `ilike`/price/category (`ProductCatalogFilters`)
@@ -270,7 +270,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - **Roadmap phase:** Post Phase 5: pre-deployment
 - **Current focus:** Frontend UI polish + deployment prep (Vercel)
 - Phase 1–5 feature work is complete; remaining gate is Deployment and Launch checklist.
-- **Recently completed:** catalog polish: local product photos, every subcategory has seed products, cart qty capped by stock.
+- **Recently completed:** catalog polish: local product photos, stock-aware carts, quieter availability copy, and admin photo upload on product create/edit.
 - Shop and product pages read from Supabase; category taxonomy lives in `src/data/categories.ts` (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs).
 - Catalog reads use `unstable_cache` (3600s); product routes revalidate hourly; orders stay uncached for freshness.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
@@ -283,7 +283,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Sample catalog removed; 22 seed products cover every subcategory; covers use newest product image or temporary cover.
 - Fonts: Updock (brand), DM Serif Display (headings), Montserrat (UI), Lora (body).
 - Vercel deployment status is not verified.
-- Remote DB should have `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, `categories-restructure.sql`, and `catalog-polish.sql` applied; set `is_admin` for your user.
+- Remote DB should have `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, `categories-restructure.sql`, `catalog-polish.sql`, and current `storage.sql` (admin-only image writes) applied; set `is_admin` for your user.
 - `RESEND_API_KEY` is placeholder until a real Resend key + domain are configured.
 - **There is no Phase 6**: next work is polish + Deployment and Launch.
 

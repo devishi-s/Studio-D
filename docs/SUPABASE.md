@@ -42,11 +42,11 @@ Until real values replace the placeholders, `src/lib/supabase/middleware.ts` ski
 
 ## Apply schema, seed, and storage
 
-In the Supabase dashboard **SQL Editor**, run in order:
+In the Supabase dashboard **SQL Editor**, run in order. `storage.sql` needs `public.is_admin()` from `admin-rls.sql`, so run step 5 before re-running step 3 on a new project.
 
 1. `supabase/schema.sql`: tables, indexes, profile trigger, RLS, stock RPC
 2. `supabase/seed.sql`: full catalog (truncates products; for fresh projects)
-3. `supabase/storage.sql`: `product-images` bucket + Storage policies
+3. `supabase/storage.sql`: `product-images` bucket + Storage policies (run **after** `admin-rls.sql` so `is_admin()` exists; if the bucket already exists this is safe to re-run)
 4. `supabase/orders-checkout.sql`: **required for existing projects** that already ran an older `schema.sql` (adds Razorpay/shipping columns + insert policies + stock RPC)
 5. `supabase/admin-rls.sql`: `profiles.is_admin`, admin RLS, promote yourself via the SQL comment at the bottom
 6. `supabase/reviews.sql`: Phase 5.4 product reviews + moderation RLS
@@ -70,14 +70,14 @@ node --experimental-strip-types scripts/generate-seed.mjs
 | --- | --- |
 | Bucket id / name | `product-images` |
 | Public | yes (public read via public object URLs) |
-| Write | authenticated users only (insert / update / delete) |
+| Write | admins only (`public.is_admin()`, insert / update / delete) |
 | Max size | 5 MB |
 | Allowed MIME types | `image/jpeg`, `image/png`, `image/webp`, `image/gif` |
 
 `supabase/storage.sql` creates the bucket and these policies on `storage.objects`:
 
 - **Public read**: anyone can `SELECT` objects in `product-images`
-- **Authenticated write**: signed-in users can upload, update, and delete
+- **Admin write**: signed-in admins can upload, update, and delete (`public.is_admin()`). Run `admin-rls.sql` before `storage.sql` so that function exists.
 
 ### App helpers
 
@@ -85,7 +85,7 @@ node --experimental-strip-types scripts/generate-seed.mjs
 | --- | --- | --- |
 | `getPublicImageUrl(bucket, path)` | `src/lib/supabase/storage.ts` | Builds `{SUPABASE_URL}/storage/v1/object/public/{bucket}/{path}` |
 | `resolveProductImagePath(path)` | same | Absolute URLs stay as-is; `/images/...` public paths stay as-is; relative paths become public Storage URLs |
-| `getPublicImageUrl` / `resolveProductImagePath` | `src/lib/supabase/storage.ts` | Build public URLs / normalize product image paths |
+| `uploadProductImages` / `deleteProductImage` | `src/lib/supabase/upload-product-image.ts` | Admin browser upload/delete into `product-images` |
 | `ProductImage` | `src/components/product/product-image.tsx` | Uses `next/image` for `/images/...` and remote URLs; branded placeholder when `src` is missing |
 
 `next.config.ts` allows your Supabase host under `/storage/v1/object/public/**` so `next/image` can optimize Storage URLs.
@@ -100,26 +100,19 @@ node --experimental-strip-types scripts/generate-seed.mjs
 
 Seeded products ship with JPEG files in `public/images/products/`. Replace those with studio photos, or upload to the `product-images` bucket and store storage-relative paths instead.
 
-### Uploading real images later
+### Uploading real images
 
-When you are ready to replace placeholders:
+Admins add photos on `/admin/products/new` and `/admin/products/[id]/edit` with **Add photos**. Files go to the `product-images` bucket as `{productId}/{uuid}.jpg` (or png/webp/gif). Saving the product stores those storage-relative paths on `products.images`.
 
-1. Confirm `supabase/storage.sql` has been applied.
-2. Sign in as an authenticated user (or use the dashboard **Storage** UI).
-3. Upload under a stable path convention, e.g. `{productId}/main.jpg`, `{productId}/detail-1.jpg`.
-4. Either:
-   - Use the dashboard to upload into bucket `product-images`, then update `products.images` to the object paths, or
-- Call `getPublicImageUrl` / set `products.images` to storage object paths after uploading in the Supabase dashboard, or paste public URLs in admin.
+JPEG, PNG, WebP, and GIF, 5 MB each, up to 8 photos. The first photo is the shop thumbnail. iPhone **HEIC** is not accepted: export as JPEG first.
 
-Example SQL after uploading `prod-1/main.jpg` in the dashboard:
+To create the bucket on a new project:
 
-```sql
-update products
-set images = array['prod-1/main.jpg']
-where id = 'prod-1';
-```
+1. Run `supabase/admin-rls.sql` (defines `is_admin()`).
+2. Run `supabase/storage.sql`.
+3. Sign in as an admin and use **Add photos**.
 
-After that, `getAllProducts` / `getProductBySlug` resolve the path to a public URL and `ProductImage` renders it through `next/image`.
+You can still paste a `/images/...` path or a public URL under **Or paste a link**.
 
 ## Schema decisions
 
@@ -144,7 +137,7 @@ After that, `getAllProducts` / `getProductBySlug` resolve the path to a public U
 | `orders` | Authenticated users can `SELECT` / `INSERT` / `UPDATE` only their own orders. Admins can `SELECT` / `UPDATE` all orders. |
 | `order_items` | Authenticated users can `SELECT` / `INSERT` items whose parent order belongs to them. Admins can `SELECT` all items. |
 | `products` | Public `SELECT`. Admins can `INSERT` / `UPDATE` / `DELETE`. |
-| `storage.objects` (`product-images`) | Public `SELECT`; authenticated `INSERT` / `UPDATE` / `DELETE`. |
+| `storage.objects` (`product-images`) | Public `SELECT`; admin `INSERT` / `UPDATE` / `DELETE` via `is_admin()`. |
 | `decrement_product_stock()` | Security-definer RPC; `authenticated` can execute (used after paid checkout). |
 | `is_admin()` | Security-definer helper for admin RLS policies. |
 
@@ -211,8 +204,7 @@ Email confirmation and password-reset links must land on `/auth/callback` so the
 
 ## Out of scope (deferred)
 
-- Replacing seed JPEGs with original Studio D studio photos / Storage uploads
-- Admin UI for image management
+- Replacing seed JPEGs with original Studio D studio photos
 - Category hero images from Storage
 - Service-role usage in the app
 - Real email delivery for contact form
