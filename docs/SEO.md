@@ -1,6 +1,6 @@
 # Studio D SEO
 
-How search metadata, structured data, sitemap, and robots are set up — and what to update before launch.
+How search metadata, structured data, sitemap, and robots are set up: and what to update before launch.
 
 ## Decisions
 
@@ -51,9 +51,9 @@ Canonical URLs are set per page via `buildPageMetadata({ path })`.
 
 ## JSON-LD
 
-- **Homepage** — `Organization` (`organizationJsonLd`)
-- **Product detail** — `Product` + `Offer` (`productJsonLd`): name, description, image, price, INR, availability
-- **About** — `LocalBusiness` (`localBusinessJsonLd`): India areaServed, email, social
+- **Homepage**: `Organization` (`organizationJsonLd`)
+- **Product detail**: `Product` + `Offer` (`productJsonLd`): name, description, image, price, INR, availability
+- **About**: `LocalBusiness` (`localBusinessJsonLd`): India areaServed, email, social
 
 Injected with `src/components/seo/json-ld.tsx`.
 
@@ -80,7 +80,7 @@ Excludes: `/account`, `/cart`, `/checkout`, `/admin`, auth, API, order confirmat
 - File: `public/og-image.jpg` (placeholder cream “Studio D” graphic, 1200×630)
 - Regenerator: `scripts/generate-og-image.ps1` (optional)
 
-### Before launch — replace the OG image
+### Before launch: replace the OG image
 
 1. Design a branded 1200×630 JPEG (product collage or logo on cream/blush; keep text large and readable).
 2. Replace `public/og-image.jpg` with the final file (same path).
@@ -100,9 +100,9 @@ Excludes: `/account`, `/cart`, `/checkout`, `/admin`, auth, API, order confirmat
 
 ## Related files
 
-- `src/lib/seo.ts` — helpers + schemas
-- `src/components/seo/json-ld.tsx` — JSON-LD script tag
-- `src/app/layout.tsx` — global metadata
+- `src/lib/seo.ts`: helpers + schemas
+- `src/components/seo/json-ld.tsx`: JSON-LD script tag
+- `src/app/layout.tsx`: global metadata
 - `src/app/sitemap.ts` / `src/app/robots.ts`
 - `public/og-image.jpg`
-- `src/lib/constants.ts` — `SITE_NAME`, `SITE_DESCRIPTION`, `SITE_URL`
+- `src/lib/constants.ts`: `SITE_NAME`, `SITE_DESCRIPTION`, `SITE_URL`

@@ -1,4 +1,4 @@
--- Studio D — restructure product categories to two-level taxonomy
+-- Studio D: restructure product categories to two-level taxonomy
 -- Run once in Supabase SQL Editor after deploying the new category code.
 -- Safe to re-run (idempotent updates).
 
@@ -15,10 +15,18 @@ update public.products
 set category = 'paintings'
 where category = 'paintings';
 
--- Handmade Gifts → Wearables (main category; refine to a subcategory later in admin)
+-- Handmade gift sets → the subcategory that matches what is actually in the box
 update public.products
-set category = 'wearables'
-where category = 'handmade-gifts';
+set category = 'flowers'
+where slug = 'birthday-gift-box-floral';
+
+update public.products
+set category = 'keychains'
+where slug = 'anniversary-set-lavender-vanilla';
+
+update public.products
+set category = 'plushies'
+where slug = 'new-baby-welcome-hamper';
 
 -- Decorative Items → Art & Decor / Decor
 update public.products

@@ -1,4 +1,4 @@
-# Studio D — Supabase Setup
+# Studio D: Supabase Setup
 
 Phase 3 foundation: project configuration, typed clients, schema, RLS, catalog seed, auth, and Storage for product images.
 
@@ -44,18 +44,19 @@ Until real values replace the placeholders, `src/lib/supabase/middleware.ts` ski
 
 In the Supabase dashboard **SQL Editor**, run in order:
 
-1. `supabase/schema.sql` — tables, indexes, profile trigger, RLS, stock RPC
-2. `supabase/seed.sql` — all 12 catalog products
-3. `supabase/storage.sql` — `product-images` bucket + Storage policies
-4. `supabase/orders-checkout.sql` — **required for existing projects** that already ran an older `schema.sql` (adds Razorpay/shipping columns + insert policies + stock RPC)
-5. `supabase/admin-rls.sql` — `profiles.is_admin`, admin RLS, promote yourself via the SQL comment at the bottom
-6. `supabase/reviews.sql` — Phase 5.4 product reviews + moderation RLS
-7. `supabase/wishlist.sql` — Phase 5.5 authenticated save-for-later wishlist
-8. `supabase/categories-restructure.sql` — maps old product category slugs → two-level taxonomy (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs)
+1. `supabase/schema.sql`: tables, indexes, profile trigger, RLS, stock RPC
+2. `supabase/seed.sql`: full catalog (truncates products; for fresh projects)
+3. `supabase/storage.sql`: `product-images` bucket + Storage policies
+4. `supabase/orders-checkout.sql`: **required for existing projects** that already ran an older `schema.sql` (adds Razorpay/shipping columns + insert policies + stock RPC)
+5. `supabase/admin-rls.sql`: `profiles.is_admin`, admin RLS, promote yourself via the SQL comment at the bottom
+6. `supabase/reviews.sql`: Phase 5.4 product reviews + moderation RLS
+7. `supabase/wishlist.sql`: Phase 5.5 authenticated save-for-later wishlist
+8. `supabase/categories-restructure.sql`: maps old product category slugs → two-level taxonomy (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs)
+9. `supabase/catalog-polish.sql`: **existing projects only**: upserts the current catalog (22 products, subcategory alignment, local image paths) without truncating reviews/wishlist/orders
 
-**Catalog note:** Sample/seed demo products were removed; the live catalog uses real handmade products. Category metadata for the storefront is defined in `src/data/categories.ts` (two-level tree); `products.category` stores a slug from that tree.
+**Catalog note:** Category metadata for the storefront is defined in `src/data/categories.ts` (two-level tree); `products.category` stores a slug from that tree. Gift-box seeds are filed under the subcategory that matches what is in the box (flowers, keychains, plushies). Wearables, keychains, bag charms, and plushies each have dedicated pieces.
 
-To regenerate the seed after editing the static catalog:
+To regenerate `seed.sql` and `catalog-polish.sql` after editing `src/data/catalog-seed.json`:
 
 ```bash
 node --experimental-strip-types scripts/generate-seed.mjs
@@ -75,17 +76,17 @@ node --experimental-strip-types scripts/generate-seed.mjs
 
 `supabase/storage.sql` creates the bucket and these policies on `storage.objects`:
 
-- **Public read** — anyone can `SELECT` objects in `product-images`
-- **Authenticated write** — signed-in users can upload, update, and delete
+- **Public read**: anyone can `SELECT` objects in `product-images`
+- **Authenticated write**: signed-in users can upload, update, and delete
 
 ### App helpers
 
 | Helper | File | Behavior |
 | --- | --- | --- |
 | `getPublicImageUrl(bucket, path)` | `src/lib/supabase/storage.ts` | Builds `{SUPABASE_URL}/storage/v1/object/public/{bucket}/{path}` |
-| `resolveProductImagePath(path)` | same | Absolute URLs stay as-is; `/images/...` mocks stay as-is; relative paths become public Storage URLs |
+| `resolveProductImagePath(path)` | same | Absolute URLs stay as-is; `/images/...` public paths stay as-is; relative paths become public Storage URLs |
 | `getPublicImageUrl` / `resolveProductImagePath` | `src/lib/supabase/storage.ts` | Build public URLs / normalize product image paths |
-| `ProductImage` | `src/components/product/product-image.tsx` | Uses `next/image` for remote URLs; branded placeholder for mocks / missing |
+| `ProductImage` | `src/components/product/product-image.tsx` | Uses `next/image` for `/images/...` and remote URLs; branded placeholder when `src` is missing |
 
 `next.config.ts` allows your Supabase host under `/storage/v1/object/public/**` so `next/image` can optimize Storage URLs.
 
@@ -93,11 +94,11 @@ node --experimental-strip-types scripts/generate-seed.mjs
 
 `products.images` is a `text[]`. Each entry may be:
 
-1. **Storage-relative path** (preferred once you upload) — e.g. `prod-1/main.jpg` → resolved to a public URL via `getPublicImageUrl`
-2. **Absolute URL** — already a full `https://…` link
-3. **Mock path** (current seed) — e.g. `/images/products/prod-1.jpg` → UI keeps the branded placeholder until you replace it
+1. **Storage-relative path** (preferred once you upload to the bucket): e.g. `prod-1/main.jpg` → resolved to a public URL via `getPublicImageUrl`
+2. **Absolute URL**: already a full `https://…` link
+3. **Local public path** (current seed): e.g. `/images/products/rose-bouquet-1.jpg` → files under `public/images/products/`
 
-Seeded products still use mock `/images/...` paths. That is intentional: no binary assets are required to run the storefront.
+Seeded products ship with JPEG files in `public/images/products/`. Replace those with studio photos, or upload to the `product-images` bucket and store storage-relative paths instead.
 
 ### Uploading real images later
 
@@ -137,7 +138,7 @@ After that, `getAllProducts` / `getProductBySlug` resolve the path to a public U
 
 | Table | Policy behavior |
 | --- | --- |
-| `products` | Public `SELECT` for `anon` and `authenticated`. No client write policies — product writes use the **service role** (admin tooling later). |
+| `products` | Public `SELECT` for `anon` and `authenticated`. No client write policies: product writes use the **service role** (admin tooling later). |
 | `profiles` | Authenticated users can `SELECT` / `INSERT` / `UPDATE` only their own row (`auth.uid() = id`). |
 | `profiles` | Authenticated users can `SELECT` / `INSERT` / `UPDATE` only their own row (`auth.uid() = id`). Admins can `SELECT` all profiles. `is_admin` changes are blocked for non-admins via trigger. |
 | `orders` | Authenticated users can `SELECT` / `INSERT` / `UPDATE` only their own orders. Admins can `SELECT` / `UPDATE` all orders. |
@@ -147,7 +148,7 @@ After that, `getAllProducts` / `getProductBySlug` resolve the path to a public U
 | `decrement_product_stock()` | Security-definer RPC; `authenticated` can execute (used after paid checkout). |
 | `is_admin()` | Security-definer helper for admin RLS policies. |
 
-Promote an admin after applying `admin-rls.sql` (run in the SQL Editor — it has no JWT, so bootstrapping is allowed):
+Promote an admin after applying `admin-rls.sql` (run in the SQL Editor: it has no JWT, so bootstrapping is allowed):
 
 ```sql
 update public.profiles set is_admin = true where email = 'you@example.com';
@@ -199,7 +200,7 @@ Email confirmation and password-reset links must land on `/auth/callback` so the
 1. Create Supabase project.
 2. Fill `.env.local` from `.env.example`.
 3. Run `supabase/schema.sql`.
-4. Run `supabase/seed.sql` (optional — prefer real products over sample seed).
+4. Run `supabase/seed.sql` on a fresh database, or `supabase/catalog-polish.sql` on an existing one.
 5. Run `supabase/storage.sql`.
 6. Run `supabase/orders-checkout.sql` if the project was created before Phase 4.3.
 7. Run `supabase/admin-rls.sql`, then `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql`.
@@ -210,7 +211,7 @@ Email confirmation and password-reset links must land on `/auth/callback` so the
 
 ## Out of scope (deferred)
 
-- Uploading the full catalog photo set (keep mocks until assets are ready)
+- Replacing seed JPEGs with original Studio D studio photos / Storage uploads
 - Admin UI for image management
 - Category hero images from Storage
 - Service-role usage in the app

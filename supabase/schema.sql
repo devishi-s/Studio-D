@@ -1,4 +1,4 @@
--- Studio D — Phase 3.1 schema, indexes, triggers, and RLS
+-- Studio D: Phase 3.1 schema, indexes, triggers, and RLS
 -- Run this in the Supabase SQL Editor (or via CLI) before seed.sql.
 --
 -- Decisions:

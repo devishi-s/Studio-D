@@ -38,7 +38,7 @@ export default async function AccountWishlistPage() {
             Wishlist
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Pieces you&apos;ve saved for later — tap the heart again to remove.
+            Pieces you&apos;ve saved for later. Tap the heart again to remove.
           </p>
         </div>
 
@@ -59,7 +59,7 @@ export default async function AccountWishlistPage() {
               Your wishlist is empty
             </p>
             <p className="max-w-sm text-sm text-muted-foreground">
-              Save handmade pieces you love while you browse — they&apos;ll wait
+              Save handmade pieces you love while you browse. They&apos;ll wait
               here until you&apos;re ready.
             </p>
             <Link

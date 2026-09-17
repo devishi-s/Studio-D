@@ -20,7 +20,7 @@ function trackEvent(name: string, props?: EventProps) {
   track(name, cleaned);
 }
 
-/** Product detail page visit — catalog identifiers only (no user PII). */
+/** Product detail page visit: catalog identifiers only (no user PII). */
 export function trackProductViewed(input: {
   productId: string;
   productName: string;
@@ -33,7 +33,7 @@ export function trackProductViewed(input: {
   });
 }
 
-/** Add to cart — product id/name/price only. */
+/** Add to cart: product id/name/price only. */
 export function trackAddToCart(input: {
   productId: string;
   productName: string;
@@ -56,7 +56,7 @@ export function trackPaymentInitiated() {
   trackEvent("payment_initiated");
 }
 
-/** Order confirmation page — order id + total only (no email/address). */
+/** Order confirmation page: order id + total only (no email/address). */
 export function trackOrderCompleted(input: {
   orderId: string;
   total: number;

@@ -26,7 +26,7 @@ export const DEFAULT_OG_IMAGE = {
   url: OG_IMAGE_PATH,
   width: 1200,
   height: 630,
-  alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
+  alt: `${SITE_NAME} · ${SITE_TAGLINE}`,
 } as const;
 
 /** Shared Open Graph + Twitter defaults layered onto page metadata. */

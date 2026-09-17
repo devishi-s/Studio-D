@@ -19,7 +19,7 @@ export function CategoryHeroCover({
 }: CategoryHeroCoverProps) {
   const displayCover = cover ?? {
     src: TEMPORARY_CATEGORY_COVER.src,
-    alt: `${label} — ${TEMPORARY_CATEGORY_COVER.alt}`,
+    alt: `${label}, ${TEMPORARY_CATEGORY_COVER.alt}`,
   };
 
   return (

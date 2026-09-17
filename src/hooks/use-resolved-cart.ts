@@ -90,6 +90,11 @@ export function useResolvedCart(): {
     };
   }, [idsKey]);
 
+  useEffect(() => {
+    if (!state.catalog.size || state.catalogKey !== idsKey) return;
+    useCartStore.getState().clampToCatalog(state.catalog);
+  }, [idsKey, state.catalog, state.catalogKey]);
+
   const resolved = getItemsWithProducts(items, state.catalog);
   const itemCount = getCartItemCount(items);
   const subtotal = getCartSubtotal(items, state.catalog);

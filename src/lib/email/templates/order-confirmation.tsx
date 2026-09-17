@@ -49,7 +49,7 @@ export function OrderConfirmationEmail({
     <Html>
       <Head />
       <Preview>
-        Thank you, {customer.fullName.split(" ")[0] || "friend"} — your Studio D
+        Thank you, {customer.fullName.split(" ")[0] || "friend"}. Your Studio D
         order {shortId} is confirmed.
       </Preview>
       <Body style={styles.body}>

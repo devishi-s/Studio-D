@@ -27,9 +27,9 @@ type ProductImageProps = {
 };
 
 /**
- * Renders a product photo with `next/image` when a real remote URL is available.
- * Falls back to the branded placeholder for missing or mock `/images/...` paths.
- * Server Component — no client JS.
+ * Renders a product photo with `next/image` when a public or remote URL is available.
+ * Falls back to the branded placeholder when `src` is missing.
+ * Server Component. No client JS.
  */
 export function ProductImage({
   src,

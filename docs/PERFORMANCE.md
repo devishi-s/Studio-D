@@ -18,7 +18,7 @@ Decisions for Core Web Vitals (LCP, CLS, INP), caching, and how to monitor after
 | Remote images | `images.remotePatterns` for Supabase Storage host | Required for `next/image` on public bucket URLs |
 | Catalog cache | `unstable_cache` via `cachedQuery`, **3600s** | Supabase JS client is not `fetch`; taggable cache with 1h freshness |
 | Orders / account | No long-lived `unstable_cache` | User-scoped; freshness over CDN caching |
-| Page ISR | `export const revalidate = 3600` (literal) on catalog routes | Next.js requires a static number — keep in sync with `PRODUCT_REVALIDATE_SECONDS` |
+| Page ISR | `export const revalidate = 3600` (literal) on catalog routes | Next.js requires a static number: keep in sync with `PRODUCT_REVALIDATE_SECONDS` |
 | Cart / mobile nav | `next/dynamic` (`ssr: false`) in `NavbarActions` | Defers Sheet + cart store until needed |
 | Cart badge | Always-rendered fixed badge slot + `invisible` until hydrated | Prevents CLS when count appears from localStorage |
 | Fonts | `display: "swap"`; mono `preload: false` | Visible text ASAP; skip unused mono preload |
@@ -33,7 +33,7 @@ Decisions for Core Web Vitals (LCP, CLS, INP), caching, and how to monitor after
    - Product detail primary gallery image
    - First row of featured products (`priorityCount={4}`)
    - First row of shop / category grids (`priorityCount={3}`)
-4. Hero / about visuals still use `ImagePlaceholder` until real assets exist — replace with `next/image` + `priority` when ready.
+4. Hero / about visuals still use `ImagePlaceholder` until real assets exist: replace with `next/image` + `priority` when ready.
 5. Confirm `NEXT_PUBLIC_SUPABASE_URL` is set so `next.config.ts` registers the Storage hostname.
 
 ## Client JS audit
@@ -62,8 +62,8 @@ Do **not** mark a component `"use client"` unless it uses hooks, events, browser
 
 ## Caching helpers
 
-- `src/lib/cache.ts` — `PRODUCT_REVALIDATE_SECONDS` (3600), `cachedQuery`
-- `src/lib/supabase/products.ts` — all public catalog reads go through `cachedQuery` with `tags: ["products"]`
+- `src/lib/cache.ts`: `PRODUCT_REVALIDATE_SECONDS` (3600), `cachedQuery`
+- `src/lib/supabase/products.ts`: all public catalog reads go through `cachedQuery` with `tags: ["products"]`
 - Admin product create/update/delete call `updateTag("products")` (and related tags) so the storefront refreshes immediately
 
 Orders stay on the authenticated Supabase server client without catalog-style hour-long caching.
@@ -84,7 +84,7 @@ $env:ANALYZE="true"; npm run build
 
 Look for large client chunks from cart, checkout (Razorpay), admin forms, and lucide icons. Prefer dynamic import for rarely opened UI.
 
-## After launch — monitor
+## After launch: monitor
 
 - [ ] Lighthouse / PageSpeed Insights on `/`, `/products`, and a product URL (mobile).
 - [ ] CrUX / Search Console Core Web Vitals (LCP, CLS, INP).

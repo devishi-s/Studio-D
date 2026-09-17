@@ -6,6 +6,7 @@ import { ShoppingBag, Trash2, Minus, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
+import { cartQuantityCap } from "@/lib/cart/quantity-cap";
 import { useMounted } from "@/hooks/use-mounted";
 import { useResolvedCart } from "@/hooks/use-resolved-cart";
 import { useCartStore } from "@/store/cart.store";
@@ -95,7 +96,10 @@ export function CartSheet() {
           <>
             <div className="flex-1 overflow-y-auto px-4 py-2">
               <ul className="space-y-4">
-                {resolved.map(({ product, quantity }) => (
+                {resolved.map(({ product, quantity }) => {
+                  const cap = cartQuantityCap(product.stockCount);
+                  const atCap = quantity >= cap;
+                  return (
                   <li key={product.id} className="flex gap-3">
                     <Link
                       href={`/products/${product.slug}`}
@@ -130,7 +134,7 @@ export function CartSheet() {
                               quantity <= 1 && "opacity-40"
                             )}
                             onClick={() =>
-                              updateQuantity(product.id, quantity - 1)
+                              updateQuantity(product.id, quantity - 1, cap)
                             }
                             disabled={quantity <= 1}
                             aria-label="Decrease quantity"
@@ -141,11 +145,19 @@ export function CartSheet() {
                             {quantity}
                           </span>
                           <button
-                            className="inline-flex h-6 w-6 items-center justify-center rounded-full text-brand-brown-light transition-colors hover:bg-brand-blush hover:text-brand-brown"
+                            className={cn(
+                              "inline-flex h-6 w-6 items-center justify-center rounded-full text-brand-brown-light transition-colors hover:bg-brand-blush hover:text-brand-brown",
+                              atCap && "opacity-40"
+                            )}
                             onClick={() =>
-                              updateQuantity(product.id, quantity + 1)
+                              updateQuantity(product.id, quantity + 1, cap)
                             }
-                            aria-label="Increase quantity"
+                            disabled={atCap}
+                            aria-label={
+                              atCap
+                                ? `Only ${cap} in stock`
+                                : "Increase quantity"
+                            }
                           >
                             <Plus className="h-3 w-3" />
                           </button>
@@ -166,7 +178,8 @@ export function CartSheet() {
                       </div>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </div>
 

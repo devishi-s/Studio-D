@@ -1,4 +1,4 @@
-# Studio D — Email (Resend)
+# Studio D: Email (Resend)
 
 Phase 4.5 sends transactional email after a verified paid order:
 

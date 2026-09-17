@@ -21,7 +21,7 @@ export function getPublicImageUrl(bucket: string, path: string): string {
 /**
  * Normalizes a product image reference for the storefront:
  * - Absolute http(s) URLs are returned as-is.
- * - Local mock paths (`/images/...`) are left as-is (UI shows placeholders until uploaded).
+ * - Local public paths (`/images/...`) are left as-is.
  * - Relative storage object paths become public Supabase URLs.
  */
 export function resolveProductImagePath(path: string): string {
@@ -31,12 +31,9 @@ export function resolveProductImagePath(path: string): string {
   return getPublicImageUrl(PRODUCT_IMAGES_BUCKET, path);
 }
 
-/** True when `src` can be passed to `next/image` as a remote/optimized asset. */
+/** True when `src` can be passed to `next/image` as a remote or public asset. */
 export function canOptimizeProductImage(src: string | null | undefined): boolean {
   if (!src) return false;
-  // Real local category covers under /public (not mock product stubs).
-  if (src.startsWith("/images/categories/")) return true;
-  // Seeded mock product paths are not real files under /public — keep placeholders.
-  if (src.startsWith("/images/")) return false;
+  if (src.startsWith("/images/")) return true;
   return src.startsWith("http://") || src.startsWith("https://");
 }

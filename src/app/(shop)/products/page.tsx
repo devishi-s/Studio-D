@@ -23,7 +23,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = buildPageMetadata({
   title: "Shop Handmade Gifts & Decor",
   description:
-    "Browse Studio D’s handmade crochet flowers, paintings, gifts, and decorative pieces — crafted with care in India.",
+    "Browse Studio D’s handmade crochet flowers, paintings, gifts, and decorative pieces, crafted with care in India.",
   path: "/products",
 });
 
@@ -85,7 +85,7 @@ async function ProductsCatalog({
             No products found
           </p>
           <p className="max-w-sm text-sm text-muted-foreground">
-            Try a different name, category, or price range — or clear your
+            Try a different name, category, or price range, or clear your
             filters and browse the full collection.
           </p>
           {activeFilterCount > 0 ? (

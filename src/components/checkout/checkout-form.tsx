@@ -172,7 +172,7 @@ export function CheckoutForm({ defaultValues }: CheckoutFormProps) {
             }
 
             clearCart();
-            toast.success("Order confirmed — thank you.");
+            toast.success("Order confirmed. Thank you.");
             router.push(
               verifyData.redirectTo ??
                 `/order-confirmation/${verifyData.orderId}`

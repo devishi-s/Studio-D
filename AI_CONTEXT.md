@@ -1,4 +1,4 @@
-# Studio D — AI Project Context
+# Studio D: AI Project Context
 
 > Permanent project memory for developers and Cursor agents.
 >
@@ -110,20 +110,20 @@ Planned route groups `(auth)` and `(account)`, checkout, and admin areas should 
 
 ### Implemented
 
-- `/` — homepage
-- `/products` — product listing, category filtering, and sorting
-- `/products/[slug]` — product details and related products
-- `/categories` — category index
-- `/categories/[slug]` — main category
-- `/categories/[slug]/[subSlug]` — subcategory
-- `/about` — brand story
-- `/cart` — cart management
-- `/contact` — contact form (`mailto:` draft handoff)
-- `/login` · `/signup` · `/reset-password` — email/password auth
-- `/auth/callback` — Supabase auth code exchange
-- `/account` — profile + edit name
-- `/account/orders` — order history
-- `/account/orders/[id]` — order detail
+- `/`: homepage
+- `/products`: product listing, category filtering, and sorting
+- `/products/[slug]`: product details and related products
+- `/categories`: category index
+- `/categories/[slug]`: main category
+- `/categories/[slug]/[subSlug]`: subcategory
+- `/about`: brand story
+- `/cart`: cart management
+- `/contact`: contact form (`mailto:` draft handoff)
+- `/login` · `/signup` · `/reset-password`: email/password auth
+- `/auth/callback`: Supabase auth code exchange
+- `/account`: profile + edit name
+- `/account/orders`: order history
+- `/account/orders/[id]`: order detail
 
 ### Planned
 
@@ -142,13 +142,13 @@ Artistic, cozy, elegant, minimal, premium, handmade, thoughtful, and timeless.
 
 ### Palette
 
-- Brown: `#6B3A2A` — headings and primary actions
-- Warm brown: `#8B5E3C` — supporting text
-- Cream: `#FDF5F0` — page background
-- Blush: `#F5E6DB` — cards and soft surfaces
-- Sage: `#7B9E87` — trust/success accents
-- Coral: `#D4856A` — highlights and interactive accents
-- Honey gold: `#E8B44D` — small decorative emphasis
+- Brown: `#6B3A2A`: headings and primary actions
+- Warm brown: `#8B5E3C`: supporting text
+- Cream: `#FDF5F0`: page background
+- Blush: `#F5E6DB`: cards and soft surfaces
+- Sage: `#7B9E87`: trust/success accents
+- Coral: `#D4856A`: highlights and interactive accents
+- Honey gold: `#E8B44D`: small decorative emphasis
 
 Use the existing CSS variables and Tailwind token names. Do not replace this palette with generic shadcn defaults.
 
@@ -242,7 +242,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Supabase client libraries and typed browser/server/proxy helpers
 - Environment placeholders (`.env.example`, `.env.local`) for URL and anon key
 - PostgreSQL schema, indexes, profile trigger, and RLS in `supabase/schema.sql`
-- Catalog seed SQL for all 12 static products in `supabase/seed.sql`
+- Catalog seed SQL in `supabase/seed.sql` (full catalog; truncates) and idempotent `supabase/catalog-polish.sql`
 - Setup documentation in `docs/SUPABASE.md`
 - Storefront product queries via `src/lib/supabase/products.ts` (active products only)
 - Route-level loading skeletons for shop, product detail, and categories
@@ -255,7 +255,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Shared `requireUser()` guard using `/login?redirectTo=…`
 - Public `product-images` Storage bucket + policies (`supabase/storage.sql`)
 - Storage helpers (`getPublicImageUrl`, `uploadProductImage`, `resolveProductImagePath`)
-- `ProductImage` component using `next/image` with placeholder fallback for mock paths
+- `ProductImage` component using `next/image` with placeholder fallback when `src` is missing
 - Supabase host allowed in `next.config.ts` `images.remotePatterns`
 - Catalog search/filters: URL params + Supabase `ilike`/price/category (`ProductCatalogFilters`)
 - Checkout form at `/checkout` (RHF + Zod); Razorpay Checkout.js + signature verify + order persistence
@@ -267,10 +267,10 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 
 ## Current Project State
 
-- **Roadmap phase:** Post Phase 5 — pre-deployment
+- **Roadmap phase:** Post Phase 5: pre-deployment
 - **Current focus:** Frontend UI polish + deployment prep (Vercel)
 - Phase 1–5 feature work is complete; remaining gate is Deployment and Launch checklist.
-- **Recently completed:** code cleanup/refactor; real products in Supabase; two-level category restructure; hero/navbar logo + vine chroma-key animations; homepage UI polish.
+- **Recently completed:** catalog polish: local product photos, every subcategory has seed products, cart qty capped by stock.
 - Shop and product pages read from Supabase; category taxonomy lives in `src/data/categories.ts` (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs).
 - Catalog reads use `unstable_cache` (3600s); product routes revalidate hourly; orders stay uncached for freshness.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
@@ -280,12 +280,12 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Reviews + wishlist live (SQL: `reviews.sql`, `wishlist.sql`).
 - Cart resolves line items from live Supabase product IDs (`useResolvedCart`).
 - Contact form still uses `mailto:` draft handoff.
-- Sample catalog removed; real handmade products uploaded (covers use newest product image or temporary cover).
+- Sample catalog removed; 22 seed products cover every subcategory; covers use newest product image or temporary cover.
 - Fonts: Updock (brand), DM Serif Display (headings), Montserrat (UI), Lora (body).
 - Vercel deployment status is not verified.
-- Remote DB should have `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql` applied; set `is_admin` for your user.
+- Remote DB should have `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, `categories-restructure.sql`, and `catalog-polish.sql` applied; set `is_admin` for your user.
 - `RESEND_API_KEY` is placeholder until a real Resend key + domain are configured.
-- **There is no Phase 6** — next work is polish + Deployment and Launch.
+- **There is no Phase 6**: next work is polish + Deployment and Launch.
 
 ## Important Decisions and Why
 
@@ -324,9 +324,6 @@ This shadcn installation uses Base UI primitives:
 
 Follow `ROADMAP.md` for implementation order. Known technical improvements include:
 
-- Enforce each product’s `stockCount` in all cart quantity controls.
-- Consolidate duplicated quantity-control UI where useful.
-- Add real product images through `next/image`.
 - Add unit/integration tests for cart operations, totals, filters, and forms.
 - Add loading skeletons and stronger error boundaries.
 - Complete accessibility and responsive-browser QA.

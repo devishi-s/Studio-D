@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 
-/** Catalog / product pages — 1 hour ISR-style cache. */
+/** Catalog / product pages: 1 hour ISR-style cache. */
 export const PRODUCT_REVALIDATE_SECONDS = 3600;
 
 type CacheOptions = {

@@ -1,4 +1,4 @@
--- Studio D — product-images storage bucket and policies
+-- Studio D: product-images storage bucket and policies
 -- Run in the Supabase SQL Editor after schema.sql.
 --
 -- Bucket: public read, authenticated write (insert/update/delete).

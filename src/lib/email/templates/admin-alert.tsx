@@ -81,7 +81,7 @@ export function AdminOrderAlertEmail({
             <Text style={styles.label}>Items</Text>
             {order.lines.map((line) => (
               <Text key={`${line.name}-${line.quantity}`} style={styles.item}>
-                {line.name} × {line.quantity} — {formatInr(line.lineTotal)}
+                {line.name} × {line.quantity}: {formatInr(line.lineTotal)}
               </Text>
             ))}
           </Section>
