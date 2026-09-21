@@ -605,7 +605,7 @@ The original canvas did not create a separate testing phase; testing is a comple
 - [ ] Decide whether shared quantity controls should replace duplicated Sheet/page implementations.
 - [x] Wire Supabase Storage + `next/image` for product photos (real asset upload still optional; mocks OK).
 - [ ] Add cart persistence versioning/migration before catalog identifiers change.
-- [ ] Add stronger loading and error boundaries during backend migration.
+- [x] Add stronger loading and error boundaries during backend migration (`src/app/not-found.tsx`, `error.tsx`, `global-error.tsx`).
 - [ ] Confirm Vercel deployment status.
 
 ---
