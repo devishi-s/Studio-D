@@ -254,7 +254,7 @@ type CartItem = {
 - [x] Configure environment variables (`.env.example` + local `.env.local` placeholders).
 - [x] Add browser and server Supabase clients (`src/lib/supabase/*` + Next.js 16 `src/proxy.ts`).
 - [x] Define the PostgreSQL schema (`supabase/schema.sql`).
-- [x] Seed initial catalog data (`supabase/seed.sql`: 12 products).
+- [x] Seed initial catalog data (`supabase/seed.sql`: 22 products).
 - [x] Configure Row Level Security policies.
 - [x] Add required indexes and constraints.
 - [x] Document local and production configuration (`docs/SUPABASE.md`).

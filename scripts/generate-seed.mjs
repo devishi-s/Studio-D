@@ -41,7 +41,18 @@ on conflict (id) do update set
   price = excluded.price,
   compare_at_price = excluded.compare_at_price,
   category = excluded.category,
-  images = excluded.images,
+  images = case
+    when exists (
+      select 1
+      from unnest(public.products.images) as img
+      where img is not null
+        and img not like '/%'
+        and img not like 'http://%'
+        and img not like 'https://%'
+    )
+    then public.products.images
+    else excluded.images
+  end,
   tags = excluded.tags,
   featured = excluded.featured,
   is_active = excluded.is_active,
@@ -71,6 +82,9 @@ const polishLines = [
   "-- Generated from src/data/catalog-seed.json",
   "-- Safe for existing projects: upserts products, does not truncate.",
   "-- Preserves reviews, wishlist, and orders that reference product ids.",
+  "-- On conflict, keeps products.images when any path is a Storage object",
+  "-- (not /images/... and not http(s)), so re-running after admin uploads",
+  "-- does not hide those photos.",
   "",
   "begin;",
   "",

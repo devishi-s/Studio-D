@@ -66,3 +66,12 @@ export function isStorageImagePath(path: string): boolean {
   if (path.startsWith("/")) return false;
   return true;
 }
+
+/** Storage objects present in `before` but not in `after`. */
+export function storagePathsRemoved(
+  before: readonly string[],
+  after: readonly string[]
+): string[] {
+  const kept = new Set(after);
+  return before.filter((path) => isStorageImagePath(path) && !kept.has(path));
+}

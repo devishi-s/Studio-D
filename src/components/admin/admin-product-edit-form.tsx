@@ -18,6 +18,8 @@ import {
   adminUpdateProductAction,
 } from "@/lib/actions/admin";
 import { Button } from "@/components/ui/button";
+import { storagePathsRemoved } from "@/lib/product-images";
+import { deleteProductImage } from "@/lib/supabase/upload-product-image";
 
 type AdminProductEditFormProps = {
   product: AdminProduct;
@@ -29,6 +31,7 @@ export function AdminProductEditForm({ product }: AdminProductEditFormProps) {
   const [deleting, setDeleting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [images, setImages] = useState<string[]>(product.images);
+  const [committedPaths, setCommittedPaths] = useState<string[]>(product.images);
 
   function validate(form: FormData): Record<string, string> {
     const next: Record<string, string> = {};
@@ -86,6 +89,11 @@ export function AdminProductEditForm({ product }: AdminProductEditFormProps) {
         toast.error(result.error);
         return;
       }
+
+      for (const path of storagePathsRemoved(committedPaths, images)) {
+        await deleteProductImage(path);
+      }
+      setCommittedPaths(images);
 
       toast.success("Product saved.");
       router.refresh();
@@ -178,6 +186,7 @@ export function AdminProductEditForm({ product }: AdminProductEditFormProps) {
         productId={product.id}
         value={images}
         onChange={setImages}
+        committedPaths={committedPaths}
         disabled={pending || deleting}
       />
 

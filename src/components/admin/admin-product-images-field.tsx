@@ -20,6 +20,8 @@ type AdminProductImagesFieldProps = {
   productId: string;
   value: string[];
   onChange: (next: string[]) => void;
+  /** Paths already saved on the product. Those Storage objects are not deleted until Save succeeds. */
+  committedPaths?: readonly string[];
   disabled?: boolean;
   error?: string;
 };
@@ -28,6 +30,7 @@ export function AdminProductImagesField({
   productId,
   value,
   onChange,
+  committedPaths,
   disabled = false,
   error,
 }: AdminProductImagesFieldProps) {
@@ -77,7 +80,10 @@ export function AdminProductImagesField({
     const path = value[index];
     if (!path || busy) return;
     onChange(value.filter((_, i) => i !== index));
-    await deleteProductImage(path);
+    // Keep committed Storage objects until the product save succeeds.
+    if (!committedPaths?.includes(path)) {
+      await deleteProductImage(path);
+    }
   }
 
   function makeCover(index: number) {

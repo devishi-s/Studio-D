@@ -28,8 +28,12 @@ export async function uploadProductImages(
 
   for (const file of files) {
     const valid = validateProductImageFile(file);
-    if (!valid.ok) return valid;
+    if (!valid.ok) {
+      await removeUploadedPaths(supabase, paths);
+      return valid;
+    }
     if (!isProductImageMimeType(file.type)) {
+      await removeUploadedPaths(supabase, paths);
       return { ok: false, error: "Use a JPEG, PNG, WebP, or GIF photo." };
     }
 
@@ -42,6 +46,7 @@ export async function uploadProductImages(
       });
 
     if (error) {
+      await removeUploadedPaths(supabase, paths);
       return {
         ok: false,
         error: error.message || "Could not upload that photo.",
@@ -51,6 +56,14 @@ export async function uploadProductImages(
   }
 
   return { ok: true, paths };
+}
+
+async function removeUploadedPaths(
+  supabase: ReturnType<typeof createClient>,
+  paths: string[]
+) {
+  if (paths.length === 0) return;
+  await supabase.storage.from(PRODUCT_IMAGES_BUCKET).remove(paths);
 }
 
 /** Best-effort delete. Removing a photo from the product still succeeds if this fails. */

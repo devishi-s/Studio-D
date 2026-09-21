@@ -42,17 +42,17 @@ Until real values replace the placeholders, `src/lib/supabase/middleware.ts` ski
 
 ## Apply schema, seed, and storage
 
-In the Supabase dashboard **SQL Editor**, run in order. `storage.sql` needs `public.is_admin()` from `admin-rls.sql`, so run step 5 before re-running step 3 on a new project.
+In the Supabase dashboard **SQL Editor**, run in order. `storage.sql` needs `public.is_admin()` from `admin-rls.sql`.
 
 1. `supabase/schema.sql`: tables, indexes, profile trigger, RLS, stock RPC
 2. `supabase/seed.sql`: full catalog (truncates products; for fresh projects)
-3. `supabase/storage.sql`: `product-images` bucket + Storage policies (run **after** `admin-rls.sql` so `is_admin()` exists; if the bucket already exists this is safe to re-run)
-4. `supabase/orders-checkout.sql`: **required for existing projects** that already ran an older `schema.sql` (adds Razorpay/shipping columns + insert policies + stock RPC)
-5. `supabase/admin-rls.sql`: `profiles.is_admin`, admin RLS, promote yourself via the SQL comment at the bottom
+3. `supabase/admin-rls.sql`: `profiles.is_admin`, admin RLS, promote yourself via the SQL comment at the bottom
+4. `supabase/storage.sql`: `product-images` bucket + Storage policies (run **after** `admin-rls.sql` so `is_admin()` exists; if the bucket already exists this is safe to re-run)
+5. `supabase/orders-checkout.sql`: **required for existing projects** that already ran an older `schema.sql` (adds Razorpay/shipping columns + insert policies + stock RPC)
 6. `supabase/reviews.sql`: Phase 5.4 product reviews + moderation RLS
 7. `supabase/wishlist.sql`: Phase 5.5 authenticated save-for-later wishlist
 8. `supabase/categories-restructure.sql`: maps old product category slugs → two-level taxonomy (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs)
-9. `supabase/catalog-polish.sql`: **existing projects only**: upserts the current catalog (22 products, subcategory alignment, local image paths) without truncating reviews/wishlist/orders
+9. `supabase/catalog-polish.sql`: **existing projects only**: upserts the current catalog (22 products, subcategory alignment, local image paths) without truncating reviews/wishlist/orders. Re-running keeps `products.images` when any path is already a Storage object.
 
 **Catalog note:** Category metadata for the storefront is defined in `src/data/categories.ts` (two-level tree); `products.category` stores a slug from that tree. Gift-box seeds are filed under the subcategory that matches what is in the box (flowers, keychains, plushies). Wearables, keychains, bag charms, and plushies each have dedicated pieces.
 
@@ -194,13 +194,14 @@ Email confirmation and password-reset links must land on `/auth/callback` so the
 2. Fill `.env.local` from `.env.example`.
 3. Run `supabase/schema.sql`.
 4. Run `supabase/seed.sql` on a fresh database, or `supabase/catalog-polish.sql` on an existing one.
-5. Run `supabase/storage.sql`.
-6. Run `supabase/orders-checkout.sql` if the project was created before Phase 4.3.
-7. Run `supabase/admin-rls.sql`, then `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql`.
-8. Confirm products exist (`select count(*) from products;`) and bucket `product-images` under **Storage**.
-9. Set Auth redirect URLs (see above).
-10. Restart the Next.js app.
-11. Visit shop pages and `/account` after signing in.
+5. Run `supabase/admin-rls.sql`.
+6. Run `supabase/storage.sql`.
+7. Run `supabase/orders-checkout.sql` if the project was created before Phase 4.3.
+8. Run `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql`.
+9. Confirm products exist (`select count(*) from products;`) and bucket `product-images` under **Storage**.
+10. Set Auth redirect URLs (see above).
+11. Restart the Next.js app.
+12. Visit shop pages and `/account` after signing in.
 
 ## Out of scope (deferred)
 
