@@ -615,3 +615,5 @@ The original canvas did not create a separate testing phase; testing is a comple
 Phases 1–5 feature work are complete. **Current focus:** UI polish + Deployment and Launch checklist (env separation, Vercel deploy when requested, production smoke tests). There is no Phase 6.
 
 **Ops reminder:** Ensure remote DB has `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql`: see `docs/SUPABASE.md`.
+
+**Launch / env decisions** (do not invent a bigger platform): two Supabase projects at go-live (current cloud DB = DEV; new project = PROD). Vercel Preview shares DEV; Production uses PROD. CI at deploy = one GitHub Action (lint + tsc + build) plus Vercel Preview/Production. Full brief: Cursor canvas `studio-d-launch-readiness.canvas.tsx` and `AI_CONTEXT.md` section "Launch and ops decisions".

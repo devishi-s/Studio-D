@@ -298,6 +298,20 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - **Supabase later:** PostgreSQL, Auth, Storage, and RLS fit the planned commerce backend.
 - **Server-authoritative payments later:** prices, stock, totals, and order state must be recalculated server-side before Razorpay.
 
+## Launch and ops decisions (maintain)
+
+Living brief for humans: Cursor canvas `studio-d-launch-readiness.canvas.tsx`. Do not contradict this section unless the user changes it.
+
+- **Architecture:** Stay on Next.js + Supabase. No Redis, queues, microservices, headless CMS, Elasticsearch, Docker, or Kubernetes for launch.
+- **Databases:** Two projects at go-live, not five. The current cloud project becomes **DEV**. Create a new **PROD** project before real customers. Local and Vercel Preview both use DEV. Only Vercel Production uses PROD. Never point Preview at PROD. Never run `supabase/seed.sql` on PROD (it truncates products).
+- **CI/CD:** None today (no GitHub Actions, Vercel not connected). GitHub Write is in place; `catalog-polish` is on origin. At deploy: Vercel Preview on PR + Production on `main`, plus one Action (`npm ci`, lint, `tsc --noEmit`, `next build`). No GitFlow, no staging cluster. Razorpay webhooks need a public HTTPS URL (Preview for test, `studiod.in` for live); localhost cannot receive them without a tunnel.
+- **Env vars:** Separate Vercel Production vs Preview. Razorpay **live** keys and live webhook secret only on Production. `SITE_URL` is hardcoded to `https://studiod.in` in `src/lib/constants.ts`; it should become `NEXT_PUBLIC_SITE_URL` per environment. If a service-role key is added for order writes, it is server-only and never `NEXT_PUBLIC_*`.
+- **Auth:** Each Supabase project needs its own Site URL + redirect allowlist (localhost, Preview, production `/auth/callback`).
+- **Security still open:** shopper RLS can insert/update own orders; `decrement_product_stock` is granted to `authenticated`; webhook is acknowledge-only. Lock these before public deploy.
+- **Not launch blockers:** automated tests, Sentry, COD, guest checkout, coupons, shipping APIs, GST invoices, product video, MFA, CAPTCHA.
+- **This week:** real photos, unique product copy, unpaid QA, GitHub Write + push `catalog-polish`, confirm `hello@studiod.in` and Instagram.
+- **SEO:** Technical markup is largely done (titles, canonicals, sitemap, robots, JSON-LD). That does **not** rank #1 for generic queries like “handmade gifts India”. Realistic win: brand queries (`Studio D`) after the domain is live. At deploy: Search Console + sitemap, real OG image, `SITE_URL` env, Preview noindex, product images as absolute URLs in OG/JSON-LD. Later: Merchant Center, blog, Hindi. Do not buy “guaranteed first page” SEO. Instagram/WhatsApp will outperform Google for handmade discovery at the start.
+
 ## Things Future Agents Must Not Change
 
 - Do not replace the App Router or move the project to the Pages Router.
@@ -311,6 +325,9 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Do not remove responsive, empty, invalid, loading, stock, or accessibility states.
 - Do not copy Radix-specific shadcn patterns blindly: this project uses Base UI.
 - Do not execute any Git command without explicit user confirmation.
+- Do not run `supabase/seed.sql` against production (it truncates products).
+- Do not put Razorpay live keys or the live webhook secret on Vercel Preview or in `.env.local`.
+- Do not add a third database, Docker, Kubernetes, or a CI test suite unless the user asks.
 
 ## Important Base UI Note
 
