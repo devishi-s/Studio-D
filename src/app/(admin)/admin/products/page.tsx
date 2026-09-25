@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 function categoryColumns(slug: string): { main: string; sub: string } {
   const node = getCategoryBySlug(slug);
-  if (!node) return { main: slug, sub: "—" };
+  if (!node) return { main: slug, sub: "" };
 
   if (node.parentSlug) {
     return {
@@ -35,10 +35,10 @@ function categoryColumns(slug: string): { main: string; sub: string } {
 
   const main = getMainCategoryBySlug(slug);
   if (main) {
-    return { main: main.name, sub: "—" };
+    return { main: main.name, sub: "" };
   }
 
-  return { main: categoryDisplayName(node), sub: "—" };
+  return { main: categoryDisplayName(node), sub: "" };
 }
 
 export default async function AdminProductsPage() {
@@ -96,7 +96,7 @@ export default async function AdminProductsPage() {
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">{main}</td>
                 <td className="px-4 py-3 text-muted-foreground">
-                  {sub === "—" ? (
+                  {sub === "" ? (
                     <span className="text-brand-coral/80">Not set</span>
                   ) : (
                     sub

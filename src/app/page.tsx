@@ -19,7 +19,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = buildPageMetadata({
   title: "Studio D | Handmade Crochet, Paintings & Thoughtful Gifts",
   description:
-    "Studio D crafts handmade crochet flowers, original paintings, and warm home decor — made slowly, meant to last.",
+    "Studio D crafts handmade crochet flowers, original paintings, and warm home decor. Made slowly, meant to last.",
   path: "/",
   absoluteTitle: true,
 });
@@ -29,7 +29,7 @@ type HomePageProps = {
 };
 
 async function FeaturedProductsSection() {
-  const featured = await getFeaturedProducts();
+  const featured = (await getFeaturedProducts()).slice(0, 8);
   return <FeaturedProducts products={featured} />;
 }
 
@@ -39,7 +39,7 @@ function FeaturedProductsFallback() {
       <Container>
         <SectionHeader
           title="Handpicked for You"
-          subtitle="Our most loved pieces — each one crafted with patience, precision, and a whole lot of heart."
+          subtitle="Our most loved pieces, each one crafted with patience, precision, and a whole lot of heart."
         />
         <div className="mt-10">
           <ProductGridSkeleton count={4} columns={4} />
@@ -70,7 +70,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <Container>
               <SectionHeader
                 title="Explore by Category"
-                subtitle="Wearables, charms, crochet creations, and art — find something that speaks to you."
+                subtitle="Wearables, charms, crochet creations, and art. Find something that speaks to you."
               />
               <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, i) => (

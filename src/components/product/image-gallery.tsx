@@ -24,7 +24,7 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
           alt={
             activeIndex === 0
               ? productName
-              : `${productName} — view ${activeIndex + 1}`
+              : `${productName}, view ${activeIndex + 1}`
           }
           fill
           sizes="(max-width: 1024px) 100vw, 50vw"

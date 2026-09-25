@@ -5,7 +5,7 @@ export type Product = {
   description: string;
   price: number;
   compareAtPrice?: number;
-  images: string[]; // absolute https URLs, storage-relative paths, or mock `/images/...` paths
+  images: string[]; // absolute https URLs, storage-relative paths, or `/images/...` public assets
   category: Category;
   tags: string[];
   materials: string[];
@@ -30,7 +30,7 @@ export type Category = {
 
 /**
  * Lean cart item stored in Zustand / localStorage.
- * Only holds the product ID and quantity — not the full Product object.
+ * Only holds the product ID and quantity, not the full Product object.
  * This keeps the persisted state small and avoids stale nested data.
  */
 export type CartItem = {

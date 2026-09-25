@@ -78,7 +78,7 @@ export default async function OrderConfirmationPage({
           {order.needsManualReview ? (
             <p className="mt-4 rounded-xl border border-brand-gold/40 bg-brand-blush/40 px-4 py-3 text-sm text-brand-brown">
               One or more items need a quick stock check on our side. We&apos;ll
-              reach out if anything changes — your payment is safe.
+              reach out if anything changes. Your payment is safe.
             </p>
           ) : null}
 

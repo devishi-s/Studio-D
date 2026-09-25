@@ -290,7 +290,7 @@ export async function updateProductStock(
  * Creates a confirmed order + immutable line snapshots after payment verification.
  * Idempotent on `razorpayIds.paymentId`.
  *
- * Prices are re-read from the catalog for snapshots — never trust client unit prices.
+ * Prices are re-read from the catalog for snapshots. Never trust client unit prices.
  * The `total` argument is a sanity check against the recalculated checkout total.
  */
 export async function createOrder(
@@ -326,7 +326,7 @@ export async function createOrder(
   }
 
   if (Math.abs(cart.total - total) > 0.01) {
-    console.warn("[createOrder] Total mismatch — using server total", {
+    console.warn("[createOrder] Total mismatch: using server total", {
       clientTotal: total,
       serverTotal: cart.total,
       userId,
@@ -384,7 +384,7 @@ export async function createOrder(
     .insert(itemRows);
 
   if (itemsError) {
-    console.error("[createOrder] order_items insert failed — rolling back order", {
+    console.error("[createOrder] order_items insert failed: rolling back order", {
       orderId,
       razorpayPaymentId: razorpayIds.paymentId,
       error: itemsError.message,
@@ -407,8 +407,8 @@ export async function createOrder(
   let needsManualReview = false;
   if (shortfalls.length > 0) {
     needsManualReview = true;
-    const reviewNotes = `Stock shortfall after payment — manual review required.\n${shortfalls.join("\n")}`;
-    console.error("[createOrder] Stock shortfall — flagged for review", {
+    const reviewNotes = `Stock shortfall after payment. Manual review required.\n${shortfalls.join("\n")}`;
+    console.error("[createOrder] Stock shortfall: flagged for review", {
       orderId,
       razorpayPaymentId: razorpayIds.paymentId,
       shortfalls,

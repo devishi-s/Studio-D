@@ -1,4 +1,4 @@
-# Studio D — AI Project Context
+# Studio D: AI Project Context
 
 > Permanent project memory for developers and Cursor agents.
 >
@@ -110,20 +110,20 @@ Planned route groups `(auth)` and `(account)`, checkout, and admin areas should 
 
 ### Implemented
 
-- `/` — homepage
-- `/products` — product listing, category filtering, and sorting
-- `/products/[slug]` — product details and related products
-- `/categories` — category index
-- `/categories/[slug]` — main category
-- `/categories/[slug]/[subSlug]` — subcategory
-- `/about` — brand story
-- `/cart` — cart management
-- `/contact` — contact form (`mailto:` draft handoff)
-- `/login` · `/signup` · `/reset-password` — email/password auth
-- `/auth/callback` — Supabase auth code exchange
-- `/account` — profile + edit name
-- `/account/orders` — order history
-- `/account/orders/[id]` — order detail
+- `/`: homepage
+- `/products`: product listing, category filtering, and sorting
+- `/products/[slug]`: product details and related products
+- `/categories`: category index
+- `/categories/[slug]`: main category
+- `/categories/[slug]/[subSlug]`: subcategory
+- `/about`: brand story
+- `/cart`: cart management
+- `/contact`: contact form (`mailto:` draft handoff)
+- `/login` · `/signup` · `/reset-password`: email/password auth
+- `/auth/callback`: Supabase auth code exchange
+- `/account`: profile + edit name
+- `/account/orders`: order history
+- `/account/orders/[id]`: order detail
 
 ### Planned
 
@@ -142,13 +142,13 @@ Artistic, cozy, elegant, minimal, premium, handmade, thoughtful, and timeless.
 
 ### Palette
 
-- Brown: `#6B3A2A` — headings and primary actions
-- Warm brown: `#8B5E3C` — supporting text
-- Cream: `#FDF5F0` — page background
-- Blush: `#F5E6DB` — cards and soft surfaces
-- Sage: `#7B9E87` — trust/success accents
-- Coral: `#D4856A` — highlights and interactive accents
-- Honey gold: `#E8B44D` — small decorative emphasis
+- Brown: `#6B3A2A`: headings and primary actions
+- Warm brown: `#8B5E3C`: supporting text
+- Cream: `#FDF5F0`: page background
+- Blush: `#F5E6DB`: cards and soft surfaces
+- Sage: `#7B9E87`: trust/success accents
+- Coral: `#D4856A`: highlights and interactive accents
+- Honey gold: `#E8B44D`: small decorative emphasis
 
 Use the existing CSS variables and Tailwind token names. Do not replace this palette with generic shadcn defaults.
 
@@ -242,7 +242,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Supabase client libraries and typed browser/server/proxy helpers
 - Environment placeholders (`.env.example`, `.env.local`) for URL and anon key
 - PostgreSQL schema, indexes, profile trigger, and RLS in `supabase/schema.sql`
-- Catalog seed SQL for all 12 static products in `supabase/seed.sql`
+- Catalog seed SQL in `supabase/seed.sql` (full catalog; truncates) and idempotent `supabase/catalog-polish.sql`
 - Setup documentation in `docs/SUPABASE.md`
 - Storefront product queries via `src/lib/supabase/products.ts` (active products only)
 - Route-level loading skeletons for shop, product detail, and categories
@@ -254,8 +254,8 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Protected `/account/orders` and `/account/orders/[id]` with user-scoped queries
 - Shared `requireUser()` guard using `/login?redirectTo=…`
 - Public `product-images` Storage bucket + policies (`supabase/storage.sql`)
-- Storage helpers (`getPublicImageUrl`, `uploadProductImage`, `resolveProductImagePath`)
-- `ProductImage` component using `next/image` with placeholder fallback for mock paths
+- Storage helpers (`getPublicImageUrl`, `uploadProductImages`, `resolveProductImagePath`)
+- `ProductImage` component using `next/image` with placeholder fallback when `src` is missing
 - Supabase host allowed in `next.config.ts` `images.remotePatterns`
 - Catalog search/filters: URL params + Supabase `ilike`/price/category (`ProductCatalogFilters`)
 - Checkout form at `/checkout` (RHF + Zod); Razorpay Checkout.js + signature verify + order persistence
@@ -267,10 +267,10 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 
 ## Current Project State
 
-- **Roadmap phase:** Post Phase 5 — pre-deployment
+- **Roadmap phase:** Post Phase 5: pre-deployment
 - **Current focus:** Frontend UI polish + deployment prep (Vercel)
 - Phase 1–5 feature work is complete; remaining gate is Deployment and Launch checklist.
-- **Recently completed:** code cleanup/refactor; real products in Supabase; two-level category restructure; hero/navbar logo + vine chroma-key animations; homepage UI polish.
+- **Recently completed:** catalog polish: local product photos, stock-aware carts, quieter availability copy, and admin photo upload on product create/edit.
 - Shop and product pages read from Supabase; category taxonomy lives in `src/data/categories.ts` (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs).
 - Catalog reads use `unstable_cache` (3600s); product routes revalidate hourly; orders stay uncached for freshness.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
@@ -280,12 +280,12 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Reviews + wishlist live (SQL: `reviews.sql`, `wishlist.sql`).
 - Cart resolves line items from live Supabase product IDs (`useResolvedCart`).
 - Contact form still uses `mailto:` draft handoff.
-- Sample catalog removed; real handmade products uploaded (covers use newest product image or temporary cover).
+- Sample catalog removed; 22 seed products cover every subcategory; covers use newest product image or temporary cover.
 - Fonts: Updock (brand), DM Serif Display (headings), Montserrat (UI), Lora (body).
 - Vercel deployment status is not verified.
-- Remote DB should have `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql` applied; set `is_admin` for your user.
+- Remote DB should have `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, `categories-restructure.sql`, `catalog-polish.sql`, and current `storage.sql` (admin-only image writes) applied; set `is_admin` for your user.
 - `RESEND_API_KEY` is placeholder until a real Resend key + domain are configured.
-- **There is no Phase 6** — next work is polish + Deployment and Launch.
+- **There is no Phase 6**: next work is polish + Deployment and Launch.
 
 ## Important Decisions and Why
 
@@ -297,6 +297,20 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - **Static data first:** UI and product experience can be validated before backend complexity.
 - **Supabase later:** PostgreSQL, Auth, Storage, and RLS fit the planned commerce backend.
 - **Server-authoritative payments later:** prices, stock, totals, and order state must be recalculated server-side before Razorpay.
+
+## Launch and ops decisions (maintain)
+
+Living brief for humans: Cursor canvas `studio-d-launch-readiness.canvas.tsx`. Do not contradict this section unless the user changes it.
+
+- **Architecture:** Stay on Next.js + Supabase. No Redis, queues, microservices, headless CMS, Elasticsearch, Docker, or Kubernetes for launch.
+- **Databases:** Two projects at go-live, not five. The current cloud project becomes **DEV**. Create a new **PROD** project before real customers. Local and Vercel Preview both use DEV. Only Vercel Production uses PROD. Never point Preview at PROD. Never run `supabase/seed.sql` on PROD (it truncates products).
+- **CI/CD:** None today (no GitHub Actions, Vercel not connected). GitHub Write is in place; `catalog-polish` is on origin. At deploy: Vercel Preview on PR + Production on `main`, plus one Action (`npm ci`, lint, `tsc --noEmit`, `next build`). No GitFlow, no staging cluster. Razorpay webhooks need a public HTTPS URL (Preview for test, `studiod.in` for live); localhost cannot receive them without a tunnel.
+- **Env vars:** Separate Vercel Production vs Preview. Razorpay **live** keys and live webhook secret only on Production. `SITE_URL` is hardcoded to `https://studiod.in` in `src/lib/constants.ts`; it should become `NEXT_PUBLIC_SITE_URL` per environment. If a service-role key is added for order writes, it is server-only and never `NEXT_PUBLIC_*`.
+- **Auth:** Each Supabase project needs its own Site URL + redirect allowlist (localhost, Preview, production `/auth/callback`).
+- **Security still open:** shopper RLS can insert/update own orders; `decrement_product_stock` is granted to `authenticated`; webhook is acknowledge-only. Lock these before public deploy.
+- **Not launch blockers:** automated tests, Sentry, COD, guest checkout, coupons, shipping APIs, GST invoices, product video, MFA, CAPTCHA.
+- **This week:** real photos, unique product copy, unpaid QA, GitHub Write + push `catalog-polish`, confirm `hello@studiod.in` and Instagram.
+- **SEO:** Technical markup is largely done (titles, canonicals, sitemap, robots, JSON-LD). That does **not** rank #1 for generic queries like “handmade gifts India”. Realistic win: brand queries (`Studio D`) after the domain is live. At deploy: Search Console + sitemap, real OG image, `SITE_URL` env, Preview noindex, product images as absolute URLs in OG/JSON-LD. Later: Merchant Center, blog, Hindi. Do not buy “guaranteed first page” SEO. Instagram/WhatsApp will outperform Google for handmade discovery at the start.
 
 ## Things Future Agents Must Not Change
 
@@ -311,6 +325,9 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Do not remove responsive, empty, invalid, loading, stock, or accessibility states.
 - Do not copy Radix-specific shadcn patterns blindly: this project uses Base UI.
 - Do not execute any Git command without explicit user confirmation.
+- Do not run `supabase/seed.sql` against production (it truncates products).
+- Do not put Razorpay live keys or the live webhook secret on Vercel Preview or in `.env.local`.
+- Do not add a third database, Docker, Kubernetes, or a CI test suite unless the user asks.
 
 ## Important Base UI Note
 
@@ -324,9 +341,6 @@ This shadcn installation uses Base UI primitives:
 
 Follow `ROADMAP.md` for implementation order. Known technical improvements include:
 
-- Enforce each product’s `stockCount` in all cart quantity controls.
-- Consolidate duplicated quantity-control UI where useful.
-- Add real product images through `next/image`.
 - Add unit/integration tests for cart operations, totals, filters, and forms.
 - Add loading skeletons and stronger error boundaries.
 - Complete accessibility and responsive-browser QA.

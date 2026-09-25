@@ -1,4 +1,4 @@
--- Studio D — Phase 5.5 wishlist (save for later)
+-- Studio D: Phase 5.5 wishlist (save for later)
 -- Run in the Supabase SQL Editor after schema.sql / reviews.sql.
 -- Safe to re-run.
 

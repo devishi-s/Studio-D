@@ -13,7 +13,7 @@ import { CategoryCard } from "@/components/common/category-card";
 export const metadata: Metadata = buildPageMetadata({
   title: "Shop by Category",
   description:
-    "Explore Studio D collections — wearables, keychains & charms, crochet creations, and art & decor.",
+    "Explore Studio D collections: wearables, keychains & charms, crochet creations, and art & decor.",
   path: "/categories",
 });
 

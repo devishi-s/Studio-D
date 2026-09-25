@@ -10,6 +10,7 @@ import {
 } from "@/lib/supabase/products";
 import { categoryHref } from "@/data/categories";
 import { formatPrice } from "@/lib/format";
+import { productAvailabilityCopy } from "@/lib/stock";
 import { buildPageMetadata, productJsonLd } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
 import { Separator } from "@/components/ui/separator";
@@ -229,9 +230,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               />
             </div>
             <p className="mt-2 text-center text-xs text-muted-foreground">
-              {product.stockCount > 0
-                ? `${product.stockCount} in stock — ready to ship`
-                : "Currently out of stock"}
+              {productAvailabilityCopy(product.stockCount)}
             </p>
 
             <div className="mt-6 grid grid-cols-3 gap-2">

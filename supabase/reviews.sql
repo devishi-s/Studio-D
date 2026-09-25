@@ -1,4 +1,4 @@
--- Studio D — Phase 5.4 product reviews
+-- Studio D: Phase 5.4 product reviews
 -- Run in the Supabase SQL Editor after schema.sql / admin-rls.sql.
 -- Safe to re-run.
 

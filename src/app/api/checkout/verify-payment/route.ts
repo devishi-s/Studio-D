@@ -160,7 +160,7 @@ export async function POST(request: Request) {
 
       return NextResponse.json(
         {
-          error: `Your payment went through, but we could not save the order. Please email ${SUPPORT_EMAIL} with payment ID ${razorpayPaymentId} — we will fix this by hand.`,
+          error: `Your payment went through, but we could not save the order. Please email ${SUPPORT_EMAIL} with payment ID ${razorpayPaymentId}. We will fix this by hand.`,
           razorpayPaymentId,
           razorpayOrderId,
           paid: true,
@@ -175,7 +175,7 @@ export async function POST(request: Request) {
     revalidatePath(`/order-confirmation/${created.orderId}`);
     revalidatePath("/products");
 
-    // Email is best-effort — never block a paid order on delivery failure.
+    // Email is best-effort. Never block a paid order on delivery failure.
     if (!created.alreadyExisted) {
       const emailPayload: OrderEmailData = {
         orderId: created.orderId,

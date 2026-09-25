@@ -1,4 +1,4 @@
-# Studio D — Payments (Razorpay)
+# Studio D: Payments (Razorpay)
 
 Phase 4.2–4.3: Razorpay Checkout, signature verification, order persistence, stock decrement, and confirmation page.
 
@@ -45,7 +45,7 @@ If signature verification succeeds but DB insert fails, the API returns **500** 
 
 ## Security rules
 
-- Never trust client-sent amounts — always recalculate from catalog prices.
+- Never trust client-sent amounts: always recalculate from catalog prices.
 - Never trust browser “payment success” without signature verification.
 - Keep `RAZORPAY_KEY_SECRET` out of `NEXT_PUBLIC_*` variables.
 - `createOrder` is idempotent on `razorpay_payment_id`.

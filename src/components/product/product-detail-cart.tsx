@@ -40,6 +40,7 @@ export function ProductDetailCart({
         price={price}
         inStock={inStock}
         quantity={quantity}
+        maxQuantity={maxQuantity}
       />
     </div>
   );

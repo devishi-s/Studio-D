@@ -35,7 +35,7 @@ export function CartPageContent({ isSignedIn = false }: CartPageContentProps) {
         </h2>
         <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
           Looks like you haven&apos;t found your perfect handcrafted piece yet.
-          Browse our collection — every item is made with love.
+          Browse our collection. Every item is made with love.
         </p>
         <Link
           href="/products"

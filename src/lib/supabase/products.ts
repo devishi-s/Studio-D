@@ -227,7 +227,7 @@ export async function getLatestCategoryCover(
         const images = (row.images ?? []).map(resolveProductImagePath);
         const src = images.find((image) => canOptimizeProductImage(image));
         if (src) {
-          return { src, alt: `${row.name} — ${category}` };
+          return { src, alt: `${row.name}, ${category}` };
         }
       }
 

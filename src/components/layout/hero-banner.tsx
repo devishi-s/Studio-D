@@ -13,7 +13,7 @@ export function HeroBanner() {
       style={{ backgroundImage: "url(/images/home-hero.jpg)" }}
     >
       {/*
-        Notepad graphic — upper-right of the hero (layout reference),
+        Notepad graphic, upper-right of the hero (layout reference),
         slight clockwise tilt. Black bg dropped via lighten blend.
       */}
       <div className="pointer-events-none absolute top-[4%] right-[3%] z-20 hidden w-[38vw] max-w-[260px] min-w-[140px] sm:block sm:right-[5%] sm:w-[32vw] md:top-[6%] md:right-[6%] md:max-w-[290px] lg:right-[8%] lg:max-w-[320px]">

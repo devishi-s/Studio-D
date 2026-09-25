@@ -2,7 +2,7 @@ import type { NavLink } from "@/types";
 
 export const SITE_NAME = "Studio D";
 export const SITE_DESCRIPTION =
-  "Handmade crochet flowers, paintings, and decorative crafts — thoughtfully made, timeless in design.";
+  "Handmade crochet flowers, paintings, and decorative crafts. Thoughtfully made, timeless in design.";
 export const SITE_URL = "https://studiod.in";
 export const SITE_TAGLINE = "Handmade · Thoughtful · Timeless";
 

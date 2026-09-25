@@ -13,8 +13,7 @@ export type MainCategory = Category & {
 
 /**
  * Two-level Studio D taxonomy.
- * `products.category` stores a slug from this tree (usually a subcategory;
- * main slug is allowed for general items, e.g. migrated handmade gifts → wearables).
+ * `products.category` stores a slug from this tree (usually a subcategory).
  */
 export const mainCategories: MainCategory[] = [
   {
@@ -93,7 +92,7 @@ export const mainCategories: MainCategory[] = [
         name: "Flowers",
         slug: "flowers",
         description:
-          "Handcrafted crochet flowers that last forever — gifts and décor.",
+          "Handcrafted crochet flowers that last forever: gifts and décor.",
         image: "/images/categories/flowers.jpg",
         displayOrder: 1,
         parentSlug: "crochet-creations",
@@ -151,13 +150,13 @@ export const categories: Category[] = mainCategories.map(
   ({ children: _children, ...main }) => main
 );
 
-/** Every selectable leaf (subcategories) plus mains — for lookups. */
+/** Every selectable leaf (subcategories) plus mains, for lookups. */
 export const allCategoryNodes: Category[] = [
   ...categories,
   ...mainCategories.flatMap((main) => main.children),
 ];
 
-/** Subcategories only — primary admin product category options. */
+/** Subcategories only: primary admin product category options. */
 export const subcategoryOptions: Category[] = mainCategories.flatMap(
   (main) => main.children
 );

@@ -75,8 +75,7 @@ export function ProductReviewsSection({
                   >
                     Login to leave a review
                   </Link>
-                  {" — "}
-                  we moderate every note before it goes live.
+                  {". We moderate every note before it goes live."}
                 </p>
               ) : existingReview ? (
                 <div className="rounded-xl border border-border/60 bg-card px-4 py-5">

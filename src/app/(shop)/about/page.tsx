@@ -17,7 +17,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 export const metadata: Metadata = buildPageMetadata({
   title: "Our Story",
   description:
-    "Meet the makers behind Studio D — handmade crochet, original paintings, and thoughtful gifts crafted with love in India.",
+    "Meet the makers behind Studio D. Handmade crochet, original paintings, and thoughtful gifts crafted with love in India.",
   path: "/about",
 });
 

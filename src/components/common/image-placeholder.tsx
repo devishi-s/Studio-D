@@ -10,7 +10,7 @@ type ImagePlaceholderProps = {
 
 const TEMP_COVER = "/images/categories/temporary-cover.jpg";
 
-/** Empty / missing image fallback — uses the shared temporary cover photo. */
+/** Empty / missing image fallback. Uses the shared temporary cover photo. */
 export function ImagePlaceholder({
   label,
   className,

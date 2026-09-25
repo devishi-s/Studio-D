@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AdminCategorySelect } from "@/components/admin/admin-category-select";
+import { AdminProductImagesField } from "@/components/admin/admin-product-images-field";
 import {
   ADMIN_FIELD_CLASS,
   isValidProductSlug,
@@ -22,6 +23,7 @@ export function AdminProductCreateForm() {
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
     if (!slugTouched) {
@@ -67,7 +69,6 @@ export function AdminProductCreateForm() {
     }
     setErrors({});
 
-    const images = parseLinesToArray(String(formData.get("images") ?? ""));
     const materials = parseLinesToArray(
       String(formData.get("materials") ?? "")
     );
@@ -166,14 +167,12 @@ export function AdminProductCreateForm() {
         <AdminCategorySelect aria-invalid={!!errors.category} />
       </Field>
 
-      <Field label="Image URLs (one per line)">
-        <textarea
-          name="images"
-          rows={3}
-          placeholder="https://… or storage path"
-          className={ADMIN_FIELD_CLASS}
-        />
-      </Field>
+      <AdminProductImagesField
+        productId={isValidProductSlug(slug) ? `prod-${slug}` : ""}
+        value={images}
+        onChange={setImages}
+        disabled={pending}
+      />
 
       <Field label="Materials (comma or new line)">
         <textarea name="materials" rows={2} className={ADMIN_FIELD_CLASS} />

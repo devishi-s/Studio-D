@@ -1,4 +1,4 @@
-# Studio D — Authoritative Development Roadmap
+# Studio D: Authoritative Development Roadmap
 
 > This document preserves the original Studio D architecture canvas roadmap and its supporting implementation plan.
 >
@@ -19,7 +19,7 @@
 
 ## Status
 
-- **Current phase:** Post Phase 5 — pre-deployment
+- **Current phase:** Post Phase 5: pre-deployment
 - **Current focus:** UI polish + deployment prep
 - **Completed phases:** Phases 1–5 (feature steps)
 - **Completed Phase 5 steps:** 5.1 SEO, 5.2 Performance, 5.3 Analytics, 5.4 Reviews, 5.5 Wishlist
@@ -45,7 +45,7 @@ Static storefront
 
 ---
 
-# Phase 1 — Foundation + Static Storefront
+# Phase 1: Foundation + Static Storefront
 
 **Original goal:** A beautiful, browsable storefront with hardcoded data. Deploy to Vercel.
 
@@ -161,7 +161,7 @@ RootLayout
 
 ---
 
-# Phase 2 — Cart + Interactivity
+# Phase 2: Cart + Interactivity
 
 **Original goal:** Users can add items to a cart, adjust quantities, and see totals.
 
@@ -242,7 +242,7 @@ type CartItem = {
 
 ---
 
-# Phase 3 — Supabase + Auth + Real Data
+# Phase 3: Supabase + Auth + Real Data
 
 **Original goal:** Real database, user accounts, and dynamic product data.
 
@@ -254,7 +254,7 @@ type CartItem = {
 - [x] Configure environment variables (`.env.example` + local `.env.local` placeholders).
 - [x] Add browser and server Supabase clients (`src/lib/supabase/*` + Next.js 16 `src/proxy.ts`).
 - [x] Define the PostgreSQL schema (`supabase/schema.sql`).
-- [x] Seed initial catalog data (`supabase/seed.sql` — 12 products).
+- [x] Seed initial catalog data (`supabase/seed.sql`: 22 products).
 - [x] Configure Row Level Security policies.
 - [x] Add required indexes and constraints.
 - [x] Document local and production configuration (`docs/SUPABASE.md`).
@@ -326,7 +326,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 **Dependency:** Requires authentication and the order schema. Meaningful order history also depends on Phase 4 order creation.
 
-## 3.5 Image storage — **COMPLETE**
+## 3.5 Image storage: **COMPLETE**
 
 - [x] Configure Supabase Storage buckets and access policies (`supabase/storage.sql`, docs in `docs/SUPABASE.md`).
 - [x] Keep seeded mock `/images/...` paths; document how to upload real assets later.
@@ -336,7 +336,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 - [x] Add fallbacks for missing / mock assets (`ImagePlaceholder`).
 - [x] Use `priority` on primary gallery image; lazy load elsewhere via `next/image` defaults.
 
-## 3.6 Search and filters — **COMPLETE**
+## 3.6 Search and filters: **COMPLETE**
 
 - [x] Add search by product name (`ilike` via Supabase).
 - [x] Filter by category.
@@ -348,13 +348,13 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 ---
 
-# Phase 4 — Checkout + Payments
+# Phase 4: Checkout + Payments
 
 **Original goal:** Complete the purchase flow with Razorpay integration.
 
 **Dependencies:** Real catalog data, secure server environment, authentication decision, database schema, and verified cart behavior.
 
-## 4.1 Checkout form — **COMPLETE**
+## 4.1 Checkout form: **COMPLETE**
 
 - [x] Build `/checkout`.
 - [x] Collect shipping address.
@@ -366,7 +366,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 - [x] Prevent checkout for invalid or unavailable items.
 - [x] Keep sensitive logic off the client (server `validateCheckoutCart`; no payment yet).
 
-## 4.2 Razorpay integration — **COMPLETE**
+## 4.2 Razorpay integration: **COMPLETE**
 
 - [x] Create Razorpay orders on the server (`/api/checkout/create-order`).
 - [x] Launch Razorpay checkout from the client using the server-created order.
@@ -378,17 +378,17 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 **Non-negotiable security rule:** Never trust prices, totals, inventory, user identity, or payment success supplied by the browser.
 
-## 4.3 Order management — **COMPLETE**
+## 4.3 Order management: **COMPLETE**
 
 - [x] Create orders and immutable order-item snapshots.
 - [x] Track order status (`confirmed` on paid checkout; history UI already live).
 - [x] Reserve/decrement inventory safely (`decrement_product_stock` + shortfall review flag).
 - [x] Handle failed or abandoned payments (no DB row until verify; paid-but-save-failed support message).
 - [x] Add order-confirmation experience (`/order-confirmation/[orderId]`).
-- [x] Expose customer order history (`/account/orders` — already wired; now receives real rows).
+- [x] Expose customer order history (`/account/orders`: already wired; now receives real rows).
 - [x] Support operational status updates (schema + account badges; admin tooling in 4.4).
 
-## 4.4 Admin dashboard — **COMPLETE**
+## 4.4 Admin dashboard: **COMPLETE**
 
 - [x] Build protected `/admin` (`requireAdmin` + `profiles.is_admin` + RLS).
 - [x] Build `/admin/products` (list, featured/stock controls, add/edit/delete).
@@ -398,25 +398,25 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 - [x] Add basic analytics (orders, revenue, low stock, recent orders).
 - [x] Enforce admin authorization on the server and through RLS (`supabase/admin-rls.sql`).
 
-## 4.5 Email notifications — **COMPLETE**
+## 4.5 Email notifications: **COMPLETE**
 
 - [x] Select Resend (React Email templates + server helpers).
 - [x] Send order confirmation (customer) after verified payment.
 - [x] Send new-order admin alert at the same time.
-- [ ] Send shipping/status updates (deferred — admin status changes can hook later).
+- [ ] Send shipping/status updates (deferred: admin status changes can hook later).
 - [x] Use branded responsive templates (`lib/email/templates`).
 - [x] Handle delivery failures without blocking orders (log + continue).
 - [x] Keep email credentials server-side (`RESEND_API_KEY`).
 
 ---
 
-# Phase 5 — Polish + Launch
+# Phase 5: Polish + Launch
 
 **Original goal:** Production-ready SEO, performance, analytics, reviews, and future engagement features.
 
 **Dependency:** Core purchase flow must be secure and stable.
 
-## 5.1 SEO — **COMPLETE**
+## 5.1 SEO: **COMPLETE**
 
 - [x] Add complete page metadata.
 - [x] Add canonical URLs.
@@ -427,7 +427,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 - [x] Verify indexability and invalid-page behavior.
 - [ ] Add meaningful alt text and semantic headings.
 
-## 5.2 Performance — **COMPLETE**
+## 5.2 Performance: **COMPLETE**
 
 - [x] Optimize all images.
 - [x] Add lazy loading where appropriate.
@@ -437,7 +437,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 - [x] Audit fonts, caching, data fetching, and bundle size.
 - [ ] Test on slower mobile devices and networks.
 
-## 5.3 Analytics — **COMPLETE**
+## 5.3 Analytics: **COMPLETE**
 
 - [x] Select Google Analytics or Plausible. → Chose Vercel Analytics + Speed Insights
 - [x] Add privacy-conscious page analytics.
@@ -447,7 +447,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 - [x] Track purchase conversion.
 - [x] Avoid collecting sensitive customer/payment information.
 
-## 5.4 Reviews system — **COMPLETE**
+## 5.4 Reviews system: **COMPLETE**
 
 - [x] Add customer ratings and reviews to product pages.
 - [x] Build a reusable `StarRating`.
@@ -456,7 +456,7 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 - [x] Add empty, loading, and error states.
 - [x] Ensure aggregate rating data is accurate.
 
-## 5.5 Wishlist — **COMPLETE**
+## 5.5 Wishlist: **COMPLETE**
 
 - [x] Add authenticated “save for later” behavior.
 - [x] Add wishlist UI on product cards and details.
@@ -614,4 +614,6 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 Phases 1–5 feature work are complete. **Current focus:** UI polish + Deployment and Launch checklist (env separation, Vercel deploy when requested, production smoke tests). There is no Phase 6.
 
-**Ops reminder:** Ensure remote DB has `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql` — see `docs/SUPABASE.md`.
+**Ops reminder:** Ensure remote DB has `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql`: see `docs/SUPABASE.md`.
+
+**Launch / env decisions** (do not invent a bigger platform): two Supabase projects at go-live (current cloud DB = DEV; new project = PROD). Vercel Preview shares DEV; Production uses PROD. CI at deploy = one GitHub Action (lint + tsc + build) plus Vercel Preview/Production. Full brief: Cursor canvas `studio-d-launch-readiness.canvas.tsx` and `AI_CONTEXT.md` section "Launch and ops decisions".

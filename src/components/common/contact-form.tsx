@@ -75,7 +75,7 @@ export function ContactForm() {
     const email = String(formData.get("email")).trim();
     const reason = String(formData.get("reason")).trim();
     const message = String(formData.get("message")).trim();
-    const subject = encodeURIComponent(`${reason} — ${name}`);
+    const subject = encodeURIComponent(`${reason}: ${name}`);
     const body = encodeURIComponent(
       `Hello Studio D,\n\n${message}\n\nFrom: ${name}\nReply to: ${email}`
     );

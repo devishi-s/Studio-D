@@ -5,6 +5,7 @@ import { Trash2, Minus, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
+import { cartQuantityCap } from "@/lib/cart/quantity-cap";
 import { useCartStore } from "@/store/cart.store";
 import { ProductImage } from "@/components/product/product-image";
 import type { CartItemWithProduct } from "@/types";
@@ -18,6 +19,8 @@ export function CartItemRow({ item }: CartItemRowProps) {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const lineTotal = product.price * quantity;
+  const cap = cartQuantityCap(product.stockCount);
+  const atCap = quantity >= cap;
 
   return (
     <div className="flex gap-4 rounded-xl border border-border/40 bg-card p-4 transition-shadow hover:shadow-sm sm:gap-6">
@@ -71,7 +74,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
                 "inline-flex h-8 w-8 items-center justify-center rounded-full text-brand-brown-light transition-colors hover:bg-brand-blush hover:text-brand-brown",
                 quantity <= 1 && "opacity-40"
               )}
-              onClick={() => updateQuantity(product.id, quantity - 1)}
+              onClick={() => updateQuantity(product.id, quantity - 1, cap)}
               disabled={quantity <= 1}
               aria-label="Decrease quantity"
             >
@@ -81,9 +84,13 @@ export function CartItemRow({ item }: CartItemRowProps) {
               {quantity}
             </span>
             <button
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-brand-brown-light transition-colors hover:bg-brand-blush hover:text-brand-brown"
-              onClick={() => updateQuantity(product.id, quantity + 1)}
-              aria-label="Increase quantity"
+              className={cn(
+                "inline-flex h-8 w-8 items-center justify-center rounded-full text-brand-brown-light transition-colors hover:bg-brand-blush hover:text-brand-brown",
+                atCap && "opacity-40"
+              )}
+              onClick={() => updateQuantity(product.id, quantity + 1, cap)}
+              disabled={atCap}
+              aria-label={atCap ? `Only ${cap} in stock` : "Increase quantity"}
             >
               <Plus className="h-3.5 w-3.5" />
             </button>

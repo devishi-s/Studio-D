@@ -24,7 +24,7 @@ export function CategoryCard({
   const variant = variantByIndex[category.displayOrder - 1] ?? "blush";
   const displayCover = cover ?? {
     src: TEMPORARY_CATEGORY_COVER.src,
-    alt: `${category.name} — ${TEMPORARY_CATEGORY_COVER.alt}`,
+    alt: `${category.name}, ${TEMPORARY_CATEGORY_COVER.alt}`,
   };
 
   return (

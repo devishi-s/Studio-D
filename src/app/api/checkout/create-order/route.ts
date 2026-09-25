@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Address is optional here — used only for Razorpay notes / future order rows.
+    // Address is optional here. Used only for Razorpay notes / future order rows.
     const addressRaw =
       body && typeof body === "object" && "address" in body
         ? (body as { address: unknown }).address

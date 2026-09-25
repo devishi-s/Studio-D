@@ -8,7 +8,7 @@ Privacy-conscious page and funnel analytics using **Vercel Analytics** and **Ver
 | --- | --- |
 | Provider | Vercel Analytics + Speed Insights |
 | Why | Free on Vercel, no cookie banner required for this first-party privacy-friendly setup, GDPR-oriented (no advertising cookies / no PII by design) |
-| Not chosen | Google Analytics / Plausible — deferred; GA needs consent UX; Plausible is fine but adds a third-party vendor when Vercel already hosts us |
+| Not chosen | Google Analytics / Plausible: deferred; GA needs consent UX; Plausible is fine but adds a third-party vendor when Vercel already hosts us |
 
 ## Setup
 
@@ -19,8 +19,8 @@ Packages:
 
 Root layout (`src/app/layout.tsx`) mounts:
 
-- `<Analytics />` — page views + custom events
-- `<SpeedInsights />` — Core Web Vitals from real users
+- `<Analytics />`: page views + custom events
+- `<SpeedInsights />`: Core Web Vitals from real users
 
 Enable **Analytics** and **Speed Insights** for the project in the Vercel dashboard after the first production deploy.
 
@@ -36,8 +36,8 @@ Wrappers live in `src/lib/analytics.ts`. Each helper no-ops when `window` is und
 | --- | --- | --- |
 | `product_viewed` | Product detail mount | `productId`, `productName`, `category` |
 | `add_to_cart` | Add to cart click | `productId`, `productName`, `price` |
-| `checkout_started` | `/checkout` mount | — |
-| `payment_initiated` | Immediately before Razorpay modal opens | — |
+| `checkout_started` | `/checkout` mount | none |
+| `payment_initiated` | Immediately before Razorpay modal opens | none |
 | `order_completed` | Order confirmation mount | `orderId`, `total` |
 | `search_performed` | Debounced search commits on `/products` | `searchTerm`, `resultCount` |
 | `category_filtered` | Category filter click on `/products` | `category` |

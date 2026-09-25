@@ -106,6 +106,7 @@ export function ProductCard({
             productName={product.name}
             price={product.price}
             inStock={product.stockCount > 0}
+            maxQuantity={product.stockCount}
             compact
           />
         </div>

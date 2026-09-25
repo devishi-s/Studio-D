@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AdminCategorySelect } from "@/components/admin/admin-category-select";
+import { AdminProductImagesField } from "@/components/admin/admin-product-images-field";
 import {
   ADMIN_FIELD_CLASS,
   isValidProductSlug,
@@ -17,6 +18,8 @@ import {
   adminUpdateProductAction,
 } from "@/lib/actions/admin";
 import { Button } from "@/components/ui/button";
+import { storagePathsRemoved } from "@/lib/product-images";
+import { deleteProductImage } from "@/lib/supabase/upload-product-image";
 
 type AdminProductEditFormProps = {
   product: AdminProduct;
@@ -27,6 +30,8 @@ export function AdminProductEditForm({ product }: AdminProductEditFormProps) {
   const [pending, startTransition] = useTransition();
   const [deleting, setDeleting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [images, setImages] = useState<string[]>(product.images);
+  const [committedPaths, setCommittedPaths] = useState<string[]>(product.images);
 
   function validate(form: FormData): Record<string, string> {
     const next: Record<string, string> = {};
@@ -72,7 +77,7 @@ export function AdminProductEditForm({ product }: AdminProductEditFormProps) {
         description: String(formData.get("description")).trim(),
         price: Number(formData.get("price")),
         category: String(formData.get("category")).trim(),
-        images: parseLinesToArray(String(formData.get("images") ?? "")),
+        images,
         materials: parseLinesToArray(String(formData.get("materials") ?? "")),
         dimensions: String(formData.get("dimensions") ?? "").trim() || null,
         stock_count: Number(formData.get("stock_count")),
@@ -84,6 +89,11 @@ export function AdminProductEditForm({ product }: AdminProductEditFormProps) {
         toast.error(result.error);
         return;
       }
+
+      for (const path of storagePathsRemoved(committedPaths, images)) {
+        await deleteProductImage(path);
+      }
+      setCommittedPaths(images);
 
       toast.success("Product saved.");
       router.refresh();
@@ -172,14 +182,13 @@ export function AdminProductEditForm({ product }: AdminProductEditFormProps) {
         />
       </Field>
 
-      <Field label="Image URLs (one per line)">
-        <textarea
-          name="images"
-          rows={3}
-          defaultValue={product.images.join("\n")}
-          className={ADMIN_FIELD_CLASS}
-        />
-      </Field>
+      <AdminProductImagesField
+        productId={product.id}
+        value={images}
+        onChange={setImages}
+        committedPaths={committedPaths}
+        disabled={pending || deleting}
+      />
 
       <Field label="Materials (comma or new line)">
         <textarea

@@ -1,4 +1,4 @@
--- Studio D — Phase 4.3 order checkout columns, RLS inserts, stock RPC
+-- Studio D: Phase 4.3 order checkout columns, RLS inserts, stock RPC
 -- Run in the Supabase SQL Editor after schema.sql (existing projects).
 -- Safe to re-run (IF NOT EXISTS / DROP POLICY IF EXISTS).
 

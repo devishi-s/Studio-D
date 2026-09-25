@@ -46,7 +46,7 @@ export type SendEmailResult =
 
 /**
  * Sends the customer-facing order confirmation.
- * Safe to call without a real API key — returns skipped instead of throwing.
+ * Safe to call without a real API key. Returns skipped instead of throwing.
  */
 export async function sendOrderConfirmation(
   order: OrderEmailData,
@@ -129,7 +129,7 @@ export async function sendAdminOrderAlert(
 
 /**
  * Fire-and-forget both post-checkout emails.
- * Never throws — order flow must not depend on email delivery.
+ * Never throws. Order flow must not depend on email delivery.
  */
 export async function sendOrderEmailsSafe(
   order: OrderEmailData,

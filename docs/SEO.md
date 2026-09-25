@@ -1,6 +1,6 @@
 # Studio D SEO
 
-How search metadata, structured data, sitemap, and robots are set up — and what to update before launch.
+How search metadata, structured data, sitemap, and robots are set up: and what to update before launch.
 
 ## Decisions
 
@@ -15,6 +15,39 @@ How search metadata, structured data, sitemap, and robots are set up — and wha
 | Categories in sitemap | `mainCategories` from `src/data/categories.ts` (main + subcategory URLs) | Matches two-level category routes |
 
 | Currency in Product JSON-LD | `INR` | Matches storefront pricing |
+
+## Ranking reality
+
+Technical SEO in this repo makes Studio D *eligible* to appear in Google. It does not put the shop above Amazon, Etsy, Flipkart, or established gift brands for broad queries such as “handmade gifts India” or “crochet flowers”.
+
+**What you can realistically win**
+
+- Brand searches: “Studio D”, “studio.d.in”, the exact product name
+- Long-tail maker copy: unique piece names + real photos (also Google Images)
+- Trust after someone already heard of you on Instagram or WhatsApp
+
+**What will not get you to #1**
+
+- More JSON-LD, an SEO plugin, a blog factory, or a paid “guaranteed first page” agency
+- Keyword stuffing in `layout.tsx` (Google largely ignores the keywords meta tag)
+- Chasing a 100 Lighthouse score before the domain is even public
+
+**Do at first production deploy**
+
+1. Confirm `SITE_URL` / `NEXT_PUBLIC_SITE_URL` is `https://studiod.in` (and redirect `www` to apex or the reverse, not both indexed).
+2. Submit `https://studiod.in/sitemap.xml` in [Google Search Console](https://search.google.com/search-console).
+3. Replace `public/og-image.jpg` (file is currently missing from `public/`).
+4. Noindex Vercel Preview so `*.vercel.app` is not a duplicate of production.
+5. Use real Storage (or absolute) image URLs in Product OG and JSON-LD; local `/images/...` paths are skipped today.
+
+**Do later, not now**
+
+- Google Merchant Center / Shopping feed (needs shipping + returns policy)
+- BreadcrumbList + AggregateRating JSON-LD once reviews are real
+- Hindi pages, a blog, FAQ schema
+- Google Business Profile only if you want a public pickup address
+
+Social links: `SITE_SOCIAL.instagram` is `https://www.instagram.com/studio.d.in`.
 
 ## Global metadata (`src/app/layout.tsx`)
 
@@ -51,13 +84,13 @@ Canonical URLs are set per page via `buildPageMetadata({ path })`.
 
 ## JSON-LD
 
-- **Homepage** — `Organization` (`organizationJsonLd`)
-- **Product detail** — `Product` + `Offer` (`productJsonLd`): name, description, image, price, INR, availability
-- **About** — `LocalBusiness` (`localBusinessJsonLd`): India areaServed, email, social
+- **Homepage**: `Organization` (`organizationJsonLd`)
+- **Product detail**: `Product` + `Offer` (`productJsonLd`): name, description, image, price, INR, availability
+- **About**: `LocalBusiness` (`localBusinessJsonLd`): India areaServed, email, social
 
 Injected with `src/components/seo/json-ld.tsx`.
 
-Social links currently use placeholder Instagram `https://instagram.com/studiod`. Update `SITE_SOCIAL` in `src/lib/seo.ts` before launch.
+Social links currently use Instagram `https://www.instagram.com/studio.d.in`. Confirm it is the live profile before launch.
 
 ## Sitemap (`src/app/sitemap.ts` → `/sitemap.xml`)
 
@@ -80,7 +113,7 @@ Excludes: `/account`, `/cart`, `/checkout`, `/admin`, auth, API, order confirmat
 - File: `public/og-image.jpg` (placeholder cream “Studio D” graphic, 1200×630)
 - Regenerator: `scripts/generate-og-image.ps1` (optional)
 
-### Before launch — replace the OG image
+### Before launch: replace the OG image
 
 1. Design a branded 1200×630 JPEG (product collage or logo on cream/blush; keep text large and readable).
 2. Replace `public/og-image.jpg` with the final file (same path).
@@ -100,9 +133,9 @@ Excludes: `/account`, `/cart`, `/checkout`, `/admin`, auth, API, order confirmat
 
 ## Related files
 
-- `src/lib/seo.ts` — helpers + schemas
-- `src/components/seo/json-ld.tsx` — JSON-LD script tag
-- `src/app/layout.tsx` — global metadata
+- `src/lib/seo.ts`: helpers + schemas
+- `src/components/seo/json-ld.tsx`: JSON-LD script tag
+- `src/app/layout.tsx`: global metadata
 - `src/app/sitemap.ts` / `src/app/robots.ts`
 - `public/og-image.jpg`
-- `src/lib/constants.ts` — `SITE_NAME`, `SITE_DESCRIPTION`, `SITE_URL`
+- `src/lib/constants.ts`: `SITE_NAME`, `SITE_DESCRIPTION`, `SITE_URL`

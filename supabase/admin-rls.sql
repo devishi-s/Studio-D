@@ -1,4 +1,4 @@
--- Studio D — Phase 4.4 admin flag + RLS
+-- Studio D: Phase 4.4 admin flag + RLS
 -- Run in the Supabase SQL Editor after schema.sql / orders-checkout.sql.
 -- Safe to re-run.
 
