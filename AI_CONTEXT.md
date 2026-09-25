@@ -270,7 +270,7 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - **Roadmap phase:** Post Phase 5: pre-deployment
 - **Current focus:** Frontend UI polish + deployment prep (Vercel)
 - Phase 1–5 feature work is complete; remaining gate is Deployment and Launch checklist.
-- **Recently completed:** catalog polish: local product photos, stock-aware carts, quieter availability copy, and admin photo upload on product create/edit.
+- **Recently completed:** catalog polish (photos, stock-aware carts, quieter availability copy, admin photo upload). Branded `not-found` / `error` / `global-error` pages on branch `error-pages`.
 - Shop and product pages read from Supabase; category taxonomy lives in `src/data/categories.ts` (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs).
 - Catalog reads use `unstable_cache` (3600s); product routes revalidate hourly; orders stay uncached for freshness.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
