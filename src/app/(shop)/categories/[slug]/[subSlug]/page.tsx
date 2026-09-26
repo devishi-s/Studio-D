@@ -11,7 +11,6 @@ import {
   mainCategories,
 } from "@/data/categories";
 import {
-  getLatestCategoryCover,
   getProductsByCategory,
 } from "@/lib/supabase/products";
 import { sortProducts } from "@/lib/products";
@@ -140,7 +139,6 @@ export default async function SubcategoryPage({
   const activeSort = (sort as SortOption) ?? "newest";
   const variant =
     variantByIndex[(main.displayOrder - 1) % 4] ?? "blush";
-  const cover = await getLatestCategoryCover(subSlug);
 
   return (
     <section className="py-10 sm:py-14">
@@ -168,7 +166,6 @@ export default async function SubcategoryPage({
           <CategoryHeroCover
             label={sub.name}
             variant={variant}
-            cover={cover}
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-brown/30 px-4 text-center">
             <p className="mb-2 text-xs font-medium uppercase tracking-wider text-white/70">

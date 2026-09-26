@@ -1,6 +1,6 @@
 import type { Category } from "@/types";
 
-/** Shared temporary cover until a category has a real product photo. */
+/** Shared temporary cover used for all category cards and banners. */
 export const TEMPORARY_CATEGORY_COVER = {
   src: "/images/categories/temporary-cover.jpg",
   alt: "Studio D handmade collection",
