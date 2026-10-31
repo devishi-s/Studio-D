@@ -72,11 +72,11 @@ export default function AboutPage() {
     <>
       <JsonLd data={localBusinessJsonLd()} />
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-brand-cream py-16 sm:py-24">
-        <div className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full bg-brand-blush/50" />
-        <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-brand-coral/5" />
-
-        <Container>
+      <section
+        className="relative flex min-h-[calc(100svh-4rem)] items-center justify-center overflow-x-clip bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url(/images/home-hero.jpg)" }}
+      >
+        <Container className="relative z-10 py-20 sm:py-28">
           <div className="relative mx-auto max-w-2xl text-center">
             <p className="animate-fade-in-up text-sm font-medium uppercase tracking-[0.2em] text-brand-coral">
               Our Story
@@ -86,7 +86,7 @@ export default function AboutPage() {
               <br />
               Made with meaning.
             </h1>
-            <p className="animate-fade-in-up animation-delay-200 mt-6 leading-relaxed text-muted-foreground">
+            <p className="animate-fade-in-up animation-delay-200 mt-6 leading-relaxed text-brand-brown/75">
               {SITE_NAME} is a small, independent studio creating handmade
               crochet wearables, plushies, original paintings, and thoughtful gifts.
               We believe the world has enough mass-produced things; what it needs
@@ -95,51 +95,6 @@ export default function AboutPage() {
           </div>
         </Container>
       </section>
-
-      {/* ── Origin story ── */}
-      <section className="py-16 sm:py-20">
-        <Container>
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            <div className="relative">
-              <ImagePlaceholder
-                label="The Studio D workspace"
-                variant="sage"
-                className="aspect-[4/5] w-full rounded-xl"
-              />
-              <div className="absolute -bottom-3 -right-3 -z-10 aspect-[4/5] w-full rounded-xl border-2 border-brand-sage/20" />
-            </div>
-
-            <div>
-              <div className="mb-4 h-px w-10 bg-brand-coral" />
-              <h2 className="font-heading text-2xl font-semibold tracking-tight text-brand-brown sm:text-3xl">
-                How it all began
-              </h2>
-              <p className="mt-4 leading-relaxed text-muted-foreground">
-                It started with a single crochet rose, made late at night in a
-                small room, following a YouTube tutorial. That first flower was
-                imperfect, a little lopsided, but it had something that
-                store-bought flowers didn&apos;t: it was made with intention.
-              </p>
-              <p className="mt-3 leading-relaxed text-muted-foreground">
-                Friends asked for one. Then friends of friends. What started as
-                a hobby became a quiet passion, and that passion became
-                {" "}{SITE_NAME}. Today, we create everything from crochet bouquets
-                to plushies to wearables, each piece carrying
-                the same care as that very first rose.
-              </p>
-              <p className="mt-3 leading-relaxed text-muted-foreground">
-                We&apos;re not a factory. We&apos;re not trying to scale to a
-                million orders. We&apos;re a small team of makers who believe
-                that handmade things carry warmth that nothing else can. When
-                you hold a Studio D product, you&apos;re holding hours of
-                someone&apos;s focused attention and genuine care.
-              </p>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      <Separator className="mx-auto max-w-7xl" />
 
       {/* ── Values ── */}
       <section className="py-16 sm:py-20">

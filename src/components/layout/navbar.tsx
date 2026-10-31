@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SITE_NAME } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/layout/container";
-import { NavLinks } from "@/components/layout/nav-links";
+import { NavbarGooey } from "@/components/layout/navbar-gooey";
 import { NavbarActions } from "@/components/layout/navbar-actions";
 import type { AuthUserSummary } from "@/components/auth/auth-nav";
 
@@ -39,7 +39,7 @@ export async function Navbar() {
             </span>
           </Link>
 
-          <NavLinks />
+          <NavbarGooey />
 
           <NavbarActions user={user} />
         </div>
