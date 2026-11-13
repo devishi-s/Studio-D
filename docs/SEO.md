@@ -9,7 +9,7 @@ How search metadata, structured data, sitemap, and robots are set up: and what t
 | Site URL | `SITE_URL` = `https://studiod.in` in `src/lib/constants.ts` | Single source for canonicals, sitemap, JSON-LD, and `metadataBase` |
 | Title template | `%s \| Studio D` in root layout | Consistent branding; homepage uses an absolute title |
 | Default description | `SITE_DESCRIPTION` | Warm handmade brand copy shared across OG/Twitter defaults |
-| Default share image | `/og-image.jpg` | Placeholder until a branded 1200×630 asset is ready |
+| Default share image | `/images/og-image.png` | Branded OG asset (`OG_IMAGE_PATH`) |
 | Private routes | `noIndex` metadata + `robots.txt` disallow | Account, cart, checkout, auth, and order confirmation should not rank |
 | Product URLs in sitemap | Fetched via `getAllProducts()` | Keeps sitemap in sync with Supabase catalog |
 | Categories in sitemap | `mainCategories` from `src/data/categories.ts` (main + subcategory URLs) | Matches two-level category routes |
@@ -36,7 +36,7 @@ Technical SEO in this repo makes Studio D *eligible* to appear in Google. It doe
 
 1. Confirm `SITE_URL` / `NEXT_PUBLIC_SITE_URL` is `https://studiod.in` (and redirect `www` to apex or the reverse, not both indexed).
 2. Submit `https://studiod.in/sitemap.xml` in [Google Search Console](https://search.google.com/search-console).
-3. Replace `public/og-image.jpg` (file is currently missing from `public/`).
+3. Confirm `/images/og-image.png` loads on the live host.
 4. Noindex Vercel Preview so `*.vercel.app` is not a duplicate of production.
 5. Use real Storage (or absolute) image URLs in Product OG and JSON-LD; local `/images/...` paths are skipped today.
 
@@ -110,20 +110,20 @@ Excludes: `/account`, `/cart`, `/checkout`, `/admin`, auth, API, order confirmat
 
 ## OG image
 
-- File: `public/og-image.jpg` (placeholder cream “Studio D” graphic, 1200×630)
-- Regenerator: `scripts/generate-og-image.ps1` (optional)
+- File: `public/images/og-image.png` (wired via `OG_IMAGE_PATH` in `src/lib/seo.ts`)
+- Prefer ~1200×630 for social previews
 
-### Before launch: replace the OG image
+### Before launch
 
-1. Design a branded 1200×630 JPEG (product collage or logo on cream/blush; keep text large and readable).
-2. Replace `public/og-image.jpg` with the final file (same path).
-3. Confirm absolute URL `https://studiod.in/og-image.jpg` loads in production.
-4. Optionally re-test with [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) and [Twitter Card Validator](https://cards-dev.twitter.com/validator).
+1. Keep the branded share image at `public/images/og-image.png` (or update `OG_IMAGE_PATH` if you change the file).
+2. After deploy, confirm `${SITE_URL}/images/og-image.png` loads.
+3. Optionally re-test with [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) and [Twitter Card Validator](https://cards-dev.twitter.com/validator).
+4. Until a domain exists, set `NEXT_PUBLIC_SITE_URL` to the Render URL (no trailing slash).
 
 ## Before-launch checklist
 
 - [ ] Confirm `SITE_URL` matches the live domain (including `https` and no trailing slash).
-- [ ] Replace `public/og-image.jpg` with a real branded image.
+- [x] Branded OG image at `public/images/og-image.png`.
 - [ ] Update Instagram (and any other) URLs in `SITE_SOCIAL`.
 - [ ] Update contact email in JSON-LD if it differs from `hello@studiod.in`.
 - [ ] Submit sitemap in Google Search Console after first production deploy.
@@ -137,5 +137,5 @@ Excludes: `/account`, `/cart`, `/checkout`, `/admin`, auth, API, order confirmat
 - `src/components/seo/json-ld.tsx`: JSON-LD script tag
 - `src/app/layout.tsx`: global metadata
 - `src/app/sitemap.ts` / `src/app/robots.ts`
-- `public/og-image.jpg`
+- `public/images/og-image.png`
 - `src/lib/constants.ts`: `SITE_NAME`, `SITE_DESCRIPTION`, `SITE_URL`

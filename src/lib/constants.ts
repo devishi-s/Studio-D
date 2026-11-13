@@ -3,8 +3,22 @@ import type { NavLink } from "@/types";
 export const SITE_NAME = "Studio D";
 export const SITE_DESCRIPTION =
   "Handmade crochet flowers, paintings, and decorative crafts. Thoughtfully made, timeless in design.";
-export const SITE_URL = "https://studiod.in";
+/** Fallback until NEXT_PUBLIC_SITE_URL is set to the live Render / custom domain. */
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://studiod.in";
 export const SITE_TAGLINE = "Handmade · Thoughtful · Timeless";
+
+/**
+ * Public studio inbox for contact / support copy.
+ * Prefer NEXT_PUBLIC_CONTACT_EMAIL; falls back to ADMIN_NOTIFICATION_EMAIL.
+ */
+export function getSiteContactEmail(): string {
+  return (
+    process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ||
+    process.env.ADMIN_NOTIFICATION_EMAIL?.trim() ||
+    "hello@studiod.in"
+  );
+}
 
 export const NAV_LINKS: NavLink[] = [
   { label: "Home", href: "/" },

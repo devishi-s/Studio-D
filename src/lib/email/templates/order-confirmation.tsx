@@ -36,11 +36,13 @@ function formatInr(amount: number): string {
 type OrderConfirmationEmailProps = {
   order: OrderEmailData;
   customer: OrderEmailCustomer;
+  supportEmail: string;
 };
 
 export function OrderConfirmationEmail({
   order,
   customer,
+  supportEmail,
 }: OrderConfirmationEmailProps) {
   const shortId = order.orderId.slice(0, 8).toUpperCase();
   const address = order.shippingAddress;
@@ -142,7 +144,7 @@ export function OrderConfirmationEmail({
           </Section>
 
           <Text style={styles.footer}>
-            Questions? Reply to this email or write to hello@studiod.in
+            Questions? Reply to this email or write to {supportEmail}
           </Text>
         </Container>
       </Body>

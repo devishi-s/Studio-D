@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/supabase/require-admin";
 import { Container } from "@/components/layout/container";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { SiteLogo } from "@/components/layout/site-logo";
 
 export default async function AdminLayout({
   children,
@@ -14,10 +15,8 @@ export default async function AdminLayout({
       <Container>
         <div className="mb-6 flex flex-col gap-4 border-b border-border/60 pb-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-brand-coral">
-              Studio D
-            </p>
-            <h1 className="mt-1 font-heading text-2xl font-semibold text-brand-brown sm:text-3xl">
+            <SiteLogo className="h-9" />
+            <h1 className="mt-2 font-heading text-2xl font-semibold text-brand-brown sm:text-3xl">
               Admin
             </h1>
           </div>

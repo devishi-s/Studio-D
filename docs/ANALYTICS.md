@@ -1,36 +1,20 @@
 # Studio D Analytics
 
-Privacy-conscious page and funnel analytics using **Vercel Analytics** and **Vercel Speed Insights**.
+Privacy-conscious page and funnel analytics.
 
-## Choice
+## Choice (updated for Render)
 
 | Option | Decision |
 | --- | --- |
-| Provider | Vercel Analytics + Speed Insights |
-| Why | Free on Vercel, no cookie banner required for this first-party privacy-friendly setup, GDPR-oriented (no advertising cookies / no PII by design) |
-| Not chosen | Google Analytics / Plausible: deferred; GA needs consent UX; Plausible is fine but adds a third-party vendor when Vercel already hosts us |
+| Original | Vercel Analytics + Speed Insights (chosen when Vercel was the planned host) |
+| Now | Hosting is **Render**. Vercel Analytics/Speed Insights will not serve as the live dashboard. |
+| Phase 6.5 | Replace with **Plausible** (preferred, privacy-friendly) or **GA4** if you already live in Google tools |
 
-## Setup
+Until Phase 6.5 lands, the app still mounts `@vercel/analytics` / `@vercel/speed-insights` in `src/app/layout.tsx`. Treat that as transitional code, not the final production tracker.
 
-Packages:
+## Current code map
 
-- `@vercel/analytics`
-- `@vercel/speed-insights`
-
-Root layout (`src/app/layout.tsx`) mounts:
-
-- `<Analytics />`: page views + custom events
-- `<SpeedInsights />`: Core Web Vitals from real users
-
-Enable **Analytics** and **Speed Insights** for the project in the Vercel dashboard after the first production deploy.
-
-## Local development
-
-Custom events and page beacons may fire in the browser during `next dev`, but **nothing is recorded in the Vercel dashboard until the site is deployed to Vercel**. That is expected.
-
-## Custom funnel events
-
-Wrappers live in `src/lib/analytics.ts`. Each helper no-ops when `window` is undefined (safe to import from Server Components; actual tracking runs in the browser).
+Custom funnel wrappers live in `src/lib/analytics.ts`. Each helper no-ops when `window` is undefined.
 
 | Event | When | Properties (no PII) |
 | --- | --- | --- |
@@ -47,14 +31,18 @@ Page-level events use `src/components/analytics/analytics-event.tsx` (client mou
 ## Privacy
 
 - Do **not** send emails, phone numbers, full shipping addresses, payment tokens, or Supabase user IDs in analytics events.
-- Product **catalog** names and IDs are allowed (they are public shop data, not personal data).
+- Product **catalog** names and IDs are allowed (public shop data).
 - Order IDs and monetary totals are operational metrics, not identity.
-- Razorpay still receives checkout prefill for payment (that is payment processing, not Vercel Analytics).
-- No analytics cookie consent banner is required for this Vercel Web Analytics setup as documented by Vercel for privacy-friendly first-party analytics; revisit if you later add GA, Meta Pixel, or similar.
+- Razorpay still receives checkout prefill for payment (payment processing, not analytics).
+- If you switch to GA4, plan a simple consent/privacy note. Plausible usually needs less consent UX.
 
-If you publish a public Privacy Policy page later, mention:
+## Phase 6.5 checklist
 
-> We use Vercel Analytics and Speed Insights to understand aggregate traffic and storefront funnel performance. These tools do not use advertising cookies and we do not send personal contact details in custom events.
+- [ ] Pick Plausible or GA4
+- [ ] Remove or gate `@vercel/analytics` and `@vercel/speed-insights`
+- [ ] Re-wire `src/lib/analytics.ts` to the new provider
+- [ ] Confirm events on a Render URL
+- [ ] Update this doc’s “Choice” table to the final provider only
 
 ## Related files
 
@@ -62,10 +50,3 @@ If you publish a public Privacy Policy page later, mention:
 - `src/components/analytics/analytics-event.tsx`
 - `src/app/layout.tsx`
 - Wire-ups: product detail, `AddToCartButton`, checkout page/form, order confirmation, `ProductCatalogFilters`
-
-## After launch
-
-- [ ] Confirm Analytics + Speed Insights enabled on the Vercel project
-- [ ] Spot-check custom events in the Vercel Analytics UI after a test purchase funnel
-- [ ] Verify no PII appears in event property payloads
-- [ ] Watch Speed Insights for LCP/CLS regressions after marketing campaigns

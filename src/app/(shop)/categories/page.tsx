@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 
-import { mainCategories } from "@/data/categories";
+import {
+  TEMPORARY_CATEGORY_COVER,
+  categoryHref,
+  mainCategories,
+} from "@/data/categories";
 import {
   getLatestCategoryCover,
   getProductsByCategory,
@@ -8,7 +12,7 @@ import {
 import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/common/section-header";
-import { CategoryCard } from "@/components/common/category-card";
+import { CategoriesYarnLineLazy } from "@/components/common/categories-yarn-line-lazy";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Shop by Category",
@@ -35,6 +39,18 @@ export default async function CategoriesPage() {
     })
   );
 
+  const yarnItems = categoriesWithCount.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    href: categoryHref(cat),
+    coverSrc: cat.cover?.src ?? TEMPORARY_CATEGORY_COVER.src,
+    coverAlt:
+      cat.cover?.alt ?? `${cat.name}, ${TEMPORARY_CATEGORY_COVER.alt}`,
+    productCount: cat.productCount,
+    childNames: cat.children.map((c) => c.name).join(", "),
+    displayOrder: cat.displayOrder,
+  }));
+
   return (
     <section className="py-12 sm:py-16">
       <Container>
@@ -48,28 +64,10 @@ export default async function CategoriesPage() {
             </>
           }
         />
-
-        <div className="mx-auto mt-10 grid max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {categoriesWithCount.map((cat, i) => (
-            <div
-              key={cat.id}
-              className={`animate-fade-in-up animation-delay-${(i + 1) * 100}`}
-            >
-              <CategoryCard
-                category={cat}
-                cover={cat.cover}
-                className="h-full"
-              />
-              <p className="mt-1.5 text-center text-xs text-muted-foreground">
-                {cat.productCount}{" "}
-                {cat.productCount === 1 ? "product" : "products"}
-                {" · "}
-                {cat.children.map((c) => c.name).join(", ")}
-              </p>
-            </div>
-          ))}
-        </div>
       </Container>
+
+      {/* Full-bleed yarn scene — no framed card around it */}
+      <CategoriesYarnLineLazy items={yarnItems} />
     </section>
   );
 }

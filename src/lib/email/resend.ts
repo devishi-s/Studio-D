@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-import { SITE_NAME } from "@/lib/constants";
+import { SITE_NAME, getSiteContactEmail } from "@/lib/constants";
 import { OrderConfirmationEmail } from "@/lib/email/templates/order-confirmation";
 import { AdminOrderAlertEmail } from "@/lib/email/templates/admin-alert";
 import type {
@@ -29,7 +29,7 @@ function getAdminInbox(): string {
   return (
     process.env.ADMIN_NOTIFICATION_EMAIL?.trim() ||
     process.env.RESEND_ADMIN_EMAIL?.trim() ||
-    "hello@studiod.in"
+    getSiteContactEmail()
   );
 }
 
@@ -74,7 +74,11 @@ export async function sendOrderConfirmation(
       from: getFromAddress(),
       to: customer.email,
       subject: `Your Studio D order ${shortId} is confirmed`,
-      react: OrderConfirmationEmail({ order, customer }),
+      react: OrderConfirmationEmail({
+        order,
+        customer,
+        supportEmail: getSiteContactEmail(),
+      }),
     });
 
     if (error) {

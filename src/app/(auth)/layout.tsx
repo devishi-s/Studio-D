@@ -1,7 +1,5 @@
-import Link from "next/link";
-
-import { SITE_NAME } from "@/lib/constants";
 import { Container } from "@/components/layout/container";
+import { SiteLogo } from "@/components/layout/site-logo";
 
 export default function AuthLayout({
   children,
@@ -15,13 +13,8 @@ export default function AuthLayout({
 
       <Container>
         <div className="relative mx-auto max-w-md">
-          <div className="mb-8 text-center">
-            <Link
-              href="/"
-              className="font-heading text-2xl font-semibold text-brand-brown"
-            >
-              {SITE_NAME}
-            </Link>
+          <div className="mb-8 flex justify-center">
+            <SiteLogo className="h-12" />
           </div>
           <div className="rounded-2xl border border-border bg-white p-5 sm:p-8">
             {children}

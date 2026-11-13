@@ -10,6 +10,7 @@ import { SITE_SOCIAL } from "@/lib/seo";
 import { mainCategories } from "@/data/categories";
 import { Container } from "@/components/layout/container";
 import { Separator } from "@/components/ui/separator";
+import { SiteLogo } from "@/components/layout/site-logo";
 
 const CATEGORY_LINKS = mainCategories.map((cat) => ({
   label: cat.name,
@@ -31,12 +32,8 @@ export function Footer() {
         <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand column */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="inline-block">
-              <span className="font-heading text-xl font-semibold text-brand-brown">
-                {SITE_NAME}
-              </span>
-            </Link>
-            <p className="mt-1 text-xs tracking-wide text-brand-coral">
+            <SiteLogo className="h-11" />
+            <p className="mt-2 text-xs tracking-wide text-brand-coral">
               {SITE_TAGLINE}
             </p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">

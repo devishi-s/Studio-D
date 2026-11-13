@@ -4,6 +4,7 @@ import { AtSign, Clock3, Mail, MapPin } from "lucide-react";
 
 import { ContactForm } from "@/components/common/contact-form";
 import { Container } from "@/components/layout/container";
+import { getSiteContactEmail } from "@/lib/constants";
 import { SITE_SOCIAL, buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -13,26 +14,27 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/contact",
 });
 
-const CONTACT_DETAILS = [
-  {
-    icon: Mail,
-    label: "Email",
-    value: "hello@studiod.in",
-    href: "mailto:hello@studiod.in",
-  },
-  {
-    icon: Clock3,
-    label: "Response time",
-    value: "Usually within 1–2 working days",
-  },
-  {
-    icon: MapPin,
-    label: "Studio",
-    value: "Handmade with care in India",
-  },
-] as const;
-
 export default function ContactPage() {
+  const contactEmail = getSiteContactEmail();
+  const contactDetails = [
+    {
+      icon: Mail,
+      label: "Email",
+      value: contactEmail,
+      href: `mailto:${contactEmail}`,
+    },
+    {
+      icon: Clock3,
+      label: "Response time",
+      value: "Usually within 1–2 working days",
+    },
+    {
+      icon: MapPin,
+      label: "Studio",
+      value: "Handmade with care in India",
+    },
+  ] as const;
+
   return (
     <>
       <section className="relative overflow-hidden bg-brand-cream py-14 sm:py-20">
@@ -69,7 +71,7 @@ export default function ContactPage() {
                   draft from your own email app.
                 </p>
               </div>
-              <ContactForm />
+              <ContactForm contactEmail={contactEmail} />
             </div>
 
             <aside className="space-y-8 lg:pt-4" aria-label="Contact details">
@@ -88,7 +90,7 @@ export default function ContactPage() {
               </div>
 
               <ul className="space-y-5">
-                {CONTACT_DETAILS.map((detail) => (
+                {contactDetails.map((detail) => (
                   <li key={detail.label} className="flex gap-3.5">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-blush">
                       <detail.icon className="h-4.5 w-4.5 text-brand-coral" />

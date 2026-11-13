@@ -6,8 +6,6 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 
-const CONTACT_EMAIL = "hello@studiod.in";
-
 const REASONS = [
   "Product question",
   "Custom order",
@@ -48,7 +46,11 @@ function getFieldErrors(formData: FormData): FieldErrors {
 const fieldClassName =
   "mt-2 w-full rounded-xl border border-input bg-white px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-brand-coral focus:ring-3 focus:ring-brand-coral/15 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/10";
 
-export function ContactForm() {
+type ContactFormProps = {
+  contactEmail: string;
+};
+
+export function ContactForm({ contactEmail }: ContactFormProps) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [statusMessage, setStatusMessage] = useState("");
 
@@ -86,7 +88,9 @@ export function ContactForm() {
     toast.success("Email draft ready", {
       description: "Review and send it from your email app.",
     });
-    window.location.assign(`mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`);
+    window.location.assign(
+      `mailto:${contactEmail}?subject=${subject}&body=${body}`
+    );
   }
 
   return (

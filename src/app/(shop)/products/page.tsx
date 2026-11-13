@@ -41,10 +41,14 @@ type ProductsPageProps = {
 
 function ProductsCatalogSkeleton() {
   return (
-    <div className="grid gap-10 lg:grid-cols-[220px_1fr]">
+    <div className="grid gap-6 lg:grid-cols-[220px_1fr] lg:gap-10">
       <div className="hidden h-80 animate-pulse rounded-xl bg-brand-blush/50 lg:block" />
-      <div className="space-y-6">
-        <div className="h-10 animate-pulse rounded-lg bg-brand-blush/50" />
+      <div className="space-y-5">
+        <div className="h-10 animate-pulse rounded-lg bg-brand-blush/50 lg:hidden" />
+        <div className="flex gap-3 border-b border-border/50 pb-4">
+          <div className="h-9 w-24 animate-pulse rounded-lg bg-brand-blush/50 lg:hidden" />
+          <div className="h-9 flex-1 animate-pulse rounded-lg bg-brand-blush/50" />
+        </div>
         <ProductGridSkeleton count={8} columns={3} />
       </div>
     </div>

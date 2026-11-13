@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { NAV_LINKS, SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
+import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
 import { categoryHref, mainCategories } from "@/data/categories";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import {
   MobileAuthLinks,
   type AuthUserSummary,
 } from "@/components/auth/auth-nav";
+import { SiteLogo } from "@/components/layout/site-logo";
 
 type MobileNavProps = {
   user: AuthUserSummary | null;
@@ -45,11 +46,16 @@ export function MobileNav({ user }: MobileNavProps) {
       </SheetTrigger>
 
       <SheetContent side="left" className="w-72 bg-brand-cream font-ui">
-        <SheetHeader className="border-b border-border pb-4">
-          <SheetTitle className="font-heading text-xl text-brand-brown">
-            {SITE_NAME}
+        <SheetHeader className="border-b border-border pb-4 pr-10">
+          <SheetTitle className="text-left">
+            <span className="sr-only">{SITE_NAME}</span>
+            <SiteLogo
+              href="/"
+              onClick={() => setOpen(false)}
+              className="h-11"
+              priority
+            />
           </SheetTitle>
-          <p className="text-xs text-brand-brown-light">{SITE_TAGLINE}</p>
         </SheetHeader>
 
         <nav className="flex flex-col gap-1 overflow-y-auto px-4 pt-2 pb-4">

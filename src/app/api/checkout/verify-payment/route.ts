@@ -12,6 +12,7 @@ import {
   revalidateCartAgainstCatalog,
 } from "@/lib/checkout/revalidate-cart";
 import { createOrder } from "@/lib/supabase/orders";
+import { getSiteContactEmail } from "@/lib/constants";
 import { sendOrderEmailsSafe } from "@/lib/email/resend";
 import type { OrderEmailData } from "@/lib/email/types";
 
@@ -23,7 +24,7 @@ type VerifyBody = {
   items?: unknown;
 };
 
-const SUPPORT_EMAIL = "hello@studiod.in";
+const SUPPORT_EMAIL = getSiteContactEmail();
 
 /**
  * Verifies Razorpay Checkout.js success signatures, then persists the order.

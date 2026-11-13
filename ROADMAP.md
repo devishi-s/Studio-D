@@ -19,15 +19,14 @@
 
 ## Status
 
-- **Current phase:** Post Phase 5: pre-deployment
-- **Current focus:** UI polish + deployment prep
-- **Completed phases:** Phases 1–5 (feature steps)
-- **Completed Phase 5 steps:** 5.1 SEO, 5.2 Performance, 5.3 Analytics, 5.4 Reviews, 5.5 Wishlist
+- **Current phase:** Phase 6 — Launch / production readiness (**paused** for UI polish)
+- **Current step:** 6.3 Razorpay test mode (local) — resume when asked
+- **Completed phases:** Phases 1–5 (feature work) + launch prep done so far: remote DB SQL + admin user, product photos in Storage
 - **Backend:** Full Phase 4 commerce path live (checkout, Razorpay, orders, admin, Resend hooks)
-- **Payments:** Razorpay wired (real keys still required for live charges)
-- **Checkout:** Complete
-- **Recent polish:** category restructure, real products, hero/navbar logo + vine animations
-- **Deployment:** Intended for Vercel; current deployment status is unverified
+- **Payments:** Razorpay wired (test/live keys still required)
+- **Email:** Resend code ready; real key + inbox config still open (Studio D mailbox deferred)
+- **Analytics:** Currently Vercel Analytics/Speed Insights — must switch for Render hosting
+- **Deployment:** **Render** (user decision; replaces earlier Vercel plan). Deploy only when explicitly requested.
 
 ## Original Delivery Strategy
 
@@ -466,6 +465,94 @@ Auth user ID plus `email`, `full_name`, `phone`, and `avatar_url` in an applicat
 
 ---
 
+# Phase 6: Launch / production readiness
+
+**Goal:** Soft-launch Studio D on **Render** with real payments, workable email, and production verification. Not another feature build phase.
+
+**Already done (do not re-do):**
+- [x] Remote DB: `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql` (+ related catalog/storage SQL as needed)
+- [x] Admin user: `profiles.is_admin = true`
+- [x] Product photos uploaded to Supabase Storage
+- [x] Storefront UI polish beyond the original Phase 5 checklist
+
+**Hosting decision:** Deploy on **Render**, not Vercel. Do not reconnect launch docs to Vercel Preview/Production assumptions.
+
+**Constraint:** No Studio D business email yet. Use a personal inbox for admin alerts until a domain mailbox exists. Branded `orders@studiod.in` / Resend domain verification is deferred (6.11), not a hard block for first soft launch.
+
+## 6.1 Interim contact + admin inbox: **COMPLETE**
+
+- [x] Pick the studio inbox for new-order alerts (`ADMIN_NOTIFICATION_EMAIL`).
+- [x] Document the inbox in `.env.local` (never commit secrets; repeat on Render in 6.8).
+- [x] Contact / support / SEO JSON-LD use `getSiteContactEmail()` (env-driven; no hardcoded `hello@studiod.in`).
+
+## 6.2 SEO assets for share/preview: **COMPLETE** (site URL deferred)
+
+- [x] Replace OG image → `public/images/og-image.png` (wired as `OG_IMAGE_PATH`).
+- [ ] Set `NEXT_PUBLIC_SITE_URL` when a Render URL or custom domain exists (no domain yet; code falls back to `https://studiod.in`).
+
+## 6.3 Razorpay test mode (local): **CURRENT**
+
+- [ ] Add Razorpay **test** keys to `.env.local` (`docs/PAYMENTS.md`).
+- [ ] Complete one successful test checkout locally (UPI/card test methods).
+- [ ] Confirm order appears in `/account/orders` and `/admin/orders`.
+- [ ] Keep **live** keys out of `.env.local`; live keys only on Render Production later.
+
+## 6.4 Resend (workable without Studio D mailbox)
+
+- [ ] Create Resend account + real `RESEND_API_KEY` in `.env.local`.
+- [ ] Set `ADMIN_NOTIFICATION_EMAIL` to the interim personal inbox from 6.1.
+- [ ] Accept interim sender limits: without a verified domain, onboarding sender only reliably reaches the Resend account email — enough to prove the pipeline.
+- [ ] Trigger one paid test order and confirm admin alert and/or customer mail path logs successfully.
+
+## 6.5 Analytics for Render (“live tracking”)
+
+- [ ] Replace Vercel Analytics + Speed Insights (they do not serve Render hosting).
+- [ ] Choose **Plausible** (preferred, privacy-friendly) or **GA4** (if already using Google tools).
+- [ ] Wire page views + existing funnel events from `src/lib/analytics.ts`.
+- [ ] Update `docs/ANALYTICS.md` to match the new provider.
+- [ ] Verify events fire locally / on a Render preview URL.
+
+## 6.6 Local full-funnel smoke test
+
+Walk once before deploy:
+
+- [ ] Browse → search/filter → wishlist → cart → checkout → Razorpay test pay → order confirmation
+- [ ] Admin: see order + approve a review
+- [ ] Login/logout, account/orders/wishlist, contact, mobile layout
+
+## 6.7 Production Supabase project
+
+- [ ] Create a separate **PROD** Supabase project (current cloud project stays **DEV**).
+- [ ] Apply schema/SQL in order (`docs/SUPABASE.md`); never run `seed.sql` on PROD if it truncates.
+- [ ] Promote admin on PROD; copy/migrate Storage images as needed.
+- [ ] Point only Render **production** at PROD. Local + any Render preview stay on DEV.
+
+## 6.8 Render deploy (only when user explicitly asks)
+
+- [ ] Add Render Web Service for Next.js (`npm run build` / `npm run start`, Node version aligned with local).
+- [ ] Set production env vars (Supabase PROD, Razorpay, Resend, `ADMIN_NOTIFICATION_EMAIL`, site URL).
+- [ ] Configure custom domain when ready; update Supabase Auth Site URL + redirect allowlist.
+- [ ] Point Razorpay webhook to the public HTTPS `/api/checkout/webhook` URL.
+- [ ] Do **not** put Razorpay live keys on preview/staging if one exists.
+
+## 6.9 Post-deploy verification
+
+- [ ] Production smoke test (same funnel as 6.6, test mode first; live mode only when ready)
+- [ ] Sitemap/robots + OG share preview
+- [ ] Analytics events appearing
+- [ ] Email + Razorpay webhook callbacks
+- [ ] Soft-launch CWV monitoring (`docs/PERFORMANCE.md`)
+
+## 6.10 Later / not blocking soft launch
+
+- [ ] Studio D business email + verified Resend sending domain (`orders@` / `hello@`)
+- [ ] Contact form beyond `mailto:`
+- [ ] Formal test suite / a11y / reduced-motion polish (cross-cutting backlog)
+- [ ] Google OAuth (never required)
+- [ ] Shipping status emails when admin updates order status
+
+---
+
 # Planned Route Inventory
 
 This route inventory was part of the original canvas and must remain aligned with the phases above.
@@ -589,8 +676,10 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 ## Deployment and Launch
 
-- [ ] Verify environment variable separation between local, preview, and production.
-- [ ] Deploy to Vercel when explicitly requested.
+Superseded in detail by **Phase 6**. Keep these as launch gates:
+
+- [ ] Verify environment variable separation between local, Render preview (if any), and Render production.
+- [ ] Deploy to **Render** only when explicitly requested (Phase 6.8).
 - [ ] Connect production Supabase and Razorpay credentials only through secure environment variables.
 - [ ] Configure domains, redirects, headers, and image hosts.
 - [ ] Run production smoke tests.
@@ -603,17 +692,19 @@ The original canvas did not create a separate testing phase; testing is a comple
 
 - [ ] Enforce product `stockCount` in every cart quantity control, not only the product-detail selector.
 - [ ] Decide whether shared quantity controls should replace duplicated Sheet/page implementations.
-- [x] Wire Supabase Storage + `next/image` for product photos (real asset upload still optional; mocks OK).
+- [x] Wire Supabase Storage + `next/image` for product photos (real photos uploaded for launch prep).
 - [ ] Add cart persistence versioning/migration before catalog identifiers change.
 - [x] Add stronger loading and error boundaries during backend migration (`src/app/not-found.tsx`, `error.tsx`, `global-error.tsx`).
-- [ ] Confirm Vercel deployment status.
+- [ ] Confirm Render deployment status (was Vercel; hosting decision changed).
 
 ---
 
 # Current Handoff
 
-Phases 1–5 feature work are complete. **Current focus:** UI polish + Deployment and Launch checklist (env separation, Vercel deploy when requested, production smoke tests). There is no Phase 6.
+Phases 1–5 feature work are complete. **Current focus: Phase 6 Launch** — **6.3 Razorpay test keys** locally, then 6.4 → 6.10 in order.
 
-**Ops reminder:** Ensure remote DB has `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, and `categories-restructure.sql`: see `docs/SUPABASE.md`.
+**Done already:** remote DB + `is_admin`, product photos in Storage, storefront UI polish.
 
-**Launch / env decisions** (do not invent a bigger platform): two Supabase projects at go-live (current cloud DB = DEV; new project = PROD). Vercel Preview shares DEV; Production uses PROD. CI at deploy = one GitHub Action (lint + tsc + build) plus Vercel Preview/Production. Full brief: Cursor canvas `studio-d-launch-readiness.canvas.tsx` and `AI_CONTEXT.md` section "Launch and ops decisions".
+**Hosting:** **Render** (not Vercel). Analytics must leave `@vercel/analytics` / Speed Insights (6.5).
+
+**Launch / env decisions:** two Supabase projects at go-live (current cloud = DEV; new = PROD). Local + any Render preview use DEV; Render production uses PROD. Never run `supabase/seed.sql` on PROD. Razorpay webhooks need a public HTTPS URL (Render). No Studio D business email yet — personal `ADMIN_NOTIFICATION_EMAIL` until 6.10/6.11. Full brief: Cursor canvas `studio-d-launch-readiness.canvas.tsx` and `AI_CONTEXT.md` section "Launch and ops decisions".

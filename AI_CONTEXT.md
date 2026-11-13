@@ -48,8 +48,8 @@ The experience should combine the cleanliness of Apple, Notion, and Muji with th
 - Razorpay later: payments
 - React Hook Form + Zod later: validated forms
 - Embla Carousel later if the gallery needs a full carousel
-- Resend or Supabase Edge Functions later: transactional email
-- Vercel: intended deployment platform
+- Resend: transactional email (order confirmation + admin alert)
+- Render: intended deployment platform (replaces earlier Vercel plan)
 
 Do not install future-phase libraries before their roadmap step requires them.
 
@@ -267,10 +267,12 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 
 ## Current Project State
 
-- **Roadmap phase:** Post Phase 5: pre-deployment
-- **Current focus:** Frontend UI polish + deployment prep (Vercel)
-- Phase 1–5 feature work is complete; remaining gate is Deployment and Launch checklist.
-- **Recently completed:** catalog polish (photos, stock-aware carts, quieter availability copy, admin photo upload). Branded `not-found` / `error` / `global-error` pages on branch `error-pages`.
+- **Roadmap phase:** Phase 6 — Launch / production readiness (**paused**; UI polish first)
+- **Current step:** 6.3 Razorpay test mode (local) — resume when user asks
+- **UI prototype:** `/categories` uses yarn-line hanging cards (`CategoriesYarnLine`) with lightweight scroll/pointer spring physics — not launch ops.
+- Phase 1–5 feature work is complete. Remaining work is ops + soft launch, not new product features.
+- **Launch prep done:** remote DB SQL applied; admin user set; product photos in Supabase Storage; storefront UI polish; studio contact inbox via `ADMIN_NOTIFICATION_EMAIL` / `NEXT_PUBLIC_CONTACT_EMAIL`; OG image at `public/images/og-image.png`.
+- **Still open:** Razorpay keys, Resend key, analytics provider for Render, local smoke test, PROD Supabase, Render deploy (only when asked), post-deploy verify. No custom domain yet — set `NEXT_PUBLIC_SITE_URL` when Render URL exists.
 - Shop and product pages read from Supabase; category taxonomy lives in `src/data/categories.ts` (Wearables, Keychains & Charms, Crochet Creations, Art & Decor + subs).
 - Catalog reads use `unstable_cache` (3600s); product routes revalidate hourly; orders stay uncached for freshness.
 - `/products` supports combinable search, category, price range, and sort via URL query params.
@@ -282,10 +284,8 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 - Contact form still uses `mailto:` draft handoff.
 - Sample catalog removed; 22 seed products cover every subcategory; covers use newest product image or temporary cover.
 - Fonts: Updock (brand), DM Serif Display (headings), Montserrat (UI), Lora (body).
-- Vercel deployment status is not verified.
-- Remote DB should have `orders-checkout.sql`, `admin-rls.sql`, `reviews.sql`, `wishlist.sql`, `categories-restructure.sql`, `catalog-polish.sql`, and current `storage.sql` (admin-only image writes) applied; set `is_admin` for your user.
-- `RESEND_API_KEY` is placeholder until a real Resend key + domain are configured.
-- **There is no Phase 6**: next work is polish + Deployment and Launch.
+- **Hosting:** Render (user decision). Do not plan Vercel Preview/Production. Existing `@vercel/analytics` / Speed Insights must be replaced in Phase 6.5.
+- `RESEND_API_KEY` is placeholder until a real Resend key is configured; branded `studiod.in` sender deferred until a Studio D mailbox/domain exists.
 
 ## Important Decisions and Why
 
@@ -303,14 +303,16 @@ Use the existing CSS variables and Tailwind token names. Do not replace this pal
 Living brief for humans: Cursor canvas `studio-d-launch-readiness.canvas.tsx`. Do not contradict this section unless the user changes it.
 
 - **Architecture:** Stay on Next.js + Supabase. No Redis, queues, microservices, headless CMS, Elasticsearch, Docker, or Kubernetes for launch.
-- **Databases:** Two projects at go-live, not five. The current cloud project becomes **DEV**. Create a new **PROD** project before real customers. Local and Vercel Preview both use DEV. Only Vercel Production uses PROD. Never point Preview at PROD. Never run `supabase/seed.sql` on PROD (it truncates products).
-- **CI/CD:** None today (no GitHub Actions, Vercel not connected). GitHub Write is in place; `catalog-polish` is on origin. At deploy: Vercel Preview on PR + Production on `main`, plus one Action (`npm ci`, lint, `tsc --noEmit`, `next build`). No GitFlow, no staging cluster. Razorpay webhooks need a public HTTPS URL (Preview for test, `studiod.in` for live); localhost cannot receive them without a tunnel.
-- **Env vars:** Separate Vercel Production vs Preview. Razorpay **live** keys and live webhook secret only on Production. `SITE_URL` is hardcoded to `https://studiod.in` in `src/lib/constants.ts`; it should become `NEXT_PUBLIC_SITE_URL` per environment. If a service-role key is added for order writes, it is server-only and never `NEXT_PUBLIC_*`.
-- **Auth:** Each Supabase project needs its own Site URL + redirect allowlist (localhost, Preview, production `/auth/callback`).
+- **Hosting:** **Render** Web Service for Next.js. Not Vercel. Deploy only when the user explicitly asks (Phase 6.8).
+- **Databases:** Two projects at go-live, not five. The current cloud project becomes **DEV**. Create a new **PROD** project before real customers. Local + any Render preview use DEV. Only Render production uses PROD. Never point preview at PROD. Never run `supabase/seed.sql` on PROD (it truncates products).
+- **CI/CD:** Optional later. Prefer a simple GitHub Action (`npm ci`, lint, `tsc --noEmit`, `next build`) plus Render auto-deploy from `main`. No GitFlow, no staging cluster. Razorpay webhooks need a public HTTPS URL on Render; localhost cannot receive them without a tunnel.
+- **Env vars:** Separate Render production vs any preview. Razorpay **live** keys and live webhook secret only on production. `SITE_URL` is hardcoded to `https://studiod.in` in `src/lib/constants.ts`; it should become `NEXT_PUBLIC_SITE_URL` per environment. If a service-role key is added for order writes, it is server-only and never `NEXT_PUBLIC_*`.
+- **Auth:** Each Supabase project needs its own Site URL + redirect allowlist (localhost, Render URL, production `/auth/callback`).
+- **Email:** No Studio D business mailbox yet. Soft launch uses personal `ADMIN_NOTIFICATION_EMAIL` + Resend API key; branded `orders@studiod.in` waits for domain mailbox (Phase 6.10/6.11). Do not claim a Studio D inbox on the storefront until it exists.
+- **Analytics:** Vercel Analytics/Speed Insights were chosen under the old Vercel plan. For Render, Phase 6.5 switches to Plausible (preferred) or GA4.
 - **Security still open:** shopper RLS can insert/update own orders; `decrement_product_stock` is granted to `authenticated`; webhook is acknowledge-only. Lock these before public deploy.
-- **Not launch blockers:** automated tests, Sentry, COD, guest checkout, coupons, shipping APIs, GST invoices, product video, MFA, CAPTCHA.
-- **This week:** real photos, unique product copy, unpaid QA, GitHub Write + push `catalog-polish`, confirm `hello@studiod.in` and Instagram.
-- **SEO:** Technical markup is largely done (titles, canonicals, sitemap, robots, JSON-LD). That does **not** rank #1 for generic queries like “handmade gifts India”. Realistic win: brand queries (`Studio D`) after the domain is live. At deploy: Search Console + sitemap, real OG image, `SITE_URL` env, Preview noindex, product images as absolute URLs in OG/JSON-LD. Later: Merchant Center, blog, Hindi. Do not buy “guaranteed first page” SEO. Instagram/WhatsApp will outperform Google for handmade discovery at the start.
+- **Not launch blockers:** automated tests, Sentry, COD, guest checkout, coupons, shipping APIs, GST invoices, product video, MFA, CAPTCHA, Studio D business email (interim personal inbox OK).
+- **SEO:** Technical markup is largely done (titles, canonicals, sitemap, robots, JSON-LD). That does **not** rank #1 for generic queries like “handmade gifts India”. Realistic win: brand queries (`Studio D`) after the domain is live. At deploy: Search Console + sitemap, real OG image, correct site URL env, product images as absolute URLs in OG/JSON-LD. Later: Merchant Center, blog, Hindi. Instagram/WhatsApp will outperform Google for handmade discovery at the start.
 
 ## Things Future Agents Must Not Change
 
@@ -326,7 +328,8 @@ Living brief for humans: Cursor canvas `studio-d-launch-readiness.canvas.tsx`. D
 - Do not copy Radix-specific shadcn patterns blindly: this project uses Base UI.
 - Do not execute any Git command without explicit user confirmation.
 - Do not run `supabase/seed.sql` against production (it truncates products).
-- Do not put Razorpay live keys or the live webhook secret on Vercel Preview or in `.env.local`.
+- Do not put Razorpay live keys or the live webhook secret on Render preview or in `.env.local`.
+- Do not plan or document Vercel as the deploy target unless the user reverses the Render decision.
 - Do not add a third database, Docker, Kubernetes, or a CI test suite unless the user asks.
 
 ## Important Base UI Note

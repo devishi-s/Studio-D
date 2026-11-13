@@ -5,14 +5,17 @@ import {
   SITE_NAME,
   SITE_TAGLINE,
   SITE_URL,
+  getSiteContactEmail,
 } from "@/lib/constants";
 import type { Product } from "@/types";
 
-export const OG_IMAGE_PATH = "/og-image.jpg";
+export const OG_IMAGE_PATH = "/images/og-image.png";
 
 export const SITE_SOCIAL = {
   instagram: "https://www.instagram.com/studio.d.in",
-  email: "mailto:hello@studiod.in",
+  get email() {
+    return `mailto:${getSiteContactEmail()}`;
+  },
 } as const;
 
 /** Absolute URL helper for canonicals, sitemap, and JSON-LD. */
@@ -89,9 +92,9 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: absoluteUrl("/og-image.jpg"),
+    logo: absoluteUrl(OG_IMAGE_PATH),
     description: SITE_DESCRIPTION,
-    email: "hello@studiod.in",
+    email: getSiteContactEmail(),
     sameAs: [SITE_SOCIAL.instagram],
   };
 }
@@ -102,10 +105,10 @@ export function localBusinessJsonLd() {
     "@type": "LocalBusiness",
     name: SITE_NAME,
     url: SITE_URL,
-    image: absoluteUrl("/og-image.jpg"),
+    image: absoluteUrl(OG_IMAGE_PATH),
     description:
       "Handmade crochet flowers, original paintings, and thoughtful gifts crafted with care in India.",
-    email: "hello@studiod.in",
+    email: getSiteContactEmail(),
     priceRange: "₹₹",
     sameAs: [SITE_SOCIAL.instagram],
     areaServed: {

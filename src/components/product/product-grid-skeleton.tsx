@@ -8,9 +8,9 @@ type ProductGridSkeletonProps = {
 };
 
 const colClasses = {
-  2: "sm:grid-cols-2",
-  3: "sm:grid-cols-2 lg:grid-cols-3",
-  4: "sm:grid-cols-2 lg:grid-cols-4",
+  2: "grid-cols-2",
+  3: "grid-cols-2 lg:grid-cols-3",
+  4: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
 } as const;
 
 export function ProductGridSkeleton({
@@ -19,7 +19,8 @@ export function ProductGridSkeleton({
   className,
 }: ProductGridSkeletonProps) {
   return (
-    <div className={cn("grid gap-5", colClasses[columns], className)}>
+    <div className={cn("grid gap-3 sm:gap-5", colClasses[columns], className)}>
+
       {Array.from({ length: count }).map((_, index) => (
         <ProductCardSkeleton key={index} />
       ))}
